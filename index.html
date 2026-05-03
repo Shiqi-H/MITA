@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>MITA - Multimodal Heritage</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="src/main.js" type="module"></script> 
+</head>
+<body style="margin: 0; overflow: hidden;">
+    <a-scene cursor="rayOrigin: mouse" raycaster="objects: .clickable" id="main-scene">
+        <a-assets>
+            <img id="arrow-img" src="/arrow.svg">
+        </a-assets>
+
+        <a-sky id="sky" src="/scene-1.jpg" class="clickable"></a-sky>
+
+        <a-entity id="scene-content"></a-entity>
+
+        <a-camera id="camera"></a-camera>
+
+        <a-light type="ambient" intensity="1.5"></a-light>
+        <a-light type="directional" position="1 2 1" intensity="1"></a-light>
+    </a-scene>
+</body>
+</html>
