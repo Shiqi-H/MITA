@@ -7,7 +7,27 @@ const SCENES = {
             { target: 'scene-3', pos: '-1 -1 3', rot: '-90 160 0' }
         ],
         models: [
-            { id: 'Box', name: 'Tree A', pos: '5 0 -4', scale: '0.5 0.5 0.5' }
+            { 
+                id: 'lavender', 
+                src: 'Lavandula/Lavandula.glb',
+                name: 'Lavandula', 
+                pos: '3 -1 2', 
+                scale: '4 4 4'
+            },
+            {
+                id: 'Nephrolepis',
+                src: 'Nephrolepis/Nephrolepis.glb',
+                name: 'Nephrolepis',
+                pos: '3 -1 4',
+                scale: '4 4 4'
+            },
+            {
+                id: 'Santolina',
+                src: 'Santolina/Santolina.glb',
+                name: 'Santolina',
+                pos: '3 -1 0',
+                scale: '4 4 4'
+            }
         ]
     },
     'scene-2': {
@@ -62,23 +82,24 @@ function goToScene(id) {
         arrow.setAttribute('position', link.pos);
         arrow.setAttribute('rotation', link.rot);
         arrow.setAttribute('class', 'clickable');
-        
         arrow.addEventListener('click', () => goToScene(link.target));
         container.appendChild(arrow);
     });
 
     data.models.forEach(m => {
-        const box = document.createElement('a-box');
-        box.setAttribute('position', m.pos);
-        box.setAttribute('scale', m.scale);
-        box.setAttribute('color', 'red');
-        box.setAttribute('class', 'clickable');
-        box.setAttribute('id', m.id);
+        const entity = document.createElement('a-entity');
+        entity.setAttribute('gltf-model', m.src); 
+        entity.setAttribute('position', m.pos);
+        entity.setAttribute('scale', m.scale);
+        entity.setAttribute('id', m.id);
+        entity.setAttribute('class', 'clickable');
 
-        box.addEventListener('click', () => {
-            alert(`This is ${m.name}, ready for more info`);
+        entity.addEventListener('click', () => {
+            console.log(`Referent model id: ${m.id}`);
+            alert(`model name: ${m.name}`);
         });
-        container.appendChild(box);
+
+        container.appendChild(entity);
     });
 }
 
