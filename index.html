@@ -1,13 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>MITA - Botanical Garden</title>
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <link rel="stylesheet" href="/src/style.css">
     <script src="src/main.js" type="module"></script> 
 </head>
-<body style="margin: 0; overflow: hidden;">
-    <a-scene cursor="rayOrigin: mouse" raycaster="objects: .clickable" id="main-scene">
+<body>
+    <main class="tour-shell">
+        <header class="tour-hud" aria-label="Tour controls">
+            <div>
+                <p class="eyebrow">MITA Botanical Garden</p>
+                <h1 id="scene-title">Scene 1</h1>
+            </div>
+            <nav class="scene-nav" aria-label="Scene navigation"></nav>
+        </header>
+
+        <aside class="plant-panel" aria-live="polite" hidden>
+            <button class="panel-close" type="button" aria-label="Close plant details">x</button>
+            <p class="eyebrow">Plant specimen</p>
+            <h2 id="plant-name"></h2>
+            <p id="plant-description"></p>
+        </aside>
+
+        <div class="loading-indicator" role="status" aria-live="polite">
+            <span></span>
+            Loading scene
+        </div>
+
+        <p class="gesture-hint">Drag to look around. Click arrows to move and plants for details.</p>
+
+        <a-scene
+            cursor="rayOrigin: mouse"
+            raycaster="objects: .clickable"
+            id="main-scene"
+            embedded
+            loading-screen="enabled: false"
+        >
         <a-assets>
             <img id="arrow-img" src="/arrow.svg">
         </a-assets>
@@ -18,6 +49,7 @@
 
         <a-light type="ambient" intensity="1.5"></a-light>
         <a-light type="directional" position="1 2 1" intensity="1"></a-light>
-    </a-scene>
+        </a-scene>
+    </main>
 </body>
 </html>
