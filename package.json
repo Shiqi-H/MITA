@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "server": "node server/index.js",
+    "start": "concurrently \"npm run dev\" \"npm run server\""
   },
   "devDependencies": {
     "vite": "^8.0.10"
@@ -16,7 +18,11 @@
     "@photo-sphere-viewer/core": "^5.14.1",
     "@photo-sphere-viewer/virtual-tour-plugin": "^5.14.1",
     "@photo-sphere-viewer/visible-range-plugin": "^5.14.1",
+    "concurrently": "^9.2.1",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
     "gsap": "^3.15.0",
-    "three": "^0.179.1"
+    "three": "^0.179.1",
+    "ws": "^8.20.0"
   }
 }

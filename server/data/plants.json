@@ -1,0 +1,154 @@
+{
+  "plants": [
+    {
+      "id": "lavender",
+      "name": "薰衣草",
+      "scientific_name": "Lavandula angustifolia",
+      "aliases": ["Lavandula", "lavandula", "薰衣草"],
+      "description": "薰衣草是原产于地中海地区的多年生芳香草本植物，以其紫色花穗和宜人香气著称，广泛用于香料、园艺和芳香疗法。",
+      "attributes": {
+        "height": "30–60 cm",
+        "lifespan": "多年生",
+        "drought_tolerance": "极高",
+        "toxicity": "低毒（猫犬敏感，人体安全）",
+        "habitat": "地中海干燥、石灰质土壤",
+        "bloom_season": "6–8月",
+        "family": "唇形科（Lamiaceae）"
+      },
+      "medical_info": {
+        "summary": "薰衣草精油具有镇静、抗焦虑、促进睡眠的作用，常用于芳香疗法缓解压力。外用可辅助治疗轻微烫伤和蚊虫叮咬。",
+        "active_compounds": ["芳樟醇", "乙酸芳樟酯", "桉叶素"],
+        "caution": "孕妇慎用；高剂量内服有毒性。",
+        "image_hint": "lavender_flower_closeup"
+      },
+      "botanical_info": "薰衣草属唇形科薰衣草属，原生于地中海盆地。叶片狭长，银灰绿色；花序穗状，蓝紫色。喜阳光充足、排水良好的碱性土壤。",
+      "feng_shui_info": null,
+      "tags": ["芳香植物", "观花植物", "药用植物", "地被植物"]
+    },
+    {
+      "id": "nephrolepis",
+      "name": "肾蕨",
+      "scientific_name": "Nephrolepis exaltata",
+      "aliases": ["Nephrolepis", "nephrolepis", "肾蕨", "蓬莱蕨"],
+      "description": "肾蕨是常见的观叶蕨类植物，叶片羽状披散，生长旺盛，耐荫性强，是室内绿化的经典选择。",
+      "attributes": {
+        "height": "50–100 cm",
+        "lifespan": "多年生",
+        "drought_tolerance": "低（需保持湿润）",
+        "toxicity": "无毒，对人宠均安全",
+        "habitat": "热带、亚热带林下湿润环境",
+        "bloom_season": "不开花（孢子繁殖）",
+        "family": "骨碎补科（Davalliaceae）"
+      },
+      "medical_info": {
+        "summary": "传统医学中，肾蕨根茎（块根）可入药，具有清热利湿、止血消肿的功效，用于治疗感冒发热、肺热咳嗽等症状。",
+        "active_compounds": ["黄酮类", "甾体类化合物"],
+        "caution": "未经处理的根茎不建议自行内服。",
+        "image_hint": "nephrolepis_rhizome"
+      },
+      "botanical_info": "肾蕨属骨碎补科，为多年生草本蕨类。叶为一回羽状复叶，羽片多数，基部有耳状突起。孢子囊群位于羽片侧脉顶端，囊群盖肾形。",
+      "feng_shui_info": null,
+      "tags": ["观叶植物", "室内植物", "蕨类植物", "耐阴植物"]
+    },
+    {
+      "id": "santolina",
+      "name": "棉杉菊",
+      "scientific_name": "Santolina chamaecyparissus",
+      "aliases": ["Santolina", "santolina", "棉杉菊", "银灰棉杉菊"],
+      "description": "棉杉菊是一种银灰色低矮常绿灌木，原产地中海地区，以其独特的银白色枝叶和小巧的黄色头状花序著称。",
+      "attributes": {
+        "height": "20–50 cm",
+        "lifespan": "常绿多年生",
+        "drought_tolerance": "极高",
+        "toxicity": "低毒（食入大量可能引起不适）",
+        "habitat": "地中海干燥、贫瘠沙质土壤",
+        "bloom_season": "6–7月",
+        "family": "菊科（Asteraceae）"
+      },
+      "medical_info": {
+        "summary": "传统上用于驱除蛀虫和蛾类，可制成香包防虫。古代地中海地区也用其治疗消化不良和寄生虫感染。",
+        "active_compounds": ["桉叶素", "倍半萜烯", "黄酮类"],
+        "caution": "有一定毒性，不建议内服，避免儿童接触。",
+        "image_hint": "santolina_yellow_flowers"
+      },
+      "botanical_info": "棉杉菊属菊科棉杉菊属，枝条密集，密被白色绒毛，叶片细裂，具浓烈芳香。花序黄色，圆球形头状，单生枝顶。适合修剪造型，常用作花境前缘。",
+      "feng_shui_info": null,
+      "tags": ["银色叶植物", "芳香植物", "耐旱植物", "地中海植物"]
+    },
+    {
+      "id": "cactus",
+      "name": "仙人掌",
+      "scientific_name": "Opuntia ficus-indica",
+      "aliases": ["仙人掌", "cactus", "掌形仙人掌"],
+      "description": "仙人掌是极具代表性的多肉植物，原产美洲热带荒漠，以肥厚的绿色茎节和锐利的刺著称，耐旱能力极强。",
+      "attributes": {
+        "height": "50–300 cm",
+        "lifespan": "多年生",
+        "drought_tolerance": "极高（旱生植物）",
+        "toxicity": "无毒（刺有物理伤害风险）",
+        "habitat": "热带、亚热带荒漠及干旱地区",
+        "bloom_season": "5–6月",
+        "family": "仙人掌科（Cactaceae）"
+      },
+      "medical_info": {
+        "summary": "仙人掌的茎肉外用可消炎止痛，处理轻微烫伤和皮肤炎症。果实（仙人果）富含维生素C，可食用。部分种类具有降血糖作用，用于辅助治疗2型糖尿病。",
+        "active_compounds": ["黄酮类", "甜菜碱", "多糖"],
+        "caution": "处理时注意刺的刺伤风险；内服制品请遵医嘱。",
+        "image_hint": "cactus_paddle_closeup"
+      },
+      "botanical_info": "仙人掌属仙人掌科仙人掌属，茎节扁平如手掌，具叶刺座，叶退化为刺。根系浅而发达，用于快速吸收雨水。CAM代谢使其在夜间固定CO₂，极大减少水分散失。",
+      "feng_shui_info": "民间认为仙人掌能吸收辐射，置于电脑旁可辟邪，但此说法缺乏科学依据。",
+      "tags": ["多肉植物", "耐旱植物", "荒漠植物", "室内植物"]
+    },
+    {
+      "id": "victoria_amazonica",
+      "name": "大王莲",
+      "scientific_name": "Victoria amazonica",
+      "aliases": ["大王莲", "亚马逊王莲", "victoria amazonica"],
+      "description": "大王莲是世界上最大的水生植物之一，圆形浮叶直径可达1–2米，叶缘上折，形如大型托盘，原产南美亚马逊热带雨林。",
+      "attributes": {
+        "height": "叶浮于水面，叶径1–2 m",
+        "lifespan": "一年生（温带地区）/ 多年生（热带）",
+        "drought_tolerance": "极低（严格水生植物）",
+        "toxicity": "轻微（含草酸钙晶体，不宜食用）",
+        "habitat": "热带浅水湖泊、河湾，水温22–35°C",
+        "bloom_season": "7–9月（夜间开花）",
+        "family": "睡莲科（Nymphaeaceae）"
+      },
+      "medical_info": {
+        "summary": "大王莲在传统医学中记载较少，但其种子（王莲豆）富含淀粉，当地居民有食用记录。提取物在初步研究中显示有抗氧化活性。",
+        "active_compounds": ["淀粉", "黄酮类", "生物碱"],
+        "caution": "含草酸钙，生食可能引起口腔刺激，不建议自行采用。",
+        "image_hint": "victoria_leaf_surface"
+      },
+      "botanical_info": "大王莲属睡莲科王莲属。叶面革质光滑，叶背具坚硬网状骨架（仿生工程设计的灵感来源）。花朵硕大，初开为白色、有香气，次日变为粉红至紫红色后凋谢。",
+      "feng_shui_info": null,
+      "tags": ["水生植物", "观叶植物", "热带植物", "巨型植物"]
+    },
+    {
+      "id": "ginkgo",
+      "name": "银杏树",
+      "scientific_name": "Ginkgo biloba",
+      "aliases": ["银杏", "银杏树", "公孙树", "白果树", "ginkgo"],
+      "description": "银杏树是地球上现存最古老的树种之一，距今已有约2.7亿年历史，被誉为\"活化石\"。秋季叶片金黄，观赏价值极高。",
+      "attributes": {
+        "height": "20–35 m",
+        "lifespan": "可达千年以上",
+        "drought_tolerance": "中等（适应性强，耐旱耐寒）",
+        "toxicity": "白果（种子）含银杏毒素，生食或大量食用有毒；叶片提取物安全",
+        "habitat": "温带落叶林，适应多种土壤",
+        "bloom_season": "3–4月（风媒花）",
+        "family": "银杏科（Ginkgoaceae）"
+      },
+      "medical_info": {
+        "summary": "银杏叶提取物（GBE）是目前研究最广泛的植物药之一。主要用于改善脑部血液循环，辅助治疗老年痴呆（阿尔茨海默病）、记忆力减退和耳鸣。银杏叶制剂（如EGb 761）已在多国获批上市。白果（种子）少量熟食可止咳化痰，但含银杏毒素（ginkgotoxin），儿童生食5–10颗即可中毒。",
+        "active_compounds": ["银杏黄酮苷", "萜内酯（银杏内酯A/B/C）", "白果酸", "银杏毒素（种子中）"],
+        "caution": "白果绝对禁止生食、大量食用。银杏叶提取物与抗凝血药（如华法林）有相互作用，需告知医生。孕妇慎用。",
+        "image_hint": "ginkgo_leaf_and_fruit"
+      },
+      "botanical_info": "银杏属银杏科银杏属，为落叶乔木，雌雄异株。扇形叶片具二叉叶脉，秋季变金黄。种子（白果）外被肉质外种皮，成熟时有异味。为孑遗植物，无现存近亲，自成一科一属一种。",
+      "feng_shui_info": "银杏在中国传统文化中象征长寿与坚韧，常种于庙宇和陵园。民间认为种植银杏树能带来福气与庇佑，但并无科学依据。",
+      "tags": ["落叶乔木", "药用植物", "观赏植物", "古老植物", "孑遗植物"]
+    }
+  ]
+}
