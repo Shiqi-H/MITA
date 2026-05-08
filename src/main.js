@@ -9,21 +9,21 @@ const SCENES = {
         models: [
             { 
                 id: 'lavender', 
-                src: 'Lavandula/Lavandula.glb',
+                src: 'model/Lavandula.glb',
                 name: 'Lavandula', 
                 pos: '3 -1 2', 
                 scale: '4 4 4'
             },
             {
                 id: 'Nephrolepis',
-                src: 'Nephrolepis/Nephrolepis.glb',
+                src: 'model/Nephrolepis.glb',
                 name: 'Nephrolepis',
                 pos: '3 -1 4',
                 scale: '4 4 4'
             },
             {
                 id: 'Santolina',
-                src: 'Santolina/Santolina.glb',
+                src: 'model/Santolina.glb',
                 name: 'Santolina',
                 pos: '3 -1 0',
                 scale: '4 4 4'
