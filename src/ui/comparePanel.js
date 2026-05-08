@@ -1,4 +1,4 @@
-import { getDisplayName } from '../core/selectors.js';
+import { getDisplayName } from '../app/selectors.js';
 import { els } from './dom.js';
 
 export function renderComparePanel(left, right, attribute = 'droughtTolerance', note = '') {

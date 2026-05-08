@@ -1,5 +1,5 @@
 import intents from '../data/intents.json';
-import { normalize } from './selectors.js';
+import { normalize } from '../app/selectors.js';
 
 export function parseIntentLocally(text) {
   const normalized = normalize(text);

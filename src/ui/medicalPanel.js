@@ -1,4 +1,4 @@
-import { getDisplayName } from '../core/selectors.js';
+import { getDisplayName } from '../app/selectors.js';
 import { showInteractionPanel } from './panels.js';
 
 export function renderMedicalPanel(plant) {

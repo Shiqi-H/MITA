@@ -1,58 +1,69 @@
-import express from 'express';
+import { createServer } from 'node:http';
+import { config } from './config.js';
+import { clarifyHandler } from './handlers/clarifyHandler.js';
+import { compareHandler } from './handlers/compareHandler.js';
+import { queryHandler } from './handlers/queryHandler.js';
 
-const app = express();
-const port = Number(process.env.PORT ?? 8787);
+const routes = {
+  'GET /api/health': (_req, res) => res.json({ ok: true, model: config.newApiModel }),
+  'POST /api/parse-intent': queryHandler,
+  'POST /api/clarify': clarifyHandler,
+  'POST /api/compare': compareHandler,
+};
 
-app.use(express.json());
+const server = createServer(async (request, response) => {
+  const routeKey = `${request.method} ${new URL(request.url, `http://${request.headers.host}`).pathname}`;
+  const handler = routes[routeKey];
 
-app.post('/api/parse-intent', async (req, res) => {
-  const { text = '' } = req.body ?? {};
-  const normalized = String(text).toLowerCase();
-
-  // Replace this deterministic parser with a model API call when an API key is available.
-  if (normalized.includes('more drought tolerant') || normalized.includes('compare')) {
-    res.json({
-      intent: 'compare',
-      target1: 'currentSelection',
-      target2Name: normalized.includes('giant water lily') ? 'giant water lily' : '',
-      attribute: 'droughtTolerance',
-      confidence: 0.8,
-    });
+  if (request.method === 'OPTIONS') {
+    sendJson(response, 204, {});
     return;
   }
 
-  if (normalized.includes('medicinal') || normalized.includes('medical') || normalized.includes('medicine')) {
-    res.json({
-      intent: 'queryAttribute',
-      referent: 'currentSelection',
-      interest: 'medicinalValue',
-      confidence: 0.8,
-    });
+  if (!handler) {
+    sendJson(response, 404, { error: 'Not found' });
     return;
   }
 
-  if (normalized === 'a' || normalized === 'b') {
-    res.json({ intent: 'resolveAmbiguity', marker: normalized.toUpperCase(), confidence: 0.9 });
-    return;
+  try {
+    const body = request.method === 'POST' ? await readJsonBody(request) : {};
+    await handler({ body }, { json: (payload) => sendJson(response, 200, payload) });
+  } catch (error) {
+    sendJson(response, 500, { error: error.message });
   }
-
-  if (normalized.includes('front') || normalized.includes('back')) {
-    res.json({
-      intent: 'resolveAmbiguity',
-      position: normalized.includes('front') ? 'front' : 'back',
-      confidence: 0.8,
-    });
-    return;
-  }
-
-  if (normalized.includes('what is this') || normalized.includes('identify')) {
-    res.json({ intent: 'identify', confidence: 0.8 });
-    return;
-  }
-
-  res.json({ intent: 'unknown', confidence: 0.2 });
 });
 
-app.listen(port, () => {
-  console.log(`MITA intent server listening on http://localhost:${port}`);
+server.listen(config.port, () => {
+  console.log(`MITA intent server listening on http://localhost:${config.port}`);
 });
+
+function sendJson(response, statusCode, payload) {
+  response.writeHead(statusCode, {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+    'Content-Type': 'application/json',
+  });
+  response.end(statusCode === 204 ? '' : JSON.stringify(payload));
+}
+
+function readJsonBody(request) {
+  return new Promise((resolve, reject) => {
+    let raw = '';
+    request.on('data', (chunk) => {
+      raw += chunk;
+    });
+    request.on('end', () => {
+      if (!raw) {
+        resolve({});
+        return;
+      }
+      try {
+        resolve(JSON.parse(raw));
+      } catch (error) {
+        reject(error);
+      }
+    });
+    request.on('error', reject);
+  });
+}

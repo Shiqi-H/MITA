@@ -1,8 +1,8 @@
-import { cancelAmbiguity, handleQuery } from './core/grounding.js';
-import { initRaycastSelection } from './core/raycastSelection.js';
-import { buildSceneNav, goToScene, updateNav } from './core/sceneRenderer.js';
-import { initSpeechRecognition, startSpeechRecognition } from './core/speech.js';
-import { resetVoiceFailures, state } from './core/state.js';
+import { cancelAmbiguity, handleQuery } from './app/grounding.js';
+import { resetVoiceFailures, state } from './app/state.js';
+import { initRaycastSelection } from './scene/raycastSelection.js';
+import { buildSceneNav, goToScene, updateNav } from './scene/sceneRenderer.js';
+import { initSpeechRecognition, startSpeechRecognition } from './speech/speech.js';
 import { hideComparePanel } from './ui/comparePanel.js';
 import { els } from './ui/dom.js';
 import { hideInteractionPanel, hidePlantPanel, updateHint } from './ui/panels.js';

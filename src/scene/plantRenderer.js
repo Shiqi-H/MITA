@@ -1,4 +1,4 @@
-import { formatVec3, scaleBy } from './selectors.js';
+import { formatVec3, scaleBy } from '../app/selectors.js';
 
 export function createPlantEntity(plant) {
   const entity = document.createElement('a-entity');

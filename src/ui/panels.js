@@ -1,5 +1,5 @@
-import { state, recordVisitedPlant, resetVoiceFailures } from '../core/state.js';
-import { getDisplayName } from '../core/selectors.js';
+import { state, recordVisitedPlant, resetVoiceFailures } from '../app/state.js';
+import { getDisplayName } from '../app/selectors.js';
 import { els } from './dom.js';
 
 let loadingTimer = null;

@@ -1,4 +1,4 @@
-import { parseIntent } from './llmClient.js';
+import { parseIntent } from '../intent/llmClient.js';
 import {
   findPlantByNameOrAlias,
   findVisitedPlantByNameOrAlias,
@@ -13,7 +13,7 @@ import {
   setAmbiguityCandidates,
   state,
 } from './state.js';
-import { speak } from './speech.js';
+import { speak } from '../speech/speech.js';
 import { renderComparePanel } from '../ui/comparePanel.js';
 import { renderMedicalPanel } from '../ui/medicalPanel.js';
 import {
@@ -26,7 +26,7 @@ import {
 } from '../ui/panels.js';
 import { showSelectionRequiredFallback, showUnsupportedInterestFallback } from '../ui/fallbackPanel.js';
 import { els } from '../ui/dom.js';
-import { renderPlantPoiMarker } from './plantRenderer.js';
+import { renderPlantPoiMarker } from '../scene/plantRenderer.js';
 
 export async function handleQuery(text) {
   if (!text.trim()) return;

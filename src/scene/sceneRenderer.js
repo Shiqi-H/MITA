@@ -1,5 +1,5 @@
-import { getAllScenes, getPlant, getScene, formatVec3 } from './selectors.js';
-import { setActiveScene, state } from './state.js';
+import { getAllScenes, getPlant, getScene, formatVec3 } from '../app/selectors.js';
+import { setActiveScene, state } from '../app/state.js';
 import { createPlantEntity } from './plantRenderer.js';
 import { displayPlant, hidePlantPanel, setLoading, updateHint } from '../ui/panels.js';
 import { els } from '../ui/dom.js';

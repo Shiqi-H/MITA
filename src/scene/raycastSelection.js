@@ -1,6 +1,6 @@
-import { getPlant } from './selectors.js';
+import { getPlant } from '../app/selectors.js';
 import { displayPlant, updateHint } from '../ui/panels.js';
-import { promptAmbiguity } from './grounding.js';
+import { promptAmbiguity } from '../app/grounding.js';
 import { els } from '../ui/dom.js';
 
 const raycaster = new THREE.Raycaster();
