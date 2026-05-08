@@ -37,7 +37,8 @@ body {
     #101814;
 }
 
-button {
+button,
+input {
   font: inherit;
 }
 
@@ -55,6 +56,8 @@ a-scene {
 
 .tour-hud,
 .plant-panel,
+.interaction-panel,
+.compare-panel,
 .gesture-hint,
 .loading-indicator {
   position: absolute;
@@ -83,6 +86,7 @@ a-scene {
 
 h1,
 h2,
+h3,
 p {
   margin-top: 0;
 }
@@ -112,7 +116,9 @@ h2 {
 }
 
 .scene-nav button,
-.panel-close {
+.panel-close,
+.query-controls button,
+.fallback-actions button {
   border: 1px solid var(--line);
   color: var(--ink);
   background: var(--panel);
@@ -136,7 +142,11 @@ h2 {
 .scene-nav button:hover,
 .scene-nav button:focus-visible,
 .panel-close:hover,
-.panel-close:focus-visible {
+.panel-close:focus-visible,
+.query-controls button:hover,
+.query-controls button:focus-visible,
+.fallback-actions button:hover,
+.fallback-actions button:focus-visible {
   transform: translateY(-1px);
   border-color: rgba(149, 208, 106, 0.78);
   outline: none;
@@ -148,26 +158,57 @@ h2 {
   border-color: transparent;
 }
 
-.plant-panel {
-  right: 22px;
-  bottom: 84px;
-  width: min(360px, calc(100vw - 44px));
-  padding: 22px;
+.plant-panel,
+.interaction-panel,
+.compare-panel {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 12px;
   background: var(--panel-strong);
   box-shadow: var(--shadow);
   backdrop-filter: blur(20px);
 }
 
-.plant-panel[hidden] {
+.plant-panel {
+  right: 22px;
+  bottom: 84px;
+  width: min(360px, calc(100vw - 44px));
+  padding: 22px;
+}
+
+.plant-panel[hidden],
+.interaction-panel[hidden],
+.compare-panel[hidden] {
   display: none;
 }
 
-.plant-panel p:last-child {
-  margin-bottom: 0;
+.panel-status {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(149, 208, 106, 0.08);
   color: var(--muted);
-  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+.attribute-list {
+  display: grid;
+  gap: 8px;
+}
+
+.attribute-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.attribute-row span {
+  color: var(--muted);
+}
+
+.attribute-row strong {
+  text-align: right;
 }
 
 .panel-close {
@@ -179,6 +220,143 @@ h2 {
   border-radius: 50%;
   font-size: 22px;
   line-height: 1;
+}
+
+.interaction-panel {
+  left: 22px;
+  bottom: 84px;
+  width: min(520px, calc(100vw - 44px));
+  padding: 20px;
+}
+
+.panel-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.query-controls {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.query-controls input {
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.query-controls input::placeholder {
+  color: rgba(248, 251, 245, 0.48);
+}
+
+.query-controls button,
+.fallback-actions button {
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.icon-button {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  min-width: 42px;
+  padding: 0;
+}
+
+.icon-button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon-button svg path:first-child:last-child {
+  fill: currentColor;
+  stroke: none;
+}
+
+.icon-button.is-listening {
+  color: #101814;
+  background: linear-gradient(135deg, var(--leaf), var(--sky));
+  border-color: transparent;
+  animation: listenButtonPulse 1s ease-in-out infinite;
+}
+
+.icon-button.is-listening svg {
+  animation: listenIconBounce 720ms ease-in-out infinite;
+}
+
+.fallback-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.voice-log {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  max-height: 130px;
+  overflow: auto;
+}
+
+.voice-log li {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--muted);
+}
+
+.compare-panel {
+  right: 22px;
+  top: 96px;
+  width: min(680px, calc(100vw - 44px));
+  padding: 20px;
+}
+
+.compare-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.compare-card {
+  padding: 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.compare-table {
+  display: grid;
+  gap: 8px;
+}
+
+.compare-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.compare-row span {
+  color: var(--muted);
 }
 
 .loading-indicator {
@@ -216,8 +394,8 @@ h2 {
 
 .gesture-hint {
   left: 50%;
-  bottom: 22px;
-  width: min(560px, calc(100vw - 44px));
+  top: 32px;
+  width: min(760px, calc(100vw - 44px));
   margin: 0;
   padding: 12px 16px;
   border: 1px solid var(--line);
@@ -230,6 +408,42 @@ h2 {
   transform: translateX(-50%);
 }
 
+.ambiguity-letters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 2px;
+  color: #101814;
+  font-weight: 800;
+}
+
+.ambiguity-letters::first-letter {
+  color: inherit;
+}
+
+.ambiguity-letters {
+  color: var(--ink);
+}
+
+.plant-panel .query-controls {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.medical-layout {
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.medical-layout img {
+  width: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
 @keyframes pulse {
   70% {
     box-shadow: 0 0 0 10px rgba(149, 208, 106, 0);
@@ -237,6 +451,28 @@ h2 {
 
   100% {
     box-shadow: 0 0 0 0 rgba(149, 208, 106, 0);
+  }
+}
+
+@keyframes listenButtonPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(149, 208, 106, 0.5);
+  }
+
+  50% {
+    box-shadow: 0 0 0 8px rgba(149, 208, 106, 0);
+  }
+}
+
+@keyframes listenIconBounce {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+
+  50% {
+    transform: scaleY(1.22);
   }
 }
 
@@ -267,10 +503,38 @@ h2 {
     padding: 18px;
   }
 
+  .interaction-panel,
+  .compare-panel {
+    left: 16px;
+    right: 16px;
+    width: auto;
+  }
+
+  .interaction-panel {
+    bottom: 74px;
+  }
+
+  .compare-panel {
+    top: 96px;
+  }
+
+  .query-controls {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .query-controls input {
+    grid-column: 1 / -1;
+  }
+
   .gesture-hint {
-    bottom: 14px;
+    top: 138px;
     width: calc(100vw - 32px);
     border-radius: 8px;
     font-size: 14px;
+  }
+
+  .compare-grid,
+  .medical-layout {
+    grid-template-columns: 1fr;
   }
 }

@@ -1,40 +1,93 @@
-# MITA - Botanical Garden
-**基于 A-Frame (WebVR) 框架的多模态植物园导览项目**
+# MITA - Multimodal Botanical Garden
 
-## 项目结构
-```
-├── index.html               # 核心渲染骨架  
-├── src/  
-│   └── main.js              # 核心逻辑：场景配置、导航控制与模型渲染  
-└── public/                  # 场景资源  
-    ├── scene-1.jpg          # 全景图  
-    ├── arrow.svg            # UI 导航图标  
-    └──models/               # 模型  
-       ├── Lavandula.glb  
-       └── ...
+MITA is a browser-based 3D botanical garden prototype built with Vite, A-Frame, and native JavaScript modules. It demonstrates three grounding-loop interactions in English:
+
+- region selection with ambiguity repair
+- persistent visited targets for comparison
+- interest-slot filling for medicinal information
+
+## Tech Stack
+
+- Vite
+- Native JavaScript ES modules
+- A-Frame / Three.js
+- Web Speech API for STT/TTS
+- JSON data files for plants, scenes, and intent keywords
+- Optional Express intent API stub in `server/`
+
+## Project Structure
+
+```text
+src/
+  main.js
+  style.css
+  data/
+    plants.json
+    scenes.json
+    intents.json
+  core/
+    grounding.js
+    intentParser.js
+    llmClient.js
+    plantRenderer.js
+    sceneRenderer.js
+    selectors.js
+    speech.js
+    state.js
+  ui/
+    comparePanel.js
+    dom.js
+    fallbackPanel.js
+    medicalPanel.js
+    panels.js
 ```
 
-## 快速开始
-1.克隆仓库
-```bash
-git clone https://github.com/Shiqi-H/MITA.git
-```
+## Run
 
-2.环境配置  
-本项目依赖 **Node.js** 环境进行开发与调试。
-- 安装 Node.js：请前往官网下载并安装 LTS 版本。
-- 安装依赖包：在项目根目录下运行以下命令，安装 A-Frame 以及相关开发工具。
 ```bash
 npm install
+npm.cmd run dev
 ```
 
-3.运行  
-执行以下命令启动本地开发服务器。
+Use `npm.cmd` on Windows PowerShell if script execution policy blocks `npm`.
+
+## Build
+
 ```bash
+npm.cmd run build
+```
+
+## Demo Prompts
+
+- `What is this?`
+- `A`
+- `B`
+- `front one`
+- `back one`
+- `Is it more drought tolerant than the giant water lily?`
+- `Tell me about its medicinal value.`
+
+## Optional Intent API
+
+The frontend defaults to local rule parsing. To route intent parsing to a backend, set:
+
+```text
+VITE_INTENT_ENGINE=llm
+```
+
+The optional backend stub is in `server/`:
+
+```bash
+cd server
+npm install
 npm run dev
 ```
-启动后，控制台会输出一个本地地址，在浏览器中打开该地址即可开始预览。
 
-## 任务进度
-- [x] 3D 场景构建，支持自由转动视角，场景之间可切换。
-- [x] 导入外部模型，支持调整大小与位置。
+The API shape is:
+
+```http
+POST /api/parse-intent
+Content-Type: application/json
+```
+
+The stub is deterministic and can be replaced with a model API call later. Do not place API keys in frontend code.

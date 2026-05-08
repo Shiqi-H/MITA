@@ -6,7 +6,7 @@
     <title>MITA - Botanical Garden</title>
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <link rel="stylesheet" href="/src/style.css">
-    <script src="src/main.js" type="module"></script> 
+    <script src="/src/main.js" type="module"></script>
 </head>
 <body>
     <main class="tour-shell">
@@ -23,6 +23,32 @@
             <p class="eyebrow">Plant specimen</p>
             <h2 id="plant-name"></h2>
             <p id="plant-description"></p>
+            <div id="plant-status" class="panel-status"></div>
+            <div id="plant-attributes" class="attribute-list"></div>
+            <div id="plant-query-controls" class="query-controls" data-query-controls></div>
+        </aside>
+
+        <section class="interaction-panel" aria-live="polite" hidden>
+            <div class="panel-head">
+                <div>
+                    <h2 id="interaction-title">System message</h2>
+                </div>
+                <button id="interaction-close" class="panel-close" type="button" aria-label="Close interaction panel">x</button>
+            </div>
+            <div id="interaction-body"></div>
+            <div id="interaction-query-controls" class="query-controls" data-query-controls></div>
+            <ul id="voice-log" class="voice-log" aria-label="Speech log"></ul>
+        </section>
+
+        <aside class="compare-panel" aria-live="polite" hidden>
+            <div class="panel-head">
+                <div>
+                    <p class="eyebrow">Comparison</p>
+                    <h2>Compare targets</h2>
+                </div>
+                <button id="compare-close" class="panel-close" type="button" aria-label="Close compare panel">x</button>
+            </div>
+            <div id="compare-body"></div>
         </aside>
 
         <div class="loading-indicator" role="status" aria-live="polite">
@@ -30,7 +56,7 @@
             Loading scene
         </div>
 
-        <p class="gesture-hint">Drag to look around. Click arrows to move and plants for details.</p>
+        <p class="gesture-hint">Click through plants to detect ambiguity. Ask in English.</p>
 
         <a-scene
             cursor="rayOrigin: mouse"
@@ -39,16 +65,16 @@
             embedded
             loading-screen="enabled: false"
         >
-        <a-assets>
-            <img id="arrow-img" src="/arrow.svg">
-        </a-assets>
+            <a-assets>
+                <img id="arrow-img" src="/arrow.svg">
+            </a-assets>
 
-        <a-sky id="sky" src="/scene-1.jpg"></a-sky>
-        <a-entity id="scene-content"></a-entity>
-        <a-camera id="camera"></a-camera>
+            <a-sky id="sky" src="/scene-1.jpg"></a-sky>
+            <a-entity id="scene-content"></a-entity>
+            <a-camera id="camera"></a-camera>
 
-        <a-light type="ambient" intensity="1.5"></a-light>
-        <a-light type="directional" position="1 2 1" intensity="1"></a-light>
+            <a-light type="ambient" intensity="1.5"></a-light>
+            <a-light type="directional" position="1 2 1" intensity="1"></a-light>
         </a-scene>
     </main>
 </body>
