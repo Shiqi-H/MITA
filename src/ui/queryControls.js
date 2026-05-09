@@ -36,7 +36,9 @@ export function renderQueryControls(container, { placeholder, onSubmit, onSpeak 
 
   const submitValue = () => {
     const value = input.value.trim();
-    if (value) onSubmit(value);
+    if (!value) return;
+    onSubmit(value);
+    input.value = '';
   };
 
   input.addEventListener('keydown', (event) => {

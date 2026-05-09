@@ -1,6 +1,6 @@
 import { getPlant } from '../app/selectors.js';
-import { displayPlant, updateHint } from '../ui/panels.js';
-import { promptAmbiguity } from '../app/grounding.js';
+import { updateHint } from '../ui/panels.js';
+import { selectPlantById } from '../app/grounding.js';
 import { els } from '../ui/dom.js';
 
 const raycaster = new THREE.Raycaster();
@@ -38,16 +38,10 @@ function handleSceneClick(event) {
 
   const plantObjects = getPlantObjects();
   const hits = raycaster.intersectObjects(plantObjects, true);
-  const candidateIds = collectCandidateIds(hits);
+  const plantId = findNearestPlantId(hits);
 
-  if (candidateIds.length >= 2) {
-    promptAmbiguity(candidateIds);
-    return;
-  }
-
-  if (candidateIds.length === 1) {
-    const plant = getPlant(candidateIds[0]);
-    if (plant) displayPlant(plant);
+  if (plantId && getPlant(plantId)) {
+    selectPlantById(plantId);
     return;
   }
 
@@ -60,13 +54,12 @@ function getPlantObjects() {
     .filter(Boolean);
 }
 
-function collectCandidateIds(hits) {
-  const ids = [];
-  hits.forEach((hit) => {
+function findNearestPlantId(hits) {
+  for (const hit of hits) {
     const id = findPlantIdFromObject(hit.object);
-    if (id && !ids.includes(id)) ids.push(id);
-  });
-  return ids;
+    if (id) return id;
+  }
+  return null;
 }
 
 function findPlantIdFromObject(object) {

@@ -19,7 +19,7 @@ export function appendVoiceLog(text) {
   const item = document.createElement('li');
   item.textContent = text;
   els.voiceLog.prepend(item);
-  while (els.voiceLog.children.length > 5) {
+  while (els.voiceLog.children.length > 20) {
     els.voiceLog.removeChild(els.voiceLog.lastElementChild);
   }
 }
@@ -45,6 +45,14 @@ export function hidePlantPanel() {
 
 export function hideInteractionPanel() {
   els.interactionPanel.hidden = true;
+}
+
+export function showHistoryPanel() {
+  els.historyPanel.hidden = false;
+}
+
+export function hideHistoryPanel() {
+  els.historyPanel.hidden = true;
 }
 
 export function showInteractionPanel(title, body) {

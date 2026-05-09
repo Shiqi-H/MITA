@@ -6,7 +6,7 @@ let activeButton = null;
 let isListening = false;
 
 export function speak(text) {
-  appendVoiceLog(`TTS: ${text}`);
+  appendVoiceLog(`System: ${text}`);
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);

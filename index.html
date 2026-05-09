@@ -25,7 +25,6 @@
             <p id="plant-description"></p>
             <div id="plant-status" class="panel-status"></div>
             <div id="plant-attributes" class="attribute-list"></div>
-            <div id="plant-query-controls" class="query-controls" data-query-controls></div>
         </aside>
 
         <section class="interaction-panel" aria-live="polite" hidden>
@@ -36,9 +35,18 @@
                 <button id="interaction-close" class="panel-close" type="button" aria-label="Close interaction panel">x</button>
             </div>
             <div id="interaction-body"></div>
-            <div id="interaction-query-controls" class="query-controls" data-query-controls></div>
-            <ul id="voice-log" class="voice-log" aria-label="Speech log"></ul>
         </section>
+
+        <aside class="history-panel" aria-live="polite" hidden>
+            <div class="panel-head">
+                <div>
+                    <p class="eyebrow">Conversation</p>
+                    <h2>History</h2>
+                </div>
+                <button id="history-close" class="panel-close" type="button" aria-label="Close conversation history">x</button>
+            </div>
+            <ul id="voice-log" class="voice-log" aria-label="Conversation history"></ul>
+        </aside>
 
         <aside class="compare-panel" aria-live="polite" hidden>
             <div class="panel-head">
@@ -56,7 +64,10 @@
             Loading scene
         </div>
 
-        <p class="gesture-hint">Click through plants to detect ambiguity. Ask in English.</p>
+        <div id="global-query-controls" class="query-controls global-query-controls" data-query-controls></div>
+        <div id="disambiguation-layer" class="disambiguation-layer" aria-hidden="true"></div>
+
+        <button class="gesture-hint" type="button" aria-label="Open conversation history">Click through plants to detect ambiguity. Ask in English.</button>
 
         <a-scene
             cursor="rayOrigin: mouse"

@@ -26,11 +26,12 @@ import {
 } from '../ui/panels.js';
 import { showSelectionRequiredFallback, showUnsupportedInterestFallback } from '../ui/fallbackPanel.js';
 import { els } from '../ui/dom.js';
-import { renderPlantPoiMarker } from '../scene/plantRenderer.js';
+import { hideDisambiguationOverlay, showDisambiguationOverlay } from '../ui/overlay.js';
+import { getVisiblePlantIds } from '../scene/visiblePlants.js';
 
 export async function handleQuery(text) {
   if (!text.trim()) return;
-  appendVoiceLog(`STT: ${text}`);
+  appendVoiceLog(`User: ${text}`);
 
   const context = {
     activeSceneId: state.activeSceneId,
@@ -93,17 +94,34 @@ export function promptAmbiguity(candidateIds) {
 
   setAmbiguityCandidates(candidates);
   clearCandidateHighlights();
-  candidates.forEach(({ id, marker }) => {
-    const plant = getPlant(id);
-    renderPlantPoiMarker(els.container, plant, marker, () => resolveAmbiguityById(plant.id));
+  showDisambiguationOverlay({
+    candidates,
+    layer: els.disambiguationLayer,
+    scene: els.scene,
+    onSelect: resolveAmbiguityById,
   });
 
   const letters = candidates.map(({ marker }) => marker).join(' / ');
   const body = document.createElement('div');
-  body.innerHTML = `
-    <p>Multiple plants were detected. Type or say one of these letters.</p>
-    <div class="ambiguity-letters">${letters}</div>
-  `;
+  const intro = document.createElement('p');
+  intro.textContent = 'Multiple plants were detected. Choose one candidate, or type/say its letter.';
+
+  const choices = document.createElement('div');
+  choices.className = 'ambiguity-choices';
+  candidates.forEach(({ id, marker }) => {
+    const plant = getPlant(id);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'ambiguity-choice';
+    button.innerHTML = `
+      <span>${marker}</span>
+      <strong>${getDisplayName(plant)}</strong>
+    `;
+    button.addEventListener('click', () => resolveAmbiguityById(id));
+    choices.appendChild(button);
+  });
+
+  body.append(intro, choices);
   showInteractionPanel('Referential Ambiguity', body);
   speak(`Multiple plants were detected. Type or say ${letters.replaceAll(' / ', ', ')}.`);
   updateHint('Ambiguity pending. Choose a letter marker.');
@@ -112,13 +130,8 @@ export function promptAmbiguity(candidateIds) {
 export function resolveAmbiguityById(id) {
   const plant = getPlant(id);
   if (!plant) return;
-  resetAmbiguity();
-  clearCandidateHighlights();
-  clearFallbackActions();
-  hideInteractionPanel();
-  displayPlant(plant);
+  selectPlantById(id);
   speak(`Selected ${getDisplayName(plant)}. Here is the plant information.`);
-  updateHint(`Selected ${getDisplayName(plant)}.`);
 }
 
 export function handleAmbiguityReply(parsed) {
@@ -140,25 +153,27 @@ export function handleAmbiguityReply(parsed) {
 }
 
 export function clearCandidateHighlights() {
-  els.container.querySelectorAll('[data-candidate="true"]').forEach((node) => node.remove());
+  hideDisambiguationOverlay(els.disambiguationLayer);
 }
 
 function handleIdentifyIntent() {
-  if (state.activeSceneId === 'scene-1') {
-    promptAmbiguity(['lavender', 'nephrolepis']);
+  const visiblePlantIds = getVisiblePlantIds({
+    container: els.container,
+    camera: els.scene.camera,
+  });
+
+  if (visiblePlantIds.length >= 2) {
+    promptAmbiguity(visiblePlantIds);
     return;
   }
 
-  const current = getCurrentPlant();
-  if (current) {
-    displayPlant(current);
-    speak(`${getDisplayName(current)} information is shown.`);
-    updateHint(`Focused referent: ${getDisplayName(current)}.`);
+  if (visiblePlantIds.length === 1) {
+    selectPlantById(visiblePlantIds[0], { announce: true, source: 'view' });
     return;
   }
 
   showSelectionRequiredFallback();
-  speak('Please select a plant first.');
+  speak('I cannot see a plant clearly. Please move the view or click a plant.');
 }
 
 function handleCompareIntent(parsed) {
@@ -225,6 +240,21 @@ function handleUnknownIntent() {
   if (failures >= 2) {
     updateHint('Click a plant in the 3D scene, or ask about a selected plant.');
   }
+}
+
+export function selectPlantById(id, { announce = false, source = 'click' } = {}) {
+  const plant = getPlant(id);
+  if (!plant) return;
+
+  resetAmbiguity();
+  clearCandidateHighlights();
+  clearFallbackActions();
+  hideInteractionPanel();
+  displayPlant(plant);
+
+  const prefix = source === 'view' ? 'Visible referent' : 'Selected';
+  if (announce) speak(`${getDisplayName(plant)} information is shown.`);
+  updateHint(`${prefix}: ${getDisplayName(plant)}.`);
 }
 
 export function cancelAmbiguity() {
