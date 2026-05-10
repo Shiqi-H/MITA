@@ -16,6 +16,10 @@ export function setSelectedPlant(id) {
   recordVisitedPlant(id);
 }
 
+export function clearSelectedPlant() {
+  state.selectedPlantId = null;
+}
+
 export function recordVisitedPlant(id) {
   if (!id || state.visitedPlantIds.includes(id)) return;
   state.visitedPlantIds.push(id);

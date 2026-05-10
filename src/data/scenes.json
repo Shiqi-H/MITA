@@ -35,14 +35,7 @@
         "rotation": [-90, -120, 0]
       }
     ],
-    "hotspots": [
-      {
-        "id": "aquatic-pair",
-        "position": [0, 0, -1.2],
-        "candidateIds": ["cactus", "giant_lotus"],
-        "mode": "compare"
-      }
-    ]
+    "hotspots": []
   },
   "scene-3": {
     "title": "Scene 3",
@@ -56,14 +49,7 @@
         "rotation": [-90, -120, 0]
       }
     ],
-    "hotspots": [
-      {
-        "id": "ginkgo-focus",
-        "position": [0, 0, -1.5],
-        "candidateIds": ["ginkgo"],
-        "mode": "single"
-      }
-    ]
+    "hotspots": []
   },
   "scene-4": {
     "title": "Scene 4",

@@ -1,6 +1,7 @@
-import { parseIntent } from '../intent/llmClient.js';
+import { generateCompareSpeech, generateDisambiguationSpeech, generateInfoSpeech, parseIntent } from '../intent/llmClient.js';
 import {
   findPlantByNameOrAlias,
+  getCurrentScenePlantIds,
   findVisitedPlantByNameOrAlias,
   getCurrentPlant,
   getDisplayName,
@@ -28,6 +29,9 @@ import { showSelectionRequiredFallback, showUnsupportedInterestFallback } from '
 import { els } from '../ui/dom.js';
 import { hideDisambiguationOverlay, showDisambiguationOverlay } from '../ui/overlay.js';
 import { getVisiblePlantIds } from '../scene/visiblePlants.js';
+
+const DEFAULT_QUERY_PLACEHOLDER = 'Ask about this plant...';
+const AMBIGUITY_FALLBACK_PLACEHOLDER = 'Please click on the plant you want.';
 
 export async function handleQuery(text) {
   if (!text.trim()) return;
@@ -68,7 +72,7 @@ export async function handleQuery(text) {
   }
 
   if (parsed.intent === 'queryAttribute') {
-    handleAttributeIntent(parsed);
+    handleAttributeIntent(parsed, text);
     return;
   }
 
@@ -84,11 +88,14 @@ export async function handleQuery(text) {
 }
 
 export function promptAmbiguity(candidateIds) {
+  setQueryPlaceholder(DEFAULT_QUERY_PLACEHOLDER);
+
   const candidates = candidateIds
     .map((id) => getPlant(id))
     .filter(Boolean)
     .map((plant, index) => ({
       id: plant.id,
+      plant,
       marker: String.fromCharCode(65 + index),
     }));
 
@@ -123,15 +130,20 @@ export function promptAmbiguity(candidateIds) {
 
   body.append(intro, choices);
   showInteractionPanel('Referential Ambiguity', body);
-  speak(`Multiple plants were detected. Type or say ${letters.replaceAll(' / ', ', ')}.`);
+  const generatedSpeech = awaitGeneratedSpeech(
+    generateDisambiguationSpeech(candidates),
+    `Multiple plants were detected. Type or say ${letters.replaceAll(' / ', ', ')}.`,
+  );
+  generatedSpeech.then(speak);
   updateHint('Ambiguity pending. Choose a letter marker.');
 }
 
-export function resolveAmbiguityById(id) {
+export async function resolveAmbiguityById(id) {
   const plant = getPlant(id);
   if (!plant) return;
   selectPlantById(id);
-  speak(`Selected ${getDisplayName(plant)}. Here is the plant information.`);
+  const generatedSpeech = await generateInfoSpeech({ plant, question: 'Introduce this selected plant.' });
+  speak(generatedSpeech || `Selected ${getDisplayName(plant)}. Here is the plant information.`);
 }
 
 export function handleAmbiguityReply(parsed) {
@@ -147,9 +159,22 @@ export function handleAmbiguityReply(parsed) {
   }
 
   const failures = incrementVoiceFailures();
-  const letters = candidates.map(({ marker }) => marker).join(', ');
+  applyAmbiguityFailure(failures);
+}
+
+export function handleAmbiguityRecognitionFailure() {
+  if (!state.ambiguityCandidates.length) return;
+  const failures = incrementVoiceFailures();
+  applyAmbiguityFailure(failures);
+}
+
+function applyAmbiguityFailure(failures) {
+  const letters = state.ambiguityCandidates.map(({ marker }) => marker).join(', ');
   speak(`I could not match that answer. Please choose ${letters}.`);
-  if (failures >= 2) updateHint(`Choose one of these markers: ${letters}.`);
+  if (failures >= 2) {
+    setQueryPlaceholder(AMBIGUITY_FALLBACK_PLACEHOLDER);
+    updateHint(`Choose one of these markers: ${letters}.`);
+  }
 }
 
 export function clearCandidateHighlights() {
@@ -161,9 +186,15 @@ function handleIdentifyIntent() {
     container: els.container,
     camera: els.scene.camera,
   });
+  const scenePlantIds = getCurrentScenePlantIds();
 
   if (visiblePlantIds.length >= 2) {
     promptAmbiguity(visiblePlantIds);
+    return;
+  }
+
+  if (scenePlantIds.length >= 2) {
+    promptAmbiguity(scenePlantIds);
     return;
   }
 
@@ -176,7 +207,7 @@ function handleIdentifyIntent() {
   speak('I cannot see a plant clearly. Please move the view or click a plant.');
 }
 
-function handleCompareIntent(parsed) {
+async function handleCompareIntent(parsed) {
   const left = getCurrentPlant();
   if (!left) {
     showSelectionRequiredFallback();
@@ -201,12 +232,18 @@ function handleCompareIntent(parsed) {
 
   displayPlant(left, 'compare');
   renderComparePanel(left, right, parsed.attribute, note);
-  speak(`Yes. ${getDisplayName(left)} is more drought tolerant than ${getDisplayName(right)}.`);
+  const generatedSpeech = await generateCompareSpeech({
+    left,
+    right,
+    attribute: parsed.attribute,
+    history: state.visitedPlantIds,
+  });
+  speak(generatedSpeech || `Yes. ${getDisplayName(left)} is more drought tolerant than ${getDisplayName(right)}.`);
   updateHint(`Compare panel opened: ${getDisplayName(left)} versus ${getDisplayName(right)}.`);
 }
 
-function handleAttributeIntent(parsed) {
-  const plant = getCurrentPlant();
+async function handleAttributeIntent(parsed, text = '') {
+  const plant = resolveAttributeTarget(parsed, text);
   if (!plant) {
     showSelectionRequiredFallback();
     speak('Please select a plant first.');
@@ -218,19 +255,37 @@ function handleAttributeIntent(parsed) {
     clearFallbackActions();
     displayPlant(plant, 'medical');
     renderMedicalPanel(plant);
-    speak(`${getDisplayName(plant)} medicinal value: ${plant.medicalInfo}`);
+    const generatedSpeech = await generateInfoSpeech({
+      plant,
+      question: 'What is the medicinal value of this plant?',
+      interest: parsed.interest,
+      history: state.visitedPlantIds,
+    });
+    speak(generatedSpeech || `${getDisplayName(plant)} medicinal value: ${plant.medicalInfo}`);
     updateHint('Medical focus panel rendered.');
     return;
   }
 
   showUnsupportedInterestFallback({
-    onMedical: () => handleAttributeIntent({ interest: 'medicinalValue' }),
+    onMedical: () => handleAttributeIntent({ ...parsed, interest: 'medicinalValue' }, text),
     onBotanical: () => {
       displayPlant(plant);
       speak(`${getDisplayName(plant)} botanical features are shown.`);
     },
   });
   speak('I do not have that information. I can show medicinal value or botanical features.');
+}
+
+function resolveAttributeTarget(parsed, text) {
+  const parsedTarget = parsed.targetPlantName ? findPlantByNameOrAlias(parsed.targetPlantName) : null;
+  if (parsedTarget) return parsedTarget;
+  const textTarget = findPlantByNameOrAlias(text);
+  if (textTarget) return textTarget;
+  return getCurrentPlant();
+}
+
+function awaitGeneratedSpeech(promise, fallback) {
+  return promise.then((speechText) => speechText || fallback);
 }
 
 function handleUnknownIntent() {
@@ -250,6 +305,7 @@ export function selectPlantById(id, { announce = false, source = 'click' } = {})
   clearCandidateHighlights();
   clearFallbackActions();
   hideInteractionPanel();
+  setQueryPlaceholder(DEFAULT_QUERY_PLACEHOLDER);
   displayPlant(plant);
 
   const prefix = source === 'view' ? 'Visible referent' : 'Selected';
@@ -262,6 +318,7 @@ export function cancelAmbiguity() {
   clearCandidateHighlights();
   clearFallbackActions();
   hideInteractionPanel();
+  setQueryPlaceholder(DEFAULT_QUERY_PLACEHOLDER);
   updateHint('Ambiguity selection canceled.');
 }
 
@@ -269,4 +326,9 @@ function findAmbiguityCandidateByName(text) {
   const namedPlant = findPlantByNameOrAlias(text);
   if (!namedPlant) return null;
   return state.ambiguityCandidates.find((candidate) => candidate.id === namedPlant.id) ?? null;
+}
+
+function setQueryPlaceholder(text) {
+  const input = els.globalQueryControls?.querySelector('input');
+  if (input) input.placeholder = text;
 }

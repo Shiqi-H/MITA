@@ -23,17 +23,40 @@ export function parseIntentLocally(text) {
   }
 
   if (normalized.includes('medicinal') || normalized.includes('medical') || normalized.includes('medicine')) {
+    const targetPlantName = extractPlantTarget(normalized);
     return {
       intent: 'queryAttribute',
-      referent: 'currentSelection',
+      referent: targetPlantName || 'currentSelection',
+      targetPlantName,
       interest: 'medicinalValue',
       confidence: 0.8,
     };
   }
 
-  if (normalized.includes('what is this') || normalized.includes('identify')) {
+  if (
+    normalized.includes('what is this') ||
+    normalized.includes('what plant is this') ||
+    normalized.includes('identify') ||
+    normalized.includes('show this plant') ||
+    normalized.includes('what am i looking at') ||
+    normalized.includes('what plant am i looking at') ||
+    normalized.includes('what is in front of me') ||
+    normalized.includes('tell me about this plant')
+  ) {
     return { intent: 'identify', confidence: 0.8 };
   }
 
   return { intent: 'unknown', confidence: 0.2 };
+}
+
+function extractPlantTarget(text) {
+  if (text.includes('giant water lily') || text.includes('water lily') || text.includes('lotus')) {
+    return 'giant water lily';
+  }
+  if (text.includes('cactus')) return 'cactus';
+  if (text.includes('ginkgo')) return 'ginkgo';
+  if (text.includes('lavender') || text.includes('lavandula')) return 'lavender';
+  if (text.includes('fern') || text.includes('nephrolepis')) return 'nephrolepis';
+  if (text.includes('santolina')) return 'santolina';
+  return '';
 }

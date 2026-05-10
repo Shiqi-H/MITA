@@ -7,7 +7,6 @@ export const els = {
   plantName: document.querySelector('#plant-name'),
   plantDescription: document.querySelector('#plant-description'),
   plantAttributes: document.querySelector('#plant-attributes'),
-  plantStatus: document.querySelector('#plant-status'),
   panelClose: document.querySelector('.panel-close'),
   loadingIndicator: document.querySelector('.loading-indicator'),
   interactionPanel: document.querySelector('.interaction-panel'),

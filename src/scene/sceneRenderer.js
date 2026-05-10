@@ -1,5 +1,5 @@
 import { getAllScenes, getPlant, getScene, formatVec3 } from '../app/selectors.js';
-import { setActiveScene, state } from '../app/state.js';
+import { clearSelectedPlant, setActiveScene, state } from '../app/state.js';
 import { createPlantEntity } from './plantRenderer.js';
 import { displayPlant, hidePlantPanel, setLoading, updateHint } from '../ui/panels.js';
 import { els } from '../ui/dom.js';
@@ -20,6 +20,7 @@ export function goToScene(id) {
   const scene = getScene(id);
   if (!scene) return;
   setActiveScene(id);
+  clearSelectedPlant();
   setLoading(true);
   hidePlantPanel();
   els.sceneTitle.textContent = scene.title;
@@ -27,7 +28,7 @@ export function goToScene(id) {
   updateNav();
   renderSceneContent(scene);
   setLoading(false);
-  updateHint(`Scene ${scene.label} loaded. Click a plant or hotspot to start.`);
+  updateHint(`Scene ${scene.label} loaded. Click a plant to start.`);
 }
 
 export function updateNav() {
@@ -38,30 +39,10 @@ export function updateNav() {
 
 function renderSceneContent(scene) {
   els.container.innerHTML = '';
-  renderSceneLinks(scene.links);
   scene.models.map((id) => getPlant(id)).filter(Boolean).forEach((plant) => {
     els.container.appendChild(createPlantEntity(plant));
   });
   renderHotspots(scene.hotspots);
-}
-
-function renderSceneLinks(links) {
-  links.forEach((link) => {
-    const arrow = document.createElement('a-image');
-    arrow.setAttribute('src', '#arrow-img');
-    arrow.setAttribute('position', formatVec3(link.position));
-    arrow.setAttribute('rotation', formatVec3(link.rotation));
-    arrow.setAttribute('scale', '0.82 0.82 0.82');
-    arrow.setAttribute('class', 'clickable scene-link');
-    arrow.setAttribute('animation__hover', 'property: scale; startEvents: mouseenter; to: 1 1 1; dur: 160');
-    arrow.setAttribute('animation__leave', 'property: scale; startEvents: mouseleave; to: 0.82 0.82 0.82; dur: 160');
-    arrow.addEventListener('click', (event) => {
-      event.stopPropagation();
-      window.__mitaSkipNextRaycast = true;
-      goToScene(link.target);
-    });
-    els.container.appendChild(arrow);
-  });
 }
 
 function renderHotspots(hotspots) {

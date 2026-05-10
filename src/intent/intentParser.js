@@ -20,17 +20,21 @@ export function parseIntentLocally(text) {
   }
 
   if (matchesAny(normalized, intents.medical)) {
+    const targetPlantName = extractPlantTarget(normalized);
     return {
       intent: 'queryAttribute',
-      referent: 'currentSelection',
+      referent: targetPlantName || 'currentSelection',
+      targetPlantName,
       interest: 'medicinalValue',
     };
   }
 
   if (matchesAny(normalized, intents.unknownInterest)) {
+    const targetPlantName = extractPlantTarget(normalized);
     return {
       intent: 'queryAttribute',
-      referent: 'currentSelection',
+      referent: targetPlantName || 'currentSelection',
+      targetPlantName,
       interest: 'unknown',
     };
   }
@@ -55,6 +59,10 @@ function parseMarker(text) {
 }
 
 function extractCompareTarget(text) {
+  return extractPlantTarget(text);
+}
+
+function extractPlantTarget(text) {
   if (text.includes('giant water lily') || text.includes('water lily') || text.includes('lotus')) {
     return 'giant water lily';
   }

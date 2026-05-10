@@ -1,7 +1,7 @@
 {
   "lavender": {
     "id": "lavender",
-    "displayName": "Lavandula",
+    "displayName": "Lavender",
     "aliases": ["lavender", "lavandula"],
     "sceneId": "scene-1",
     "model": "/models/Lavandula.glb",
@@ -16,7 +16,7 @@
       "medicinalValue": "aromatic and calming"
     },
     "images": {
-      "medical": "/scene-1.jpg"
+      "medical": "/Lavandula-medic.jpg"
     }
   },
   "nephrolepis": {

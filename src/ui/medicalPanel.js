@@ -10,7 +10,6 @@ export function renderMedicalPanel(plant) {
       <p class="eyebrow">Medicinal value</p>
       <h3>${getDisplayName(plant)}</h3>
       <p>${plant.medicalInfo}</p>
-      <p class="panel-status">Recorded value: ${plant.attributes.medicinalValue}</p>
     </div>
   `;
   showInteractionPanel('Medicinal Focus', layout);

@@ -6,13 +6,26 @@ loadLocalEnv();
 
 export const config = {
   port: Number(process.env.PORT ?? 8787),
-  newApiKey: process.env.NEWAPI_API_KEY ?? '',
-  newApiBaseUrl: normalizeBaseUrl(process.env.NEWAPI_BASE_URL ?? 'https://newapi.gisphere.info'),
-  newApiModel: process.env.NEWAPI_MODEL ?? 'gpt nano',
+  openai: {
+    apiKey: process.env.OPENAI_API_KEY ?? process.env.NEWAPI_API_KEY ?? '',
+    baseUrl: getOpenAiBaseUrl(),
+    model: process.env.OPENAI_MODEL ?? process.env.NEWAPI_MODEL ?? 'gpt-4o-mini',
+  },
 };
 
 function normalizeBaseUrl(url) {
   return url.replace(/\/+$/, '');
+}
+
+function getOpenAiBaseUrl() {
+  if (process.env.OPENAI_BASE_URL) return normalizeBaseUrl(process.env.OPENAI_BASE_URL);
+  if (process.env.NEWAPI_BASE_URL) return ensureV1Path(process.env.NEWAPI_BASE_URL);
+  return 'https://api.openai.com/v1';
+}
+
+function ensureV1Path(url) {
+  const normalized = normalizeBaseUrl(url);
+  return normalized.endsWith('/v1') ? normalized : `${normalized}/v1`;
 }
 
 function loadLocalEnv() {

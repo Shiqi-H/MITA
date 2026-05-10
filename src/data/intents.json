@@ -1,5 +1,14 @@
 {
-  "identify": ["what is this", "what plant is this", "identify this", "show this plant"],
+  "identify": [
+    "what is this",
+    "what plant is this",
+    "identify this",
+    "show this plant",
+    "what am i looking at",
+    "what plant am i looking at",
+    "what is in front of me",
+    "tell me about this plant"
+  ],
   "ambiguity": ["a", "b", "front", "back", "front one", "back one"],
   "compare": ["compare", "more drought tolerant", "drought tolerance", "than the giant water lily"],
   "medical": ["medicinal value", "medical", "medicine", "medicinal", "herbal use"],

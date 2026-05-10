@@ -3,8 +3,13 @@ import { parseIntentLocally } from './intentParser.js';
 const INTENT_ENGINE = import.meta.env.VITE_INTENT_ENGINE ?? 'local';
 
 export async function parseIntent(text, context) {
+  const deterministicIntent = parseIntentLocally(text, context);
+  if (['identify', 'resolveAmbiguity'].includes(deterministicIntent.intent)) {
+    return { ...deterministicIntent, source: 'local' };
+  }
+
   if (INTENT_ENGINE !== 'llm') {
-    return parseIntentLocally(text, context);
+    return deterministicIntent;
   }
 
   try {
@@ -27,5 +32,36 @@ export async function parseIntent(text, context) {
       ...parseIntentLocally(text, context),
       parserFallback: 'local',
     };
+  }
+}
+
+export async function generateInfoSpeech({ plant, question = '', interest = '', history = [] }) {
+  return postSpeech('/api/generate-info', { plant, question, interest, history });
+}
+
+export async function generateCompareSpeech({ left, right, attribute = 'droughtTolerance', history = [] }) {
+  return postSpeech('/api/compare', { left, right, attribute, history });
+}
+
+export async function generateDisambiguationSpeech(candidates) {
+  return postSpeech('/api/generate-disambiguation', { candidates });
+}
+
+async function postSpeech(url, body) {
+  if (INTENT_ENGINE !== 'llm') return '';
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) throw new Error(`${url} failed: ${response.status}`);
+    const payload = await response.json();
+    return typeof payload.speech === 'string' ? payload.speech : '';
+  } catch (error) {
+    console.warn(error);
+    return '';
   }
 }

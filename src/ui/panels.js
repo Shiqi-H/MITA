@@ -1,4 +1,4 @@
-import { state, recordVisitedPlant, resetVoiceFailures } from '../app/state.js';
+import { clearSelectedPlant, resetVoiceFailures, setSelectedPlant } from '../app/state.js';
 import { getDisplayName } from '../app/selectors.js';
 import { els } from './dom.js';
 
@@ -30,17 +30,20 @@ export function updateHint(text) {
 
 export function displayPlant(plant, focusType = 'default') {
   if (!plant) return;
-  state.selectedPlantId = plant.id;
-  recordVisitedPlant(plant.id);
+  setSelectedPlant(plant.id);
   els.plantName.textContent = getDisplayName(plant);
   els.plantDescription.textContent = plant.description;
-  els.plantStatus.textContent = getPlantStatus(plant, focusType);
   renderAttributes(plant, focusType);
   els.plantPanel.hidden = false;
 }
 
 export function hidePlantPanel() {
   els.plantPanel.hidden = true;
+}
+
+export function closePlantPanelAndClearSelection() {
+  hidePlantPanel();
+  clearSelectedPlant();
 }
 
 export function hideInteractionPanel() {
@@ -93,11 +96,9 @@ function renderAttributes(plant, focusType) {
   const rows =
     focusType === 'medical'
       ? [
-          ['ID', plant.id],
           ['Medicinal value', plant.attributes.medicinalValue],
         ]
       : [
-          ['ID', plant.id],
           ['Drought tolerance', plant.attributes.droughtTolerance],
           ['Height', plant.attributes.height],
           ['Lifespan', plant.attributes.lifespan],
@@ -109,8 +110,3 @@ function renderAttributes(plant, focusType) {
     .join('');
 }
 
-function getPlantStatus(plant, focusType) {
-  if (focusType === 'medical') return `Focused on medicinal value for ${getDisplayName(plant)}.`;
-  if (focusType === 'compare') return `Comparing ${getDisplayName(plant)} with another plant.`;
-  return `Selected ${getDisplayName(plant)}.`;
-}

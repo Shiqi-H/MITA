@@ -1,15 +1,15 @@
-import { cancelAmbiguity, handleQuery } from './app/grounding.js';
+import { cancelAmbiguity, handleAmbiguityRecognitionFailure, handleQuery } from './app/grounding.js';
 import { resetVoiceFailures, state } from './app/state.js';
 import { initRaycastSelection } from './scene/raycastSelection.js';
 import { buildSceneNav, goToScene, updateNav } from './scene/sceneRenderer.js';
 import { initSpeechRecognition, startSpeechRecognition } from './speech/speech.js';
 import { hideComparePanel } from './ui/comparePanel.js';
 import { els } from './ui/dom.js';
-import { hideHistoryPanel, hideInteractionPanel, hidePlantPanel, showHistoryPanel, updateHint } from './ui/panels.js';
+import { closePlantPanelAndClearSelection, hideHistoryPanel, hidePlantPanel, showHistoryPanel, updateHint } from './ui/panels.js';
 import { renderQueryControls } from './ui/queryControls.js';
 
 function initApp() {
-  els.panelClose.addEventListener('click', hidePlantPanel);
+  els.panelClose.addEventListener('click', closePlantPanelAndClearSelection);
   els.interactionClose.addEventListener('click', cancelAmbiguity);
   els.compareClose.addEventListener('click', hideComparePanel);
   els.historyClose.addEventListener('click', hideHistoryPanel);
@@ -23,6 +23,7 @@ function initApp() {
 
   initSpeechRecognition({
     onTranscript: handleQuery,
+    onRecognitionFailure: handleAmbiguityRecognitionFailure,
   });
 
   resetVoiceFailures();

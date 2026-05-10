@@ -21,6 +21,6 @@ export function createPlantEntity(plant) {
 function applyFallbackGeometry(entity, plant) {
   const color = plant.id === 'giant_lotus' ? '#9dd7e6' : plant.id === 'ginkgo' ? '#e0cf63' : '#7bc67e';
   const primitive = plant.id === 'giant_lotus' ? 'cylinder' : 'sphere';
-  entity.setAttribute('geometry', `primitive: ${primitive}; radius: 0.4; height: 0.08`);
+  entity.setAttribute('geometry', `primitive: ${primitive}; radius: 0.2; height: 0.08`);
   entity.setAttribute('material', `color: ${color}; shader: flat; opacity: 0.9`);
 }

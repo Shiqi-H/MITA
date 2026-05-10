@@ -22,6 +22,10 @@ export function getCurrentPlant() {
   return state.selectedPlantId ? getPlant(state.selectedPlantId) : null;
 }
 
+export function getCurrentScenePlantIds() {
+  return getScene(state.activeSceneId)?.models ?? [];
+}
+
 export function formatVec3(values) {
   return values.join(' ');
 }
