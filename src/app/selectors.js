@@ -22,6 +22,19 @@ export function getCurrentPlant() {
   return state.selectedPlantId ? getPlant(state.selectedPlantId) : null;
 }
 
+export function getPreviousSelectedPlant() {
+  const currentId = state.selectedPlantId;
+  if (!currentId) return null;
+
+  for (let index = state.visitedPlantIds.length - 2; index >= 0; index -= 1) {
+    const id = state.visitedPlantIds[index];
+    const plant = id && id !== currentId ? getPlant(id) : null;
+    if (plant) return plant;
+  }
+
+  return null;
+}
+
 export function getCurrentScenePlantIds() {
   return getScene(state.activeSceneId)?.models ?? [];
 }

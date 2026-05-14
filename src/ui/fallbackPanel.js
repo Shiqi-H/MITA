@@ -1,8 +1,7 @@
-import { setFallbackActions, showInteractionPanel, updateHint } from './panels.js';
+import { setFallbackActions, showInteractionPanel } from './panels.js';
 
 export function showSelectionRequiredFallback() {
   showInteractionPanel('Select a plant first', 'Please select a plant in the scene before asking for a focused attribute.');
-  updateHint('Select a plant, then ask again.');
 }
 
 export function showUnsupportedInterestFallback({ onMedical, onBotanical }) {
@@ -14,5 +13,4 @@ export function showUnsupportedInterestFallback({ onMedical, onBotanical }) {
     { label: 'Medicinal value', onClick: onMedical },
     { label: 'Botanical features', onClick: onBotanical },
   ]);
-  updateHint('Choose an available information type.');
 }

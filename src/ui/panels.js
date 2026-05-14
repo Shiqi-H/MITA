@@ -2,19 +2,6 @@ import { clearSelectedPlant, resetVoiceFailures, setSelectedPlant } from '../app
 import { getDisplayName } from '../app/selectors.js';
 import { els } from './dom.js';
 
-let loadingTimer = null;
-
-export function setLoading(isLoading) {
-  window.clearTimeout(loadingTimer);
-  if (isLoading) {
-    els.loadingIndicator.classList.add('is-visible');
-    return;
-  }
-  loadingTimer = window.setTimeout(() => {
-    els.loadingIndicator.classList.remove('is-visible');
-  }, 250);
-}
-
 export function appendVoiceLog(text) {
   const item = document.createElement('li');
   item.textContent = text;
@@ -22,10 +9,6 @@ export function appendVoiceLog(text) {
   while (els.voiceLog.children.length > 20) {
     els.voiceLog.removeChild(els.voiceLog.lastElementChild);
   }
-}
-
-export function updateHint(text) {
-  els.hint.textContent = text;
 }
 
 export function displayPlant(plant, focusType = 'default') {
@@ -89,7 +72,6 @@ export function clearFallbackActions() {
 export function resetVoiceUi() {
   resetVoiceFailures();
   clearFallbackActions();
-  updateHint('Voice input cleared.');
 }
 
 function renderAttributes(plant, focusType) {

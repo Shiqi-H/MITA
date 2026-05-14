@@ -21,7 +21,7 @@ export function clearSelectedPlant() {
 }
 
 export function recordVisitedPlant(id) {
-  if (!id || state.visitedPlantIds.includes(id)) return;
+  if (!id || state.visitedPlantIds.at(-1) === id) return;
   state.visitedPlantIds.push(id);
 }
 

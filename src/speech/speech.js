@@ -44,7 +44,6 @@ export function initSpeechRecognition({ onTranscript, onRecognitionFailure }) {
   });
   speechRecognition.addEventListener('error', () => {
     receivedResult = true;
-    appendVoiceLog('STT error: recognition failed');
     onRecognitionFailure?.('error');
     setListening(false);
   });

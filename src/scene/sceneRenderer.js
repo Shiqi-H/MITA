@@ -1,7 +1,7 @@
 import { getAllScenes, getPlant, getScene, formatVec3 } from '../app/selectors.js';
 import { clearSelectedPlant, setActiveScene, state } from '../app/state.js';
 import { createPlantEntity } from './plantRenderer.js';
-import { displayPlant, hidePlantPanel, setLoading, updateHint } from '../ui/panels.js';
+import { displayPlant, hidePlantPanel } from '../ui/panels.js';
 import { els } from '../ui/dom.js';
 
 export function buildSceneNav() {
@@ -21,14 +21,11 @@ export function goToScene(id) {
   if (!scene) return;
   setActiveScene(id);
   clearSelectedPlant();
-  setLoading(true);
   hidePlantPanel();
   els.sceneTitle.textContent = scene.title;
   els.sky.setAttribute('src', scene.panorama);
   updateNav();
   renderSceneContent(scene);
-  setLoading(false);
-  updateHint(`Scene ${scene.label} loaded. Click a plant to start.`);
 }
 
 export function updateNav() {

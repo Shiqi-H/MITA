@@ -60,9 +60,7 @@ a-scene {
 .history-panel,
 .compare-panel,
 .global-query-controls,
-.disambiguation-layer,
-.gesture-hint,
-.loading-indicator {
+.disambiguation-layer {
   position: absolute;
   z-index: 10;
 }
@@ -220,8 +218,11 @@ h2 {
   position: absolute;
   top: 12px;
   right: 12px;
+  display: grid;
+  place-items: center;
   width: 34px;
   height: 34px;
+  padding: 0;
   border-radius: 50%;
   font-size: 22px;
   line-height: 1;
@@ -416,63 +417,6 @@ h2 {
   color: var(--muted);
 }
 
-.loading-indicator {
-  left: 50%;
-  top: 50%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--panel-strong);
-  box-shadow: var(--shadow);
-  opacity: 0;
-  transform: translate(-50%, -46%);
-  transition:
-    opacity 180ms ease,
-    transform 180ms ease;
-  pointer-events: none;
-}
-
-.loading-indicator.is-visible {
-  opacity: 1;
-  transform: translate(-50%, -50%);
-}
-
-.loading-indicator span {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--leaf);
-  box-shadow: 0 0 0 0 rgba(149, 208, 106, 0.55);
-  animation: pulse 1.2s infinite;
-}
-
-.gesture-hint {
-  left: 50%;
-  top: 32px;
-  width: min(760px, calc(100vw - 44px));
-  margin: 0;
-  padding: 12px 16px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--muted);
-  text-align: center;
-  background: var(--panel);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
-  backdrop-filter: blur(16px);
-  cursor: pointer;
-  transform: translateX(-50%);
-}
-
-.gesture-hint:hover,
-.gesture-hint:focus-visible {
-  border-color: rgba(149, 208, 106, 0.78);
-  color: var(--ink);
-  outline: none;
-}
-
 .disambiguation-layer {
   inset: 0;
   z-index: 6;
@@ -576,16 +520,6 @@ h2 {
   object-fit: cover;
 }
 
-@keyframes pulse {
-  70% {
-    box-shadow: 0 0 0 10px rgba(149, 208, 106, 0);
-  }
-
-  100% {
-    box-shadow: 0 0 0 0 rgba(149, 208, 106, 0);
-  }
-}
-
 @keyframes listenButtonPulse {
   0%,
   100% {
@@ -662,13 +596,6 @@ h2 {
 
   .query-controls input {
     grid-column: 1 / -1;
-  }
-
-  .gesture-hint {
-    top: 138px;
-    width: calc(100vw - 32px);
-    border-radius: 8px;
-    font-size: 14px;
   }
 
   .compare-grid,

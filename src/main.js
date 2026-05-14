@@ -5,7 +5,7 @@ import { buildSceneNav, goToScene, updateNav } from './scene/sceneRenderer.js';
 import { initSpeechRecognition, startSpeechRecognition } from './speech/speech.js';
 import { hideComparePanel } from './ui/comparePanel.js';
 import { els } from './ui/dom.js';
-import { closePlantPanelAndClearSelection, hideHistoryPanel, hidePlantPanel, showHistoryPanel, updateHint } from './ui/panels.js';
+import { closePlantPanelAndClearSelection, hideHistoryPanel, hidePlantPanel, showHistoryPanel } from './ui/panels.js';
 import { renderQueryControls } from './ui/queryControls.js';
 
 function initApp() {
@@ -13,7 +13,7 @@ function initApp() {
   els.interactionClose.addEventListener('click', cancelAmbiguity);
   els.compareClose.addEventListener('click', hideComparePanel);
   els.historyClose.addEventListener('click', hideHistoryPanel);
-  els.hint.addEventListener('click', showHistoryPanel);
+  els.historyTrigger.addEventListener('click', showHistoryPanel);
 
   renderQueryControls(els.globalQueryControls, {
     placeholder: 'Ask about this plant...',
@@ -34,7 +34,6 @@ function initApp() {
   hidePlantPanel();
   hideComparePanel();
   hideHistoryPanel();
-  updateHint('Drag to look around. Click a plant, or ask about the current view.');
 }
 
 initApp();

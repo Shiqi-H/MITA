@@ -1,5 +1,4 @@
 import { getPlant } from '../app/selectors.js';
-import { updateHint } from '../ui/panels.js';
 import { selectPlantById } from '../app/grounding.js';
 import { els } from '../ui/dom.js';
 
@@ -45,7 +44,6 @@ function handleSceneClick(event) {
     return;
   }
 
-  updateHint('No plant hit. Click directly through a plant model.');
 }
 
 function getPlantObjects() {
