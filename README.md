@@ -118,8 +118,7 @@ Is this more drought tolerant than the giant water lily?
 - 更丰富的数据来源：为每个植物补充图片、来源链接、养护建议和医学免责声明。
 - 离线演示模式：在没有 LLM API 的情况下，使用更完整的本地规则和模板生成回答。
 
-## ��ʵ��
-
+## 已更新
 - [x] 2026-05-14 English follow-up context support: current selected plant and previous selected plant can be resolved from follow-up questions such as `it`, `this one`, `that plant`, `previous one`, and `last one`. Completed at 23:53 +02:00.
 - [x] 2026-05-14 Named comparison target priority: `Compare this one with cactus` now compares the current selection with Cactus instead of falling back to the previous selection. Completed at 23:53 +02:00.
 - [x] 2026-05-14 Drought-tolerance-only comparison rule: supported comparisons continue to use `droughtTolerance`; attempts to compare height, lifespan, medicinal value, or other attributes now get a not-supported voice response. Completed at 23:53 +02:00.
