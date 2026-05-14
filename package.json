@@ -8,7 +8,8 @@
     "server": "npm --prefix server run dev",
     "dev:server": "npm --prefix server run dev",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:parser": "node scripts/validate-followup-context.mjs"
   },
   "devDependencies": {
     "vite": "^8.0.10"

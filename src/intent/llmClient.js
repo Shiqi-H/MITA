@@ -4,7 +4,10 @@ const INTENT_ENGINE = import.meta.env.VITE_INTENT_ENGINE ?? 'local';
 
 export async function parseIntent(text, context) {
   const deterministicIntent = parseIntentLocally(text, context);
-  if (['identify', 'resolveAmbiguity'].includes(deterministicIntent.intent)) {
+  if (
+    ['identify', 'resolveAmbiguity'].includes(deterministicIntent.intent) ||
+    hasNamedCompareTarget(deterministicIntent)
+  ) {
     return { ...deterministicIntent, source: 'local' };
   }
 
@@ -33,6 +36,10 @@ export async function parseIntent(text, context) {
       parserFallback: 'local',
     };
   }
+}
+
+function hasNamedCompareTarget(intent) {
+  return intent.intent === 'compare' && intent.target2Referent === 'namedPlant' && Boolean(intent.target2Name);
 }
 
 export async function generateInfoSpeech({ plant, question = '', interest = '', history = [] }) {

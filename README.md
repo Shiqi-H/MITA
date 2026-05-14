@@ -117,3 +117,12 @@ Is this more drought tolerant than the giant water lily?
 - 植物历史面板：把访问过的植物按时间展示，并允许用户从历史中重新选择、比较或查看详情。
 - 更丰富的数据来源：为每个植物补充图片、来源链接、养护建议和医学免责声明。
 - 离线演示模式：在没有 LLM API 的情况下，使用更完整的本地规则和模板生成回答。
+
+## ��ʵ��
+
+- [x] 2026-05-14 English follow-up context support: current selected plant and previous selected plant can be resolved from follow-up questions such as `it`, `this one`, `that plant`, `previous one`, and `last one`. Completed at 23:53 +02:00.
+- [x] 2026-05-14 Named comparison target priority: `Compare this one with cactus` now compares the current selection with Cactus instead of falling back to the previous selection. Completed at 23:53 +02:00.
+- [x] 2026-05-14 Drought-tolerance-only comparison rule: supported comparisons continue to use `droughtTolerance`; attempts to compare height, lifespan, medicinal value, or other attributes now get a not-supported voice response. Completed at 23:53 +02:00.
+- [x] 2026-05-14 LLM intent prompt alignment: LLM mode now follows the English-only follow-up schema and marks non-drought comparison attributes as unsupported. Completed at 23:53 +02:00.
+- [x] 2026-05-14 Parser validation coverage: added `npm.cmd run test:parser` to validate current-selection follow-ups, previous-selection comparison, named comparison, and unsupported comparison attributes. Completed at 23:53 +02:00.
+- [x] 2026-05-14 Build verification: `npm.cmd run test:parser` and `npm.cmd run build` both pass. Completed at 23:53 +02:00.

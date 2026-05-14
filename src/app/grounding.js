@@ -4,6 +4,7 @@ import {
   getCurrentScenePlantIds,
   findVisitedPlantByNameOrAlias,
   getCurrentPlant,
+  getPreviousSelectedPlant,
   getDisplayName,
   getPlant,
 } from './selectors.js';
@@ -23,7 +24,6 @@ import {
   displayPlant,
   hideInteractionPanel,
   showInteractionPanel,
-  updateHint,
 } from '../ui/panels.js';
 import { showSelectionRequiredFallback, showUnsupportedInterestFallback } from '../ui/fallbackPanel.js';
 import { els } from '../ui/dom.js';
@@ -44,7 +44,6 @@ export async function handleQuery(text) {
     ambiguityCandidates: state.ambiguityCandidates,
   };
   const parsed = await parseIntent(text, context);
-  if (parsed.parserFallback) appendVoiceLog('Intent parser fallback: local rules used.');
 
   if (state.ambiguityCandidates.length && parsed.intent === 'resolveAmbiguity') {
     handleAmbiguityReply(parsed);
@@ -67,7 +66,7 @@ export async function handleQuery(text) {
   }
 
   if (parsed.intent === 'compare') {
-    handleCompareIntent(parsed);
+    handleCompareIntent(parsed, text);
     return;
   }
 
@@ -80,7 +79,6 @@ export async function handleQuery(text) {
   if (namedPlant) {
     displayPlant(namedPlant);
     speak(`${getDisplayName(namedPlant)} information is shown.`);
-    updateHint(`Focused referent: ${getDisplayName(namedPlant)}.`);
     return;
   }
 
@@ -135,7 +133,6 @@ export function promptAmbiguity(candidateIds) {
     `Multiple plants were detected. Type or say ${letters.replaceAll(' / ', ', ')}.`,
   );
   generatedSpeech.then(speak);
-  updateHint('Ambiguity pending. Choose a letter marker.');
 }
 
 export async function resolveAmbiguityById(id) {
@@ -173,7 +170,6 @@ function applyAmbiguityFailure(failures) {
   speak(`I could not match that answer. Please choose ${letters}.`);
   if (failures >= 2) {
     setQueryPlaceholder(AMBIGUITY_FALLBACK_PLACEHOLDER);
-    updateHint(`Choose one of these markers: ${letters}.`);
   }
 }
 
@@ -199,7 +195,7 @@ function handleIdentifyIntent() {
   }
 
   if (visiblePlantIds.length === 1) {
-    selectPlantById(visiblePlantIds[0], { announce: true, source: 'view' });
+    selectPlantById(visiblePlantIds[0], { announce: true });
     return;
   }
 
@@ -207,39 +203,52 @@ function handleIdentifyIntent() {
   speak('I cannot see a plant clearly. Please move the view or click a plant.');
 }
 
-async function handleCompareIntent(parsed) {
-  const left = getCurrentPlant();
+async function handleCompareIntent(parsed, text = '') {
+  const left = resolvePlantReferent(parsed.target1 || 'currentSelection', parsed.target1Name || '');
   if (!left) {
     showSelectionRequiredFallback();
     speak('Please select a plant first.');
     return;
   }
 
-  const targetText = parsed.target2Name || 'giant water lily';
-  const visitedMatch = findVisitedPlantByNameOrAlias(targetText);
-  const globalMatch = findPlantByNameOrAlias(targetText);
-  const right = visitedMatch || globalMatch;
+  const namedTargetFromText = findPlantByNameOrAlias(text);
+  const target2Referent = namedTargetFromText ? 'namedPlant' : parsed.target2Referent || 'previousSelection';
+  const targetText = namedTargetFromText ? getDisplayName(namedTargetFromText) : parsed.target2Name || '';
+  const right = resolvePlantReferent(target2Referent, targetText);
+  const attribute = parsed.attribute || 'droughtTolerance';
+
+  if (attribute !== 'droughtTolerance') {
+    speak('Comparison for that attribute is not supported yet. I can compare drought tolerance.');
+    return;
+  }
 
   if (!right) {
+    if (target2Referent === 'previousSelection') {
+      showInteractionPanel('Previous plant not found', 'Please select at least two different plants before comparing with the previous selection.');
+      speak('Please select at least two different plants before comparing with the previous selection.');
+      return;
+    }
+
     showInteractionPanel('Comparison target not found', `I could not find ${targetText}. Please select another plant or use a known plant name.`);
     speak(`I could not find ${targetText}.`);
     return;
   }
 
-  const note = visitedMatch
+  const note = target2Referent === 'previousSelection'
+    ? 'Compared with the previously selected plant.'
+    : findVisitedPlantByNameOrAlias(targetText)
     ? ''
     : `${getDisplayName(right)} was not in your visited history, so I used the plant database instead.`;
 
   displayPlant(left, 'compare');
-  renderComparePanel(left, right, parsed.attribute, note);
+  renderComparePanel(left, right, attribute, note);
   const generatedSpeech = await generateCompareSpeech({
     left,
     right,
-    attribute: parsed.attribute,
+    attribute,
     history: state.visitedPlantIds,
   });
-  speak(generatedSpeech || `Yes. ${getDisplayName(left)} is more drought tolerant than ${getDisplayName(right)}.`);
-  updateHint(`Compare panel opened: ${getDisplayName(left)} versus ${getDisplayName(right)}.`);
+  speak(generatedSpeech || getCompareFallbackSpeech(left, right));
 }
 
 async function handleAttributeIntent(parsed, text = '') {
@@ -262,7 +271,6 @@ async function handleAttributeIntent(parsed, text = '') {
       history: state.visitedPlantIds,
     });
     speak(generatedSpeech || `${getDisplayName(plant)} medicinal value: ${plant.medicalInfo}`);
-    updateHint('Medical focus panel rendered.');
     return;
   }
 
@@ -281,7 +289,19 @@ function resolveAttributeTarget(parsed, text) {
   if (parsedTarget) return parsedTarget;
   const textTarget = findPlantByNameOrAlias(text);
   if (textTarget) return textTarget;
+  return resolvePlantReferent(parsed.referent || 'currentSelection', parsed.targetPlantName || '');
+}
+
+function resolvePlantReferent(referent, targetText = '') {
+  if (referent === 'previousSelection') return getPreviousSelectedPlant();
+  if (referent === 'namedPlant') {
+    return findVisitedPlantByNameOrAlias(targetText) || findPlantByNameOrAlias(targetText);
+  }
   return getCurrentPlant();
+}
+
+function getCompareFallbackSpeech(left, right) {
+  return `${getDisplayName(left)} and ${getDisplayName(right)} are compared by drought tolerance.`;
 }
 
 function awaitGeneratedSpeech(promise, fallback) {
@@ -289,15 +309,10 @@ function awaitGeneratedSpeech(promise, fallback) {
 }
 
 function handleUnknownIntent() {
-  const failures = incrementVoiceFailures();
   speak('I could not identify a clear target. Please click the scene or add more detail.');
-  updateHint('No clear intent found. Try: What is this?');
-  if (failures >= 2) {
-    updateHint('Click a plant in the 3D scene, or ask about a selected plant.');
-  }
 }
 
-export function selectPlantById(id, { announce = false, source = 'click' } = {}) {
+export function selectPlantById(id, { announce = false } = {}) {
   const plant = getPlant(id);
   if (!plant) return;
 
@@ -308,9 +323,7 @@ export function selectPlantById(id, { announce = false, source = 'click' } = {})
   setQueryPlaceholder(DEFAULT_QUERY_PLACEHOLDER);
   displayPlant(plant);
 
-  const prefix = source === 'view' ? 'Visible referent' : 'Selected';
   if (announce) speak(`${getDisplayName(plant)} information is shown.`);
-  updateHint(`${prefix}: ${getDisplayName(plant)}.`);
 }
 
 export function cancelAmbiguity() {
@@ -319,7 +332,6 @@ export function cancelAmbiguity() {
   clearFallbackActions();
   hideInteractionPanel();
   setQueryPlaceholder(DEFAULT_QUERY_PLACEHOLDER);
-  updateHint('Ambiguity selection canceled.');
 }
 
 function findAmbiguityCandidateByName(text) {

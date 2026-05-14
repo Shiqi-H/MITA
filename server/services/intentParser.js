@@ -12,12 +12,14 @@ export function parseIntentLocally(text) {
     return { intent: 'resolveAmbiguity', marker: 'C', confidence: 0.9 };
   }
 
-  if (normalized.includes('more drought tolerant') || normalized.includes('compare')) {
+  if (isCompareIntent(normalized)) {
+    const target2Referent = getCompareReferent(normalized);
     return {
       intent: 'compare',
       target1: 'currentSelection',
-      target2Name: normalized.includes('giant water lily') ? 'giant water lily' : '',
-      attribute: 'droughtTolerance',
+      target2Referent,
+      target2Name: target2Referent === 'namedPlant' ? extractPlantTarget(normalized) : '',
+      attribute: getComparisonAttribute(normalized),
       confidence: 0.8,
     };
   }
@@ -26,7 +28,7 @@ export function parseIntentLocally(text) {
     const targetPlantName = extractPlantTarget(normalized);
     return {
       intent: 'queryAttribute',
-      referent: targetPlantName || 'currentSelection',
+      referent: getAttributeReferent(normalized, targetPlantName),
       targetPlantName,
       interest: 'medicinalValue',
       confidence: 0.8,
@@ -47,6 +49,96 @@ export function parseIntentLocally(text) {
   }
 
   return { intent: 'unknown', confidence: 0.2 };
+}
+
+function isCompareIntent(text) {
+  return (
+    text.includes('more drought tolerant') ||
+    text.includes('drought tolerance') ||
+    text.includes('compare') ||
+    text.includes('compared to') ||
+    text.includes('compared with') ||
+    text.includes('how does it compare') ||
+    text.includes('how do they compare') ||
+    text.includes('what about compared to') ||
+    text.includes('what about compared with') ||
+    (text.includes('than') && hasComparisonCue(text))
+  );
+}
+
+function hasComparisonCue(text) {
+  return [
+    'more',
+    'less',
+    'better',
+    'worse',
+    'taller',
+    'shorter',
+    'longer',
+    'medicinal',
+    'medical',
+    'drought',
+    'height',
+    'lifespan',
+  ].some((cue) => text.includes(cue));
+}
+
+function getCompareReferent(text) {
+  if (
+    text.includes('previous') ||
+    text.includes('last') ||
+    text.includes('the one before') ||
+    text.includes('previous one') ||
+    text.includes('last one') ||
+    text.includes('the previous plant') ||
+    text.includes('previously selected') ||
+    text.includes('last selected')
+  ) {
+    return 'previousSelection';
+  }
+  return extractPlantTarget(text) ? 'namedPlant' : 'previousSelection';
+}
+
+function getAttributeReferent(text, targetPlantName) {
+  if (targetPlantName) return 'namedPlant';
+  if (
+    text.includes('previous') ||
+    text.includes('last one') ||
+    text.includes('the one before') ||
+    text.includes('the previous plant')
+  ) {
+    return 'previousSelection';
+  }
+  return 'currentSelection';
+}
+
+function getComparisonAttribute(text) {
+  if (
+    text.includes('medicinal') ||
+    text.includes('medical') ||
+    text.includes('medicine') ||
+    text.includes('herbal')
+  ) {
+    return 'unsupported';
+  }
+  if (
+    text.includes('height') ||
+    text.includes('tall') ||
+    text.includes('taller') ||
+    text.includes('shorter')
+  ) {
+    return 'unsupported';
+  }
+  if (
+    text.includes('lifespan') ||
+    text.includes('life span') ||
+    text.includes('live longer') ||
+    text.includes('lives longer') ||
+    text.includes('long-lived')
+  ) {
+    return 'unsupported';
+  }
+  return 'droughtTolerance';
 }
 
 function extractPlantTarget(text) {
