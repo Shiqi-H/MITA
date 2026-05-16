@@ -21,6 +21,7 @@ export const els = {
   compareClose: document.querySelector('#compare-close'),
   voiceLog: document.querySelector('#voice-log'),
   disambiguationLayer: document.querySelector('#disambiguation-layer'),
+  fadeOverlay: document.querySelector('#scene-fade-overlay'),
   scene: document.querySelector('#main-scene'),
   camera: document.querySelector('#camera'),
 };

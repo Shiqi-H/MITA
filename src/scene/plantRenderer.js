@@ -1,4 +1,5 @@
 import { formatVec3, scaleBy } from '../app/selectors.js';
+import { hoverHighlight, unhoverHighlight } from '../ui/highlight.js';
 
 export function createPlantEntity(plant) {
   const entity = document.createElement('a-entity');
@@ -15,6 +16,8 @@ export function createPlantEntity(plant) {
   entity.setAttribute('data-plant-id', plant.id);
   entity.setAttribute('animation__hover', `property: scale; startEvents: mouseenter; to: ${scaleBy(plant.scale, 1.09)}; dur: 180`);
   entity.setAttribute('animation__leave', `property: scale; startEvents: mouseleave; to: ${formatVec3(plant.scale)}; dur: 180`);
+  entity.addEventListener('mouseenter', () => hoverHighlight(plant.id));
+  entity.addEventListener('mouseleave', () => unhoverHighlight(plant.id));
   return entity;
 }
 

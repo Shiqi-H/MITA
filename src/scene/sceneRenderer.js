@@ -3,6 +3,7 @@ import { clearSelectedPlant, setActiveScene, state } from '../app/state.js';
 import { createPlantEntity } from './plantRenderer.js';
 import { displayPlant, hidePlantPanel } from '../ui/panels.js';
 import { els } from '../ui/dom.js';
+import { gsap } from 'gsap';
 
 export function buildSceneNav() {
   getAllScenes().forEach(([id, scene]) => {
@@ -19,13 +20,21 @@ export function buildSceneNav() {
 export function goToScene(id) {
   const scene = getScene(id);
   if (!scene) return;
-  setActiveScene(id);
-  clearSelectedPlant();
-  hidePlantPanel();
-  els.sceneTitle.textContent = scene.title;
-  els.sky.setAttribute('src', scene.panorama);
-  updateNav();
-  renderSceneContent(scene);
+
+  gsap.to(els.fadeOverlay, {
+    opacity: 1,
+    duration: 0.4,
+    onComplete: () => {
+      setActiveScene(id);
+      clearSelectedPlant();
+      hidePlantPanel();
+      els.sceneTitle.textContent = scene.title;
+      els.sky.setAttribute('src', scene.panorama);
+      updateNav();
+      renderSceneContent(scene);
+      gsap.to(els.fadeOverlay, { opacity: 0, duration: 0.4 });
+    },
+  });
 }
 
 export function updateNav() {
