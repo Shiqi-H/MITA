@@ -7,6 +7,7 @@ import { hideComparePanel } from './ui/comparePanel.js';
 import { els } from './ui/dom.js';
 import { closePlantPanelAndClearSelection, hideHistoryPanel, hidePlantPanel, showHistoryPanel } from './ui/panels.js';
 import { renderQueryControls } from './ui/queryControls.js';
+import { registerOutlineComponent } from './ui/outlineEffect.js';
 
 function initApp() {
   els.panelClose.addEventListener('click', closePlantPanelAndClearSelection);
@@ -35,5 +36,8 @@ function initApp() {
   hideComparePanel();
   hideHistoryPanel();
 }
+
+registerOutlineComponent();
+initApp();
 
 initApp();

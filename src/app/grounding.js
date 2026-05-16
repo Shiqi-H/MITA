@@ -25,6 +25,7 @@ import {
   hideInteractionPanel,
   showInteractionPanel,
 } from '../ui/panels.js';
+import { highlightPlant, highlightOnly, clearAllHighlights, DISAMBIG_COLORS } from '../ui/highlight.js';
 import { showSelectionRequiredFallback, showUnsupportedInterestFallback } from '../ui/fallbackPanel.js';
 import { els } from '../ui/dom.js';
 import { hideDisambiguationOverlay, showDisambiguationOverlay } from '../ui/overlay.js';
@@ -98,13 +99,16 @@ export function promptAmbiguity(candidateIds) {
     }));
 
   setAmbiguityCandidates(candidates);
-  clearCandidateHighlights();
-  showDisambiguationOverlay({
-    candidates,
-    layer: els.disambiguationLayer,
-    scene: els.scene,
-    onSelect: resolveAmbiguityById,
-  });
+clearCandidateHighlights();
+candidates.forEach((c, i) => {
+  highlightPlant(c.id, DISAMBIG_COLORS[i % DISAMBIG_COLORS.length]);
+});
+showDisambiguationOverlay({
+  candidates,
+  layer: els.disambiguationLayer,
+  scene: els.scene,
+  onSelect: resolveAmbiguityById,
+});
 
   const letters = candidates.map(({ marker }) => marker).join(' / ');
   const body = document.createElement('div');
@@ -321,6 +325,8 @@ export function selectPlantById(id, { announce = false } = {}) {
   clearFallbackActions();
   hideInteractionPanel();
   setQueryPlaceholder(DEFAULT_QUERY_PLACEHOLDER);
+  setQueryPlaceholder(DEFAULT_QUERY_PLACEHOLDER);
+  highlightOnly(id);
   displayPlant(plant);
 
   if (announce) speak(`${getDisplayName(plant)} information is shown.`);
@@ -329,11 +335,11 @@ export function selectPlantById(id, { announce = false } = {}) {
 export function cancelAmbiguity() {
   resetAmbiguity();
   clearCandidateHighlights();
+  clearAllHighlights();
   clearFallbackActions();
   hideInteractionPanel();
   setQueryPlaceholder(DEFAULT_QUERY_PLACEHOLDER);
 }
-
 function findAmbiguityCandidateByName(text) {
   const namedPlant = findPlantByNameOrAlias(text);
   if (!namedPlant) return null;
