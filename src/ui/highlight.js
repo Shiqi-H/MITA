@@ -43,3 +43,19 @@ export function highlightOnly(plantId) {
   unhighlightPlant(plantId);
   highlightPlant(plantId);
 }
+
+const HOVER_COLOR = '#fff59d';
+
+export function hoverHighlight(plantId) {
+  const el = document.getElementById(plantId);
+  if (!el || !el.object3D) return;
+  if (highlighted.has(plantId)) return;
+  addToOutline(el.object3D, HOVER_COLOR);
+}
+
+export function unhoverHighlight(plantId) {
+  const el = document.getElementById(plantId);
+  if (!el || !el.object3D) return;
+  if (highlighted.has(plantId)) return;
+  removeFromOutline(el.object3D);
+}

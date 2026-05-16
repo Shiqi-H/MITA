@@ -3,7 +3,7 @@ import { RenderPass }     from 'three/examples/jsm/postprocessing/RenderPass.js'
 import { OutlinePass }    from 'three/examples/jsm/postprocessing/OutlinePass.js';
 import { OutputPass }     from 'three/examples/jsm/postprocessing/OutputPass.js';
 
-const SLOT_COLORS = ['#ffee58', '#48c774', '#3e8ed0'];
+const SLOT_COLORS = ['#ffee58', '#48c774', '#3e8ed0','#fff59d'];
 
 const slots = SLOT_COLORS.map((color) => ({
   color,
@@ -43,21 +43,23 @@ export function registerOutlineComponent() {
       composer.setSize(size.x, size.y);
       composer.addPass(new RenderPass(scene, camera));
 
-      slots.forEach((slot) => {
-        const pass = new OutlinePass(
-          new window.THREE.Vector2(size.x, size.y),
-          scene,
-          camera,
-        );
-        pass.edgeStrength    = this.data.strength;
-        pass.edgeGlow        = this.data.glow;
-        pass.edgeThickness   = this.data.thickness;
-        pass.visibleEdgeColor.set(slot.color);
-        pass.hiddenEdgeColor.set(slot.color);
-        pass.selectedObjects = slot.selectedObjects;
-        composer.addPass(pass);
-        slot.pass = pass;
-      });
+      slots.forEach((slot, index) => {
+  const pass = new OutlinePass(
+    new window.THREE.Vector2(size.x, size.y),
+    scene,
+    camera,
+  );
+  
+  const isHover = index === 3;
+  pass.edgeStrength    = isHover ? 2 : this.data.strength;
+  pass.edgeGlow        = isHover ? 0.3 : this.data.glow;
+  pass.edgeThickness   = isHover ? 1.5 : this.data.thickness;
+  pass.visibleEdgeColor.set(slot.color);
+  pass.hiddenEdgeColor.set(slot.color);
+  pass.selectedObjects = slot.selectedObjects;
+  composer.addPass(pass);
+  slot.pass = pass;
+});
 
       composer.addPass(new OutputPass());
 
