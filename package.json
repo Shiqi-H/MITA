@@ -20,6 +20,6 @@
     "@photo-sphere-viewer/virtual-tour-plugin": "^5.14.1",
     "@photo-sphere-viewer/visible-range-plugin": "^5.14.1",
     "gsap": "^3.15.0",
-    "three": "^0.179.1"
+    "three": "^0.158.0"
   }
 }
