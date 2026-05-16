@@ -1,51 +1,56 @@
-/**
- * ui/highlight.js
- * Highlight / un-highlight a plant model in the A-Frame scene.
- *
- * Uses A-Frame's material component to add a colored tint.
- * Stores original material so it can be restored.
- */
+import { addToOutline, removeFromOutline, clearOutline } from './outline-effect.js';
+export const DISAMBIG_COLORS = ['#ffee58', '#48c774', '#3e8ed0'];
 
-/** @type {Map<string, string|null>} plantId → original material string */
-const originalMaterials = new Map();
+/** @type {Map<string, THREE.Object3D>} */
+const highlighted = new Map();
 
 /**
- * Highlight a plant by ID (yellow glow).
  * @param {string} plantId
- * @param {string} [color]  - CSS colour string, default '#ffee58'
+ * @param {string} [color]  
  */
-export function highlightPlant(plantId, color = '#ffee58') {
+
+export function highlightPlant(plantId, color) {
   const el = document.querySelector(`#${CSS.escape(plantId)}`);
   if (!el) return;
 
-  if (!originalMaterials.has(plantId)) {
-    originalMaterials.set(plantId, el.getAttribute('material'));
-  }
-  el.setAttribute('material', `color: ${color}; emissive: ${color}; emissiveIntensity: 0.4`);
-}
-
-/**
- * Remove highlight from a plant, restoring its original material.
- * @param {string} plantId
- */
-export function unhighlightPlant(plantId) {
-  const el = document.querySelector(`#${CSS.escape(plantId)}`);
-  if (!el) return;
-
-  const original = originalMaterials.get(plantId);
-  if (original) {
-    el.setAttribute('material', original);
+const apply = () => {
+    if (!el.object3D) return;
+    addToOutline(el.object3D, color);
+    highlighted.set(plantId, el.object3D);
+  };
+ 
+  if (el.getObject3D && el.getObject3D('mesh')) {
+    apply();
   } else {
-    el.removeAttribute('material');
+    el.addEventListener('model-loaded', apply, { once: true });
   }
-  originalMaterials.delete(plantId);
 }
 
 /**
- * Clear all active highlights.
+ * @param {string} plantId
  */
+
+export function unhighlightPlant(plantId) {
+  const obj = highlighted.get(plantId);
+  if (obj) {
+    removeFromOutline(obj);
+    highlighted.delete(plantId);
+  }
+}
+
 export function clearAllHighlights() {
-  for (const id of originalMaterials.keys()) {
-    unhighlightPlant(id);
+  clearOutline();
+  highlighted.clear();
+}
+
+/**
+ * @param {string} plantId
+ */
+export function highlightOnly(plantId) {
+  for (const id of [...highlighted.keys()]) {
+    if (id !== plantId) unhighlightPlant(id);
+  }
+  if (!highlighted.has(plantId)) {
+    highlightPlant(plantId);
   }
 }

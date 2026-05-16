@@ -8,8 +8,8 @@
 
 /** @type {HTMLElement|null} */
 let overlayEl = null;
-/** @type {Function|null} — call to remove current overlay */
-let _cleanup = null;
+// /** @type {Function|null} — call to remove current overlay */
+// let _cleanup = null;
 
 /**
  * Show disambiguation labels above hit plants.
@@ -54,31 +54,31 @@ export function showDisambiguationOverlay(candidates, onSelect) {
   document.body.appendChild(overlayEl);
 
   // Highlight the candidate plants in the 3D scene
-  candidates.forEach((c, i) => {
-    const el = document.querySelector(`#${CSS.escape(c.id)}`);
-    if (el) {
-      el.setAttribute('material', `color: ${i === 0 ? '#ffdd57' : '#48c774'}; opacity: 0.6`);
-      el.setAttribute('data-mita-highlighted', '1');
-    }
-  });
+  // candidates.forEach((c, i) => {
+  //   const el = document.querySelector(`#${CSS.escape(c.id)}`);
+  //   if (el) {
+  //     el.setAttribute('material', `color: ${i === 0 ? '#ffdd57' : '#48c774'}; opacity: 0.6`);
+  //     el.setAttribute('data-mita-highlighted', '1');
+  //   }
+  // });
 
-  _cleanup = () => {
-    candidates.forEach((c) => {
-      const el = document.querySelector(`#${CSS.escape(c.id)}`);
-      if (el && el.getAttribute('data-mita-highlighted')) {
-        el.removeAttribute('material');
-        el.removeAttribute('data-mita-highlighted');
-      }
-    });
-  };
+  // _cleanup = () => {
+  //   candidates.forEach((c) => {
+  //     const el = document.querySelector(`#${CSS.escape(c.id)}`);
+  //     if (el && el.getAttribute('data-mita-highlighted')) {
+  //       el.removeAttribute('material');
+  //       el.removeAttribute('data-mita-highlighted');
+  //     }
+  //   });
+  // };
 }
 
 /**
- * Remove the disambiguation overlay and restore plant materials.
+ * Remove the disambiguation overlay.
  */
 export function hideDisambiguationOverlay() {
   overlayEl?.remove();
   overlayEl = null;
-  _cleanup?.();
-  _cleanup = null;
+//   // _cleanup?.();
+//   _cleanup = null;
 }

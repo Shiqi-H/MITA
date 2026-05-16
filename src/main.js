@@ -70,8 +70,17 @@ import './style.css';
 import { wsClient } from './ws-client.js';
 import { STTController, speak } from './speech.js';
 import { showDisambiguationOverlay, hideDisambiguationOverlay } from './ui/overlay.js';
-import { highlightPlant, unhighlightPlant, clearAllHighlights } from './ui/highlight.js';
+// import { highlightPlant, unhighlightPlant, clearAllHighlights } from './ui/highlight.js';
+import {
+    highlightPlant,
+    unhighlightPlant,
+    clearAllHighlights,
+    highlightOnly,
+    DISAMBIG_COLORS,
+} from './ui/highlight.js';
 import { renderInfoCard, renderComparisonCard, renderFallbackCard, closeCard } from './ui/cards.js';
+import { registerOutlineComponent } from './ui/outline-effect.js';
+
 
 // ─────────────────────────────────────────────
 // Session state
@@ -120,10 +129,13 @@ wsClient.on('disambiguate', (msg) => {
     clearAllHighlights();
     clarifyRetryCount = 0;
     // Highlight each candidate
-    msg.candidates.forEach((c) => highlightPlant(c.id));
+    msg.candidates.forEach((c,i) => {
+        const color = DISAMBIG_COLORS[i % DISAMBIG_COLORS.length];
+        highlightPlant(c.id,color);
+    });
     // Show overlay with click-to-select buttons
     showDisambiguationOverlay(msg.candidates, (selectedId) => {
-        clearAllHighlights();
+        highlightOnly(selectedId);
         wsClient.send({ type: 'clarify', selectedId }, visitedPlants);
     });
     speak(msg.speech);
@@ -131,8 +143,7 @@ wsClient.on('disambiguate', (msg) => {
 
 wsClient.on('response', (msg) => {
     hideDisambiguationOverlay();
-    clearAllHighlights();
-    highlightPlant(msg.plantId);
+    highlightOnly(msg.plantId);
     renderInfoCard(msg.cardType, msg.data);
     speak(msg.speech);
     // Record visit
@@ -316,6 +327,9 @@ function goToScene(id) {
 
             console.log('[raycaster] hits:', ids);
 
+            clearAllHighlights();
+            ids.forEach((id) => highlightPlant(id));
+
             // If STT is not listening, send query with empty text (general info request)
             if (!stt.isListening) {
                 wsClient.send(
@@ -342,6 +356,7 @@ function slotToText(slot) {
 // ─────────────────────────────────────────────
 // Init
 // ─────────────────────────────────────────────
+registerOutlineComponent();
 
 window.onload = () => {
     goToScene('scene-1');
