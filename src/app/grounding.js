@@ -325,7 +325,6 @@ export function selectPlantById(id, { announce = false } = {}) {
   clearFallbackActions();
   hideInteractionPanel();
   setQueryPlaceholder(DEFAULT_QUERY_PLACEHOLDER);
-  setQueryPlaceholder(DEFAULT_QUERY_PLACEHOLDER);
   highlightOnly(id);
   displayPlant(plant);
 
