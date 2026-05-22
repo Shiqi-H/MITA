@@ -109,11 +109,11 @@ h2 {
 
 .scene-nav {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: center;
   justify-content: flex-end;
   gap: 8px;
-  max-width: min(520px, 48vw);
   pointer-events: auto;
+  position: relative;
 }
 
 .scene-nav button,
@@ -555,12 +555,6 @@ h2 {
     max-width: 100%;
   }
 
-  .scene-nav button {
-    min-width: 40px;
-    min-height: 36px;
-    padding: 7px 10px;
-  }
-
   .plant-panel {
     left: 16px;
     right: 16px;
@@ -602,4 +596,71 @@ h2 {
   .medical-layout {
     grid-template-columns: 1fr;
   }
+}
+
+.scene-nav-arrow,
+.scene-nav-num {
+  height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--ink);
+  font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+.scene-nav-arrow { width: 40px; }
+.scene-nav-num   { min-width: 48px; padding: 0 14px; }
+
+.scene-nav-arrow:hover,
+.scene-nav-num:hover {
+  transform: translateY(-1px);
+  border-color: rgba(149, 208, 106, 0.78);
+}
+
+.scene-nav-pager {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  display: flex;
+  gap: 6px;
+  max-width: min(280px, 60vw);
+  overflow-x: auto;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel-strong);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(20px);
+  z-index: 20;
+}
+.scene-nav-pager[hidden] { display: none; }
+.scene-nav-pager::-webkit-scrollbar { height: 6px; }
+.scene-nav-pager::-webkit-scrollbar-thumb {
+  background: rgba(149, 208, 106, 0.5);
+  border-radius: 3px;
+}
+
+.scene-nav-page {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink);
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+.scene-nav-page:hover {
+  transform: translateY(-1px);
+  border-color: rgba(149, 208, 106, 0.78);
+}
+.scene-nav-page[aria-current="true"] {
+  color: #0c1410;
+  background: linear-gradient(135deg, var(--leaf), var(--sky));
+  border-color: transparent;
 }

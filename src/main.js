@@ -39,5 +39,3 @@ function initApp() {
 
 registerOutlineComponent();
 initApp();
-
-initApp();

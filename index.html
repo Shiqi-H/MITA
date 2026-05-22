@@ -1,96 +1,320 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>MITA - Botanical Garden</title>
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <link rel="stylesheet" href="/src/style.css">
-    <script src="/src/main.js" type="module"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MITA Botanical Garden - Welcome</title>
+
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      color: #f8fbf5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+
+      background:
+        linear-gradient(rgba(12, 20, 16, 0.85), rgba(12, 20, 16, 0.95)),
+        url('/garden-cover.jpg') center/cover no-repeat fixed;
+    }
+
+    .main-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 32px 24px;
+    }
+
+    .landing {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 36px;
+      max-width: 1200px;
+      width: 100%;
+      align-items: stretch;
+    }
+
+    .map-side {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(248, 251, 245, 0.18);
+      min-height: 540px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    }
+    #map { width: 100%; height: 100%; min-height: 540px; }
+
+    .garden-marker {
+      width: 20px;
+      height: 20px;
+      background: #95d06a;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 0 rgba(149, 208, 106, 0.7);
+      animation: pulse 1.8s infinite;
+      cursor: pointer;
+    }
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(149, 208, 106, 0.7); }
+      70%  { box-shadow: 0 0 0 18px rgba(149, 208, 106, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(149, 208, 106, 0); }
+    }
+
+    .text-side {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 8px 4px;
+    }
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-size: 12px;
+      color: #95d06a;
+      margin-bottom: 14px;
+      font-weight: 600;
+    }
+    .text-side h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 600;
+      font-size: 46px;
+      line-height: 1.1;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+    .subtitle {
+      font-size: 14px;
+      color: #b8c4b8;
+      margin-bottom: 22px;
+    }
+    .text-side p.intro {
+      font-size: 14.5px;
+      line-height: 1.7;
+      color: #d8e2d8;
+      margin-bottom: 24px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      padding: 12px 8px;
+      border: 1px solid rgba(248, 251, 245, 0.15);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      text-align: center;
+    }
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 600;
+      font-size: 22px;
+      color: #95d06a;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 10.5px;
+      color: #b8c4b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .how-to {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 24px;
+      padding: 14px;
+      border: 1px solid rgba(248, 251, 245, 0.1);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .how-item {
+      text-align: center;
+    }
+    .how-icon {
+      font-size: 20px;
+      margin-bottom: 6px;
+    }
+    .how-text {
+      font-size: 11px;
+      color: #b8c4b8;
+      line-height: 1.3;
+    }
+
+    .enter-btn {
+      align-self: flex-start;
+      padding: 14px 32px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: #0c1410;
+      background: #95d06a;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .enter-btn:hover { background: #a8de80; }
+    .enter-btn:active { transform: scale(0.98); }
+
+    /* Footer */
+    .site-footer {
+      padding: 16px 32px;
+      border-top: 1px solid rgba(248, 251, 245, 0.1);
+      text-align: center;
+      font-size: 12px;
+      color: rgba(184, 196, 184, 0.7);
+    }
+    .site-footer span { color: #95d06a; }
+
+    #fade-overlay {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transition: opacity 0.5s ease;
+    }
+
+    @media (max-width: 860px) {
+      .landing { grid-template-columns: 1fr; gap: 24px; }
+      .map-side { min-height: 360px; }
+      #map { min-height: 360px; }
+      .text-side h1 { font-size: 36px; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
 </head>
 <body>
-    <main class="tour-shell">
-        <header class="tour-hud" aria-label="Tour controls">
-            <div>
-                <p class="eyebrow">MITA Botanical Garden</p>
-                <h1 id="scene-title">Scene 1</h1>
-            </div>
-            <nav class="scene-nav" aria-label="Scene navigation"></nav>
-        </header>
+  <div class="main-wrap">
+    <div class="landing">
 
-        <aside class="plant-panel" aria-live="polite" hidden>
-            <button class="panel-close" type="button" aria-label="Close plant details">x</button>
-            <p class="eyebrow">Plant specimen</p>
-            <h2 id="plant-name"></h2>
-            <p id="plant-description"></p>
-            <div id="plant-attributes" class="attribute-list"></div>
-        </aside>
+      <div class="map-side" id="map-side">
+        <div id="map"></div>
+      </div>
 
-        <section class="interaction-panel" aria-live="polite" hidden>
-            <div class="panel-head">
-                <div>
-                    <h2 id="interaction-title">System message</h2>
-                </div>
-                <button id="interaction-close" class="panel-close" type="button" aria-label="Close interaction panel">x</button>
-            </div>
-            <div id="interaction-body"></div>
-        </section>
+      <div class="text-side">
+        <p class="eyebrow" data-anim>MITA Botanical Garden</p>
+        <h1 data-anim>Orto Botanico Città Studi</h1>
+        <p class="subtitle" data-anim>Via Camillo Golgi 18, 20133 Milano, Italy</p>
+        <p class="intro" data-anim>
+          【占位文字，之后替换】The Città Studi Botanical Garden was created in 2001
+          on the reclaimed land of the former Cascina Rosa farmstead in Milan.
+          Spanning roughly 25,000 square metres, it brings together plant
+          collections by growth environment, human use, and survival strategy,
+          including carnivorous plants, succulents, and reconstructed habitats
+          typical of the Lombardy region.
+        </p>
 
-        <aside class="history-panel" aria-live="polite" hidden>
-            <div class="panel-head">
-                <div>
-                    <p class="eyebrow">Conversation</p>
-                    <h2>History</h2>
-                </div>
-                <button id="history-close" class="panel-close" type="button" aria-label="Close conversation history">x</button>
-            </div>
-            <ul id="voice-log" class="voice-log" aria-label="Conversation history"></ul>
-        </aside>
+        <!-- Key Stats -->
+        <div class="stats" data-anim>
+          <div class="stat-card">
+            <div class="stat-num">2001</div>
+            <div class="stat-label">Founded</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">25k</div>
+            <div class="stat-label">m² area</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">6+</div>
+            <div class="stat-label">Plants</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">5</div>
+            <div class="stat-label">Scenes</div>
+          </div>
+        </div>
 
-        <aside class="compare-panel" aria-live="polite" hidden>
-            <div class="panel-head">
-                <div>
-                    <p class="eyebrow">Comparison</p>
-                    <h2>Compare targets</h2>
-                </div>
-                <button id="compare-close" class="panel-close" type="button" aria-label="Close compare panel">x</button>
-            </div>
-            <div id="compare-body"></div>
-        </aside>
+        <!-- How to use -->
+        <div class="how-to" data-anim>
+          <div class="how-item">
+            <div class="how-icon">👁️</div>
+            <div class="how-text">360° panoramic view</div>
+          </div>
+          <div class="how-item">
+            <div class="how-icon">🌿</div>
+            <div class="how-text">Click plants to learn</div>
+          </div>
+          <div class="how-item">
+            <div class="how-icon">🎙️</div>
+            <div class="how-text">Ask by voice or text</div>
+          </div>
+        </div>
 
-        <div id="global-query-controls" class="query-controls global-query-controls" data-query-controls></div>
-        <div id="disambiguation-layer" class="disambiguation-layer" aria-hidden="true"></div>
+        <button class="enter-btn" id="enter-btn" data-anim>Enter the Garden →</button>
+      </div>
+    </div>
+  </div>
 
-        <button
-            id="history-trigger"
-            type="button"
-            aria-label="Open conversation history"
-            title="历史记录"
-            style="position: absolute; left: 22px; bottom: 22px; z-index: 12; width: 48px; height: 48px; padding: 0; display: grid; place-items: center; border: 1px solid rgba(248, 251, 245, 0.18); border-radius: 10px; color: #f8fbf5; background: rgba(12, 20, 16, 0.72); box-shadow: 0 18px 60px rgba(0, 0, 0, 0.34); backdrop-filter: blur(16px); cursor: pointer;"
-        >
-            <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;">
-                <path d="M3 5h18"></path>
-                <path d="M3 12h18"></path>
-                <path d="M3 19h18"></path>
-            </svg>
-        </button>
+  <!-- Footer -->
+  <footer class="site-footer">
+    <span>MITA</span> · A Multimodal Botanical Tour ·
+    Built by KEYAN CHENG , KAIFEI XU , SHIQI HUANG , YUFEI LIU(This ranking is in no particular order) · Politecnico di Milano
+  </footer>
 
-        <a-scene
-            cursor="rayOrigin: mouse"
-            raycaster="objects: .clickable"
-            id="main-scene"
-            embedded
-            loading-screen="enabled: false"
-            outline-effect="thickness: 3; strength: 5; glow: 0.8"
-        >
-            <a-sky id="sky" src="/scene-1.jpg"></a-sky>
-            <a-entity id="scene-content"></a-entity>
-            <a-camera id="camera"></a-camera>
+  <div id="fade-overlay"></div>
 
-            <a-light type="ambient" intensity="1.5"></a-light>
-            <a-light type="directional" position="1 2 1" intensity="1"></a-light>
-        </a-scene>
-        <div id="scene-fade-overlay" style="position: fixed; inset: 0; background: #000; opacity: 0; pointer-events: none; z-index: 1000; transition: opacity 0.4s ease;"></div>
-    </main>
+  <script>
+    const GARDEN_LAT = 45.4775;
+    const GARDEN_LNG = 9.2300;
+
+    function enterGarden() {
+      const overlay = document.getElementById('fade-overlay');
+      overlay.style.opacity = '1';
+      setTimeout(() => {
+        window.location.href = 'app.html';
+      }, 500);
+    }
+
+    const map = L.map('map').setView([GARDEN_LAT, GARDEN_LNG], 16);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+      maxZoom: 19,
+    }).addTo(map);
+
+    const gardenIcon = L.divIcon({
+      className: '',
+      html: '<div class="garden-marker"></div>',
+      iconSize: [20, 20],
+      iconAnchor: [10, 10],
+    });
+
+    const marker = L.marker([GARDEN_LAT, GARDEN_LNG], { icon: gardenIcon }).addTo(map);
+    marker.bindPopup('Orto Botanico Città Studi<br>点击进入虚拟导览');
+    marker.on('click', enterGarden);
+
+    document.getElementById('enter-btn').addEventListener('click', enterGarden);
+
+    window.addEventListener('load', () => {
+      gsap.from('#map-side', { x: -40, opacity: 0, duration: 0.7, ease: 'power2.out' });
+      gsap.from('[data-anim]', {
+        y: 20,
+        opacity: 0,
+        duration: 0.6,
+        stagger: 0.08,        
+        delay: 0.3,
+        ease: 'power2.out',
+      });
+    });
+  </script>
 </body>
 </html>

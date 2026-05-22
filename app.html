@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MITA - Botanical Garden</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <link rel="stylesheet" href="/src/style.css">
+    <script src="/src/main.js" type="module"></script>
+</head>
+<body>
+    <main class="tour-shell">
+        <header class="tour-hud" aria-label="Tour controls">
+            <div>
+                <p class="eyebrow">MITA Botanical Garden</p>
+                <h1 id="scene-title">Scene 1</h1>
+            </div>
+            <nav class="scene-nav" aria-label="Scene navigation"></nav>
+        </header>
+
+        <aside class="plant-panel" aria-live="polite" hidden>
+            <button class="panel-close" type="button" aria-label="Close plant details">x</button>
+            <p class="eyebrow">Plant specimen</p>
+            <h2 id="plant-name"></h2>
+            <p id="plant-description"></p>
+            <div id="plant-attributes" class="attribute-list"></div>
+        </aside>
+
+        <section class="interaction-panel" aria-live="polite" hidden>
+            <div class="panel-head">
+                <div>
+                    <h2 id="interaction-title">System message</h2>
+                </div>
+                <button id="interaction-close" class="panel-close" type="button" aria-label="Close interaction panel">x</button>
+            </div>
+            <div id="interaction-body"></div>
+        </section>
+
+        <aside class="history-panel" aria-live="polite" hidden>
+            <div class="panel-head">
+                <div>
+                    <p class="eyebrow">Conversation</p>
+                    <h2>History</h2>
+                </div>
+                <button id="history-close" class="panel-close" type="button" aria-label="Close conversation history">x</button>
+            </div>
+            <ul id="voice-log" class="voice-log" aria-label="Conversation history"></ul>
+        </aside>
+
+        <aside class="compare-panel" aria-live="polite" hidden>
+            <div class="panel-head">
+                <div>
+                    <p class="eyebrow">Comparison</p>
+                    <h2>Compare targets</h2>
+                </div>
+                <button id="compare-close" class="panel-close" type="button" aria-label="Close compare panel">x</button>
+            </div>
+            <div id="compare-body"></div>
+        </aside>
+
+        <div id="global-query-controls" class="query-controls global-query-controls" data-query-controls></div>
+        <div id="disambiguation-layer" class="disambiguation-layer" aria-hidden="true"></div>
+
+        <button
+            id="history-trigger"
+            type="button"
+            aria-label="Open conversation history"
+            title="历史记录"
+            style="position: absolute; left: 22px; bottom: 22px; z-index: 12; width: 48px; height: 48px; padding: 0; display: grid; place-items: center; border: 1px solid rgba(248, 251, 245, 0.18); border-radius: 10px; color: #f8fbf5; background: rgba(12, 20, 16, 0.72); box-shadow: 0 18px 60px rgba(0, 0, 0, 0.34); backdrop-filter: blur(16px); cursor: pointer;"
+        >
+            <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;">
+                <path d="M3 5h18"></path>
+                <path d="M3 12h18"></path>
+                <path d="M3 19h18"></path>
+            </svg>
+        </button>
+        <button
+            id="back-to-landing"
+            type="button"
+            aria-label="Back to home"
+            title="返回首页"
+            onclick="window.location.href='index.html'"
+            style="position: absolute; left: 82px; bottom: 22px; z-index: 12; width: 48px; height: 48px; padding: 0; display: grid; place-items: center; border: 1px solid rgba(248, 251, 245, 0.18); border-radius: 10px; color: #f8fbf5; background: rgba(12, 20, 16, 0.72); box-shadow: 0 18px 60px rgba(0, 0, 0, 0.34); backdrop-filter: blur(16px); cursor: pointer;"
+        >
+            <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;">
+                <path d="M3 12l9-9 9 9"></path>
+                <path d="M5 10v10h14V10"></path>
+            </svg>
+        </button>
+        <a-scene
+            cursor="rayOrigin: mouse"
+            raycaster="objects: .clickable"
+            id="main-scene"
+            embedded
+            loading-screen="enabled: false"
+            outline-effect="thickness: 3; strength: 5; glow: 0.8"
+        >
+            <a-sky id="sky" src="/scene-1.jpg"></a-sky>
+            <a-entity id="scene-content"></a-entity>
+            <a-camera id="camera"></a-camera>
+
+            <a-light type="ambient" intensity="1.5"></a-light>
+            <a-light type="directional" position="1 2 1" intensity="1"></a-light>
+        </a-scene>
+        <div id="scene-fade-overlay" style="position: fixed; inset: 0; background: #000; opacity: 0; pointer-events: none; z-index: 1000; transition: opacity 0.4s ease;"></div>
+    </main>
+</body>
+</html>

@@ -1,5 +1,6 @@
 import { getPlant } from '../app/selectors.js';
 import { selectPlantById } from '../app/grounding.js';
+import { clearAllHighlights } from '../ui/highlight.js';
 import { els } from '../ui/dom.js';
 
 const raycaster = new THREE.Raycaster();
@@ -43,6 +44,8 @@ function handleSceneClick(event) {
     selectPlantById(plantId);
     return;
   }
+  clearAllHighlights();
+  cancelAmbiguity();
 
 }
 
