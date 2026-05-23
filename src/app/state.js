@@ -3,7 +3,6 @@ export const state = {
   selectedPlantId: null,
   ambiguityCandidates: [],
   visitedPlantIds: [],
-  interactionMode: 'idle',
   voiceFailures: 0,
 };
 
@@ -27,12 +26,10 @@ export function recordVisitedPlant(id) {
 
 export function setAmbiguityCandidates(candidates) {
   state.ambiguityCandidates = candidates;
-  state.interactionMode = candidates.length ? 'ambiguity_pending' : 'idle';
 }
 
 export function resetAmbiguity() {
   state.ambiguityCandidates = [];
-  state.interactionMode = 'idle';
   state.voiceFailures = 0;
 }
 

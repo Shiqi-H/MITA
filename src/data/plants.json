@@ -42,7 +42,7 @@
   "santolina": {
     "id": "santolina",
     "displayName": "Santolina",
-    "aliases": ["cotton lavender", "santolina"],
+    "aliases": ["cotton lavender", "santolina", "Lavanda cotone"],
     "sceneId": "scene-1",
     "model": "/models/Santolina.glb",
     "position": [3, -1, 0],
@@ -57,66 +57,6 @@
     },
     "images": {
       "medical": "/scene-1.jpg"
-    }
-  },
-  "cactus": {
-    "id": "cactus",
-    "displayName": "Cactus",
-    "aliases": ["cactus", "succulent"],
-    "sceneId": "scene-2",
-    "model": null,
-    "position": [0, -1, 0],
-    "scale": [3, 3, 3],
-    "description": "A highly drought-adapted succulent with water-storing tissues.",
-    "medicalInfo": "Some cactus species are used as edible or medicinal plants, but use depends on the species.",
-    "attributes": {
-      "droughtTolerance": "very high",
-      "height": "1.2 m",
-      "lifespan": "long-lived perennial",
-      "medicinalValue": "species-dependent"
-    },
-    "images": {
-      "medical": "/scene-2.jpg"
-    }
-  },
-  "giant_lotus": {
-    "id": "giant_lotus",
-    "displayName": "Giant Water Lily",
-    "aliases": ["giant water lily", "water lily", "lotus"],
-    "sceneId": "scene-2",
-    "model": null,
-    "position": [0, -1, -2],
-    "scale": [4, 4, 4],
-    "description": "A large aquatic plant with floating leaves and very low drought tolerance.",
-    "medicalInfo": "The giant water lily is primarily an aquatic ornamental plant, not a common medicinal plant.",
-    "attributes": {
-      "droughtTolerance": "very low",
-      "height": "floating leaf plant",
-      "lifespan": "annual or short-lived perennial",
-      "medicinalValue": "not a common medicinal plant"
-    },
-    "images": {
-      "medical": "/scene-2.jpg"
-    }
-  },
-  "ginkgo": {
-    "id": "ginkgo",
-    "displayName": "Ginkgo",
-    "aliases": ["ginkgo", "ginkgo tree", "maidenhair tree"],
-    "sceneId": "scene-3",
-    "model": null,
-    "position": [0, -1, 0],
-    "scale": [4, 4, 4],
-    "description": "A resilient tree with fan-shaped leaves and strong cultural significance.",
-    "medicalInfo": "Ginkgo leaves and seeds are widely associated with traditional medicine. Extracts are often discussed for circulation and memory support, but use should be guided by professional advice.",
-    "attributes": {
-      "droughtTolerance": "moderate",
-      "height": "20 m",
-      "lifespan": "long-lived tree",
-      "medicinalValue": "high traditional medicinal value"
-    },
-    "images": {
-      "medical": "/scene-3.jpg"
     }
   }
 }

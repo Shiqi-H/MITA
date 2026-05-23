@@ -1,4 +1,4 @@
-import { clearSelectedPlant, resetVoiceFailures, setSelectedPlant } from '../app/state.js';
+import { clearSelectedPlant, setSelectedPlant } from '../app/state.js';
 import { getDisplayName } from '../app/selectors.js';
 import { els } from './dom.js';
 
@@ -67,11 +67,6 @@ export function setFallbackActions(actions) {
 
 export function clearFallbackActions() {
   els.interactionBody.querySelectorAll('.fallback-actions').forEach((node) => node.remove());
-}
-
-export function resetVoiceUi() {
-  resetVoiceFailures();
-  clearFallbackActions();
 }
 
 function renderAttributes(plant, focusType) {
