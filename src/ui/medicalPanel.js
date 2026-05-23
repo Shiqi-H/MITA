@@ -7,10 +7,9 @@ export function renderMedicalPanel(plant) {
   layout.innerHTML = `
     <img src="${plant.images.medical}" alt="${getDisplayName(plant)} medicinal reference">
     <div>
-      <p class="eyebrow">Medicinal value</p>
       <h3>${getDisplayName(plant)}</h3>
       <p>${plant.medicalInfo}</p>
     </div>
   `;
-  showInteractionPanel('Medicinal Focus', layout);
+  showInteractionPanel('Medicinal value', layout);
 }
