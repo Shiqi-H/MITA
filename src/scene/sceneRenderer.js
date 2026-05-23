@@ -1,7 +1,9 @@
 import { getAllScenes, getPlant, getScene, formatVec3 } from '../app/selectors.js';
+import { cancelAmbiguity } from '../app/handlers/ambiguity.js';
 import { clearSelectedPlant, setActiveScene, state } from '../app/state.js';
 import { createPlantEntity } from './plantRenderer.js';
 import { displayPlant, hidePlantPanel } from '../ui/panels.js';
+import { hideComparePanel } from '../ui/comparePanel.js';
 import { els } from '../ui/dom.js';
 import { gsap } from 'gsap';
  
@@ -72,9 +74,8 @@ export function goToScene(id) {
     opacity: 1,
     duration: 0.4,
     onComplete: () => {
+      resetSceneTransientUi();
       setActiveScene(id);
-      clearSelectedPlant();
-      hidePlantPanel();
       els.sceneTitle.textContent = scene.title;
       els.sky.setAttribute('src', scene.panorama);
       updateNav();
@@ -83,7 +84,13 @@ export function goToScene(id) {
     },
   });
 }
- 
+function resetSceneTransientUi() {
+  cancelAmbiguity();
+  clearSelectedPlant();
+  hidePlantPanel();
+  hideComparePanel();
+}
+
 export function updateNav() {
   const index = sceneIds.indexOf(state.activeSceneId);
  

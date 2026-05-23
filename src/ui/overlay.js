@@ -1,9 +1,11 @@
 let rafId = null;
+let overlayToken = 0;
 
 export function showDisambiguationOverlay({ candidates, layer, scene, onSelect }) {
   hideDisambiguationOverlay(layer);
   if (!layer || !scene) return;
 
+  const token = ++overlayToken;
   const markerMap = new Map();
   layer.hidden = false;
   layer.setAttribute('aria-hidden', 'false');
@@ -20,6 +22,8 @@ export function showDisambiguationOverlay({ candidates, layer, scene, onSelect }
   });
 
   const updateMarkers = () => {
+    if (token !== overlayToken || layer.hidden) return;
+
     const camera = scene.camera;
     const canvas = scene.renderer?.domElement;
     if (!camera || !canvas) {
@@ -45,6 +49,7 @@ export function showDisambiguationOverlay({ candidates, layer, scene, onSelect }
 }
 
 export function hideDisambiguationOverlay(layer) {
+  overlayToken += 1;
   if (rafId) {
     cancelAnimationFrame(rafId);
     rafId = null;
