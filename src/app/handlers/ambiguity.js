@@ -1,4 +1,5 @@
 import { generateDisambiguationSpeech } from '../../intent/llmClient.js';
+import { getMarkerForIndex } from '../../intent/intentParser.js';
 import { speak } from '../../speech/speech.js';
 import { els } from '../../ui/dom.js';
 import { DISAMBIG_COLORS, clearAllHighlights, highlightPlant } from '../../ui/highlight.js';
@@ -25,7 +26,7 @@ export function promptAmbiguity(candidateIds) {
     .map((plant, index) => ({
       id: plant.id,
       plant,
-      marker: String.fromCharCode(65 + index),
+      marker: getMarkerForIndex(index),
     }));
 
   setAmbiguityCandidates(candidates);

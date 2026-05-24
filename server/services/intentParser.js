@@ -1,15 +1,10 @@
-export function parseIntentLocally(text) {
+export function parseIntentLocally(text, context = {}) {
   const normalized = String(text ?? '').trim().toLowerCase();
   if (!normalized) return { intent: 'unknown', confidence: 0.2 };
 
-  if (normalized === 'a' || normalized.includes('option a') || normalized.includes('plant a')) {
-    return { intent: 'resolveAmbiguity', marker: 'A', confidence: 0.9 };
-  }
-  if (normalized === 'b' || normalized.includes('option b') || normalized.includes('plant b')) {
-    return { intent: 'resolveAmbiguity', marker: 'B', confidence: 0.9 };
-  }
-  if (normalized === 'c' || normalized.includes('option c') || normalized.includes('plant c')) {
-    return { intent: 'resolveAmbiguity', marker: 'C', confidence: 0.9 };
+  const marker = parseMarker(normalized, context);
+  if (marker) {
+    return { intent: 'resolveAmbiguity', marker, confidence: 0.9 };
   }
 
   if (isCompareIntent(normalized)) {
@@ -81,6 +76,42 @@ function hasComparisonCue(text) {
     'height',
     'lifespan',
   ].some((cue) => text.includes(cue));
+}
+
+function parseMarker(text, context = {}) {
+  const markers = getAllowedMarkers(context);
+  return markers.find((marker) => {
+    const normalizedMarker = marker.toLowerCase();
+    return (
+      text === normalizedMarker ||
+      markerPhraseMatches(text, 'option', normalizedMarker) ||
+      markerPhraseMatches(text, 'plant', normalizedMarker)
+    );
+  }) ?? null;
+}
+
+function markerPhraseMatches(text, prefix, marker) {
+  return new RegExp(`\\b${prefix}\\s+${marker}\\b`).test(text);
+}
+
+function getAllowedMarkers(context = {}) {
+  const candidates = Array.isArray(context.ambiguityCandidates) ? context.ambiguityCandidates : [];
+  if (!candidates.length) return ['A', 'B', 'C', 'D'];
+
+  return candidates
+    .map((candidate, index) => candidate.marker || getMarkerForIndex(index))
+    .sort((left, right) => right.length - left.length);
+}
+
+function getMarkerForIndex(index) {
+  let cursor = index + 1;
+  let marker = '';
+  while (cursor > 0) {
+    cursor -= 1;
+    marker = String.fromCharCode(65 + (cursor % 26)) + marker;
+    cursor = Math.floor(cursor / 26);
+  }
+  return marker;
 }
 
 function getCompareReferent(text) {

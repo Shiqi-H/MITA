@@ -18,11 +18,11 @@ function normalize(text) {
   return String(text ?? '').trim().toLowerCase();
 }
 
-export function parseIntentLocally(text) {
+export function parseIntentLocally(text, context = {}) {
   const normalized = normalize(text);
   if (!normalized) return { intent: 'unknown' };
 
-  const marker = parseMarker(normalized);
+  const marker = parseMarker(normalized, context);
   if (marker) {
     return { intent: 'resolveAmbiguity', marker };
   }
@@ -104,12 +104,40 @@ function hasComparisonCue(text) {
   ].some((cue) => text.includes(cue));
 }
 
-function parseMarker(text) {
-  if (text === 'a' || text.includes('option a') || text.includes('plant a')) return 'A';
-  if (text === 'b' || text.includes('option b') || text.includes('plant b')) return 'B';
-  if (text === 'c' || text.includes('option c') || text.includes('plant c')) return 'C';
-  if (text === 'd' || text.includes('option d') || text.includes('plant d')) return 'D';
-  return null;
+function parseMarker(text, context = {}) {
+  const markers = getAllowedMarkers(context);
+  return markers.find((marker) => {
+    const normalizedMarker = marker.toLowerCase();
+    return (
+      text === normalizedMarker ||
+      markerPhraseMatches(text, 'option', normalizedMarker) ||
+      markerPhraseMatches(text, 'plant', normalizedMarker)
+    );
+  }) ?? null;
+}
+
+function markerPhraseMatches(text, prefix, marker) {
+  return new RegExp(`\\b${prefix}\\s+${marker}\\b`).test(text);
+}
+
+function getAllowedMarkers(context = {}) {
+  const candidates = Array.isArray(context.ambiguityCandidates) ? context.ambiguityCandidates : [];
+  if (!candidates.length) return ['A', 'B', 'C', 'D'];
+
+  return candidates
+    .map((candidate, index) => candidate.marker || getMarkerForIndex(index))
+    .sort((left, right) => right.length - left.length);
+}
+
+export function getMarkerForIndex(index) {
+  let cursor = index + 1;
+  let marker = '';
+  while (cursor > 0) {
+    cursor -= 1;
+    marker = String.fromCharCode(65 + (cursor % 26)) + marker;
+    cursor = Math.floor(cursor / 26);
+  }
+  return marker;
 }
 
 function getCompareReferent(text) {

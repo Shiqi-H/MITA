@@ -10,7 +10,7 @@ export async function queryHandler(req, res) {
   } catch (error) {
     console.warn(error.message);
     res.json({
-      ...parseIntentLocally(text),
+      ...parseIntentLocally(text, context),
       source: 'local',
       parserFallback: 'local',
     });

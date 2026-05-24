@@ -17,6 +17,12 @@ const cases = [
     },
   },
   {
+    text: 'What plant am I looking at?',
+    expected: {
+      intent: 'identify',
+    },
+  },
+  {
     text: 'How does it compare with the previous one?',
     expected: {
       intent: 'compare',
@@ -67,12 +73,34 @@ const cases = [
     },
     skipServer: true,
   },
+  {
+    text: 'option f',
+    context: {
+      ambiguityCandidates: Array.from({ length: 6 }, (_, index) => ({ marker: String.fromCharCode(65 + index) })),
+    },
+    expected: {
+      intent: 'resolveAmbiguity',
+      marker: 'F',
+    },
+  },
+  {
+    text: 'plant aa',
+    context: {
+      ambiguityCandidates: Array.from({ length: 27 }, (_, index) => ({
+        marker: index < 26 ? String.fromCharCode(65 + index) : 'AA',
+      })),
+    },
+    expected: {
+      intent: 'resolveAmbiguity',
+      marker: 'AA',
+    },
+  },
 ];
 
 for (const [suiteName, parse] of parserSuites) {
   for (const testCase of cases) {
     if (suiteName === 'server' && testCase.skipServer) continue;
-    const actual = parse(testCase.text);
+    const actual = parse(testCase.text, testCase.context);
     for (const [key, value] of Object.entries(testCase.expected)) {
       assert.equal(
         actual[key],
