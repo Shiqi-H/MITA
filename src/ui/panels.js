@@ -18,10 +18,12 @@ export function displayPlant(plant, focusType = 'default') {
   els.plantDescription.textContent = plant.description;
   renderAttributes(plant, focusType);
   els.plantPanel.hidden = false;
+  updatePlantPanelMetrics();
 }
 
 export function hidePlantPanel() {
   els.plantPanel.hidden = true;
+  updatePlantPanelMetrics();
 }
 
 export function closePlantPanelAndClearSelection() {
@@ -41,12 +43,16 @@ export function hideHistoryPanel() {
   els.historyPanel.hidden = true;
 }
 
-export function showInteractionPanel(title, body) {
+export function showInteractionPanel(title, body, options = {}) {
   els.interactionTitle.textContent = title;
   if (typeof body === 'string') {
     els.interactionBody.textContent = body;
   } else {
     els.interactionBody.replaceChildren(body);
+  }
+  els.interactionPanel.classList.toggle('medical-panel', options.variant === 'medical');
+  if (options.variant === 'medical') {
+    updatePlantPanelMetrics();
   }
   els.interactionPanel.hidden = false;
 }
@@ -86,4 +92,17 @@ function renderAttributes(plant, focusType) {
     .map(([key, value]) => `<div class="attribute-row"><span>${key}</span><strong>${value}</strong></div>`)
     .join('');
 }
+
+export function updatePlantPanelMetrics() {
+  window.requestAnimationFrame(() => {
+    const plantPanelHeight = els.plantPanel.hidden ? 0 : els.plantPanel.offsetHeight;
+    document.documentElement.style.setProperty('--plant-panel-height', `${plantPanelHeight}px`);
+  });
+}
+
+window.addEventListener('resize', () => {
+  if (els.interactionPanel.classList.contains('medical-panel')) {
+    updatePlantPanelMetrics();
+  }
+});
 

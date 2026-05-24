@@ -11,5 +11,5 @@ export function renderMedicalPanel(plant) {
       <p>${plant.medicalInfo}</p>
     </div>
   `;
-  showInteractionPanel('Medicinal value', layout);
+  showInteractionPanel('Medicinal value', layout, { variant: 'medical' });
 }

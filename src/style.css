@@ -235,6 +235,16 @@ h2 {
   padding: 20px;
 }
 
+.interaction-panel.medical-panel {
+  left: auto;
+  right: 22px;
+  bottom: calc(84px + var(--plant-panel-height, 0px) + 20px);
+  width: min(360px, calc(100vw - 44px));
+  height: auto;
+  max-height: calc(100svh - 44px - 84px - var(--plant-panel-height, 0px) - 20px);
+  overflow: auto;
+}
+
 .history-panel {
   left: 50%;
   top: 86px;
@@ -380,10 +390,11 @@ h2 {
 }
 
 .compare-panel {
-  right: 22px;
-  top: 96px;
+  left: 50%;
+  top: 50%;
   width: min(680px, calc(100vw - 44px));
   padding: 20px;
+  transform: translate(-50%, -50%);
 }
 
 .compare-grid {
@@ -573,6 +584,15 @@ h2 {
 
   .interaction-panel {
     bottom: 74px;
+  }
+
+  .interaction-panel.medical-panel {
+    left: 16px;
+    right: 16px;
+    bottom: calc(74px + var(--plant-panel-height, 0px) + 20px);
+    width: auto;
+    height: auto;
+    max-height: calc(100svh - 32px - 74px - var(--plant-panel-height, 0px) - 20px);
   }
 
   .history-panel {
