@@ -23,7 +23,6 @@ function initApp() {
   });
 
   initSpeechRecognition({
-    onTranscript: handleQuery,
     onRecognitionFailure: handleAmbiguityRecognitionFailure,
   });
 

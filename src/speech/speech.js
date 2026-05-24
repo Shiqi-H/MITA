@@ -18,7 +18,7 @@ export function speak(text) {
   window.speechSynthesis.speak(utterance);
 }
 
-export function initSpeechRecognition({ onTranscript, onRecognitionFailure }) {
+export function initSpeechRecognition({ onRecognitionFailure }) {
   const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognitionCtor) {
     return null;
@@ -31,8 +31,11 @@ export function initSpeechRecognition({ onTranscript, onRecognitionFailure }) {
   speechRecognition.addEventListener('result', (event) => {
     receivedResult = true;
     const transcript = event.results[0][0].transcript;
-    if (activeInput) activeInput.value = transcript;
-    onTranscript(transcript);
+    if (activeInput) {
+      activeInput.value = transcript;
+      activeInput.dispatchEvent(new Event('input', { bubbles: true }));
+      activeInput.focus();
+    }
   });
   speechRecognition.addEventListener('start', () => {
     receivedResult = false;
