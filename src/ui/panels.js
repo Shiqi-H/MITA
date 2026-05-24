@@ -1,6 +1,7 @@
 import { clearSelectedPlant, setSelectedPlant } from '../app/state.js';
 import { getDisplayName } from '../app/selectors.js';
 import { els } from './dom.js';
+import { clearAllHighlights } from './highlight.js';
 
 export function appendVoiceLog(text) {
   const item = document.createElement('li');
@@ -29,6 +30,7 @@ export function hidePlantPanel() {
 export function closePlantPanelAndClearSelection() {
   hidePlantPanel();
   clearSelectedPlant();
+  clearAllHighlights();
 }
 
 export function hideInteractionPanel() {
