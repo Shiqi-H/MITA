@@ -1,23 +1,17 @@
 # MITA Plant Interaction Demo
-
-MITA 是一个面向植物场景探索的交互式 Web Demo。前端使用 Vite + A-Frame/Three.js 呈现 360 全景、3D 植物模型和交互面板；后端提供意图解析、植物信息生成、歧义澄清和植物比较接口。
+MITA 是一个面向植物场景探索的交互式 Web Demo。前端使用 Vite + A-Frame/Three.js 呈现 360 全景、3D 植物模型和交互面板；后端提供意图解析、植物信息生成、歧义澄清和植物比较等。
 
 ## 运行方式
-
-项目需要同时启动前端和后端两个进程。
+项目需要先在本地安装相关依赖。在项目根目录运行：
+```powershell
+npm install
+```
+然后再启动前端和后端两个进程。
 
 ### 1. 启动前端
-
 在项目根目录运行：
-
 ```powershell
 npm.cmd run dev
-```
-
-前端由 Vite 启动，默认访问地址通常是：
-
-```text
-http://localhost:5173
 ```
 
 ### 2. 启动后端
@@ -27,101 +21,44 @@ http://localhost:5173
 ```powershell
 npm.cmd run server
 ```
-
 该命令会执行根目录 `package.json` 中的 `server` 脚本，并转到 `server` 目录运行后端：
-
-```text
-npm --prefix server run dev
-```
-
-后端默认提供 `/api` 接口，例如：
-
-```text
-GET  /api/health
-POST /api/parse-intent
-POST /api/generate-info
-POST /api/generate-disambiguation
-POST /api/clarify
-POST /api/compare
-```
-
 > PowerShell 中建议使用 `npm.cmd`。如果环境支持，也可以使用 `npm run dev` 和 `npm run server`。
 
-## 已实现的 Task
+## 课程任务设计
 
-### Task 1: 3D 场景中的植物识别与选择
-
-关键点：
-
-- 使用全景图片构建多个植物场景，并通过场景导航切换不同区域。
-- 支持 GLB 植物模型加载；没有模型的植物使用 fallback geometry 显示，保证场景中仍有可点击目标。
-- 使用 Raycaster / 点击事件选择植物，并把选中的植物同步到右侧信息面板。
-- 植物数据集中维护名称、别名、模型路径、位置、描述、药用信息和属性，避免把内容写死在 UI 逻辑里。
-
-### Task 2: 指代表达和歧义消解
-
-关键点：
-
+### Task 1: 视野检测与多模态消歧
 - 用户可以问类似 `what is this`、`what plant am I looking at` 的问题。
 - 当前视野或当前场景中有多个候选植物时，会进入 Referential Ambiguity 流程。
 - 系统为候选植物生成 A/B/C 标记，用户可以点击候选项，也可以输入或语音回答字母。
 - 如果语音识别或回答无法匹配，系统会提示用户重新选择，并在多次失败后引导用户直接点击目标植物。
 
-### Task 3: 植物属性查询与药用价值展示
-
-关键点：
-
+### Task 2: 植物选中与深度对话 
 - 支持查询植物属性，例如药用价值、植物基础信息等。
 - 当用户询问 medicinal value / medical / herbal use 时，会打开专门的药用信息面板。
 - 如果用户询问暂不支持的兴趣点，例如 symbolism、feng shui，会显示 fallback 交互，引导用户查看已支持的 botanical features 或 medicinal value。
 - 信息生成优先走后端 LLM 接口；失败时保留本地 fallback，避免核心交互完全中断。
 
-### Task 4: 植物比较
-
-关键点：
-
+### Task 4: 跨上下文的植物比较
 - 支持比较当前选中植物和另一个植物，例如：
-
 ```text
 Is this more drought tolerant than the giant water lily?
 ```
-
 - 比较面板会展示两个植物的描述和关键属性，包括 drought tolerance、height、lifespan、medicinal value。
 - 比较目标优先从用户访问历史中查找；如果历史中没有，则回退到全局植物数据库。
 - 后端 `/api/compare` 接口负责生成自然语言比较回答，前端负责展示结构化对比结果。
 
-### Task 5: 语音输入、文本输入和对话反馈
+## 已完成
+- [x] 历史比较：支持用户问“这个选中的植物和上一个选中的植物相比，谁更耐旱一些？”（**注意：目前只支持比较耐旱性**），系统根据 `visitedPlantIds` 找到上一次选中的植物并自动比较。
+- [x] 多轮追问：用户可以先选择植物，再问“那它有什么药用价值？”（**注意：目前只支持询问药用价值**）、“它和刚才那个比呢？”，系统自动继承上下文。
+- [x] 离线模式：在没有 LLM 的情况下，可以使用本地规则和模板生成回答。
+- [x] 切换创建场景时，之前场景的资源未清除。如 dom元素。
+- [x] 语音输入后，识别的文字应该先显示在输入框中，用户确认后再发送给系统进行处理。让用户有机会修改输入内容。
+- [x] 统一卡片样式，优化布局。
+- [x] 歧义植物数量解析，前后端保持一致，根据视野内的植物数量，动态调整解析逻辑，支持更多的植物选项。
 
-关键点：
-
-- 页面提供文本输入和 Speak 按钮，支持手动输入和语音识别。
-- 用户问题会被记录到 voice log，便于展示交互过程。
-- 关键交互结果会通过 TTS 播放，例如选中植物、歧义提示、比较结果和 fallback 提示。
-- 前端保存当前场景、当前选中植物、歧义候选、访问历史和语音失败次数，用于维持上下文。
-
-### Task 6: 前后端 LLM 接口拆分
-
-关键点：
-
-- 前端通过 `src/intent/llmClient.js` 调用后端 API，不直接暴露模型调用细节。
-- 后端按 `config`、`services`、`handlers` 分层组织，负责意图解析、澄清、信息生成和比较回答。
-- Vite 使用 `/api` 代理到后端，前端开发时可以直接调用同源 `/api/...`。
-- 意图解析支持 LLM 优先、本地规则 fallback 的策略，提高开发和演示稳定性。
-
-## 计划实现的功能
-
-- 历史比较：支持用户问“这个选中的植物和上一个选中的植物相比，谁更耐旱一些？”，系统根据 `visitedPlantIds` 找到上一次选中的植物并自动比较。
-- 更完整的比较属性：除了耐旱性，还支持光照需求、浇水频率、适合室内/室外、养护难度等。
-- 多轮追问：用户可以先选择植物，再问“那它有什么药用价值？”、“它和刚才那个比呢？”，系统自动继承上下文。
-- 更强的目标解析：支持“左边那个”、“靠近水边的那个”、“最高的那个”等空间描述。
-- 植物历史面板：把访问过的植物按时间展示，并允许用户从历史中重新选择、比较或查看详情。
-- 更丰富的数据来源：为每个植物补充图片、来源链接、养护建议和医学免责声明。
-- 离线演示模式：在没有 LLM API 的情况下，使用更完整的本地规则和模板生成回答。
-
-## 已更新
-- [x] 2026-05-14 English follow-up context support: current selected plant and previous selected plant can be resolved from follow-up questions such as `it`, `this one`, `that plant`, `previous one`, and `last one`. Completed at 23:53 +02:00.
-- [x] 2026-05-14 Named comparison target priority: `Compare this one with cactus` now compares the current selection with Cactus instead of falling back to the previous selection. Completed at 23:53 +02:00.
-- [x] 2026-05-14 Drought-tolerance-only comparison rule: supported comparisons continue to use `droughtTolerance`; attempts to compare height, lifespan, medicinal value, or other attributes now get a not-supported voice response. Completed at 23:53 +02:00.
-- [x] 2026-05-14 LLM intent prompt alignment: LLM mode now follows the English-only follow-up schema and marks non-drought comparison attributes as unsupported. Completed at 23:53 +02:00.
-- [x] 2026-05-14 Parser validation coverage: added `npm.cmd run test:parser` to validate current-selection follow-ups, previous-selection comparison, named comparison, and unsupported comparison attributes. Completed at 23:53 +02:00.
-- [x] 2026-05-14 Build verification: `npm.cmd run test:parser` and `npm.cmd run build` both pass. Completed at 23:53 +02:00.
+## 未完成：
+- [] 完善数据库：为每个植物提供模型，补充图片，丰富相关信息。
+- [] 植物取消选中（关闭植物信息卡片）后，高亮状态未取消，仍然显示为选中状态。需要在取消选中时同时取消高亮状态。
+- [] 歧义候选存在时，即使用户输入普通问题，也会被当成歧义回复处理。需要优化意图解析逻辑，确保只有在用户明确表达歧义时才触发歧义回复。
+- [] 消歧时，无法识别用户输入 “Choose A”，只能识别 "A"。需要优化意图解析逻辑，支持更多选择指令。
+- [] 若无法识别用户的语音输入内容，应该给用户明确的反馈。可以添加一个新的回复类型，例如 "unrecognized_input"，当用户的输入无法被识别时，返回这个类型的回复。
