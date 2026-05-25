@@ -5,7 +5,7 @@
     "aliases": ["lavender", "lavandula"],
     "sceneId": "scene-1",
     "model": "/models/Lavandula.glb",
-    "position": [3, -1, 4],
+    "position": [4, -1, 4],
     "scale": [4, 4, 4],
     "description": "A fragrant Mediterranean herb with violet flowers and aromatic foliage.",
     "medicalInfo": "Lavender is commonly associated with calming, fragrance, and light herbal care.",
@@ -16,7 +16,7 @@
       "medicinalValue": "aromatic and calming"
     },
     "images": {
-      "medical": "/Lavandula-medic.jpg"
+      "medical": "/Lavandula.jpg"
     }
   },
   "nephrolepis": {
@@ -36,7 +36,7 @@
       "medicinalValue": "limited"
     },
     "images": {
-      "medical": "/scene-1.jpg"
+      "medical": "/Nephrolepis.jpg"
     }
   },
   "santolina": {
@@ -45,7 +45,7 @@
     "aliases": ["cotton lavender", "santolina"],
     "sceneId": "scene-1",
     "model": "/models/Santolina.glb",
-    "position": [3, -1, 0],
+    "position": [2, -1, 0],
     "scale": [4, 4, 4],
     "description": "A compact silver-green shrub for aromatic borders and dry gardens.",
     "medicalInfo": "Santolina is associated with aromatic foliage and traditional herbal use.",
@@ -56,7 +56,27 @@
       "medicinalValue": "traditional herbal use"
     },
     "images": {
-      "medical": "/scene-1.jpg"
+      "medical": "/Santolina.jpg"
+    }
+  },
+  "ficus": {
+    "id": "ficus",
+    "displayName": "Ficus_Microcarpa",
+    "aliases": ["ficus", "ficus microcarpa", "banyan"],
+    "sceneId": "scene-1",
+    "model": "/models/Ficus_Microcarpa.glb",
+    "position": [-3, -1, 2], 
+    "scale": [4, 4, 4],
+    "description": "An elegant and hardy evergreen tree with dense, glossy green leaves, known for its striking aerial root system and lush, umbrella-like canopy.",
+    "medicalInfo": "Ficus microcarpa has traditional medicinal value; its aerial roots and leaves are often used in herbal teas to clear heat and dispel dampness.",
+    "attributes": {
+      "droughtTolerance": "medium",
+      "height": "15-25 m",
+      "lifespan": "perennial",
+      "medicinalValue": "moderate"
+    },
+    "images": {
+      "medical": "/Ficus.jpg"
     }
   },
   "cactus": {
