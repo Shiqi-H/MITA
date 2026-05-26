@@ -5,10 +5,10 @@
     "aliases": ["lavender", "lavandula"],
     "sceneId": "scene-1",
     "model": "/models/Lavandula.glb",
-    "position": [3, -1, 4],
+    "position": [4, -1, 4],
     "scale": [4, 4, 4],
     "description": "A fragrant Mediterranean herb with violet flowers and aromatic foliage.",
-    "medicalInfo": "Lavender is commonly associated with calming, fragrance, and light herbal care.",
+    "medicalInfo": "Lavender is widely celebrated in modern aromatherapy and herbal medicine. Rich in linalool and linalyl acetate, its essential oil is clinically proven to reduce anxiety, alleviate insomnia, calm the nervous system, and possess mild antiseptic properties for skin healing.",
     "attributes": {
       "droughtTolerance": "high",
       "height": "0.8 m",
@@ -16,8 +16,8 @@
       "medicinalValue": "aromatic and calming"
     },
     "images": {
-      "info": "/Lavandula-medic.jpg",
-      "medical": "/Lavandula-medic.jpg"
+      "info": "/Lavandula.jpg",
+      "medical": "/Lavandula.jpg"
     }
   },
   "nephrolepis": {
@@ -26,10 +26,10 @@
     "aliases": ["fern", "nephrolepis", "boston fern"],
     "sceneId": "scene-1",
     "model": "/models/Nephrolepis.glb",
-    "position": [3, -1, 2],
+    "position": [4.5, -2, 2],
     "scale": [4, 4, 4],
     "description": "A lush fern with arching fronds that adds soft woodland texture.",
-    "medicalInfo": "Nephrolepis is mostly ornamental and humidity-loving; it is not a common medicinal herb.",
+    "medicalInfo": "Nephrolepis (and related fern species) is utilized in traditional herbal remedies for its anti-inflammatory, antimicrobial, and diuretic properties. It is traditionally decocted to clear heat, detoxify the body, and soothe respiratory discomfort.",
     "attributes": {
       "droughtTolerance": "low",
       "height": "0.9 m",
@@ -37,7 +37,7 @@
       "medicinalValue": "limited"
     },
     "images": {
-      "medical": "/scene-1.jpg"
+      "medical": "/Nephrolepis.jpg"
     }
   },
   "santolina": {
@@ -46,10 +46,10 @@
     "aliases": ["cotton lavender", "santolina", "Lavanda cotone"],
     "sceneId": "scene-1",
     "model": "/models/Santolina.glb",
-    "position": [3, -1, 0],
-    "scale": [4, 4, 4],
+    "position": [1, 0.5, 2],
+    "scale": [2, 2, 2],
     "description": "A compact silver-green shrub for aromatic borders and dry gardens.",
-    "medicalInfo": "Santolina is associated with aromatic foliage and traditional herbal use.",
+    "medicalInfo": "Santolina (commonly known as Cotton Lavender) has a rich history in traditional Mediterranean medicine. It is highly valued for its anthelmintic (anti-parasitic) properties, traditionally used to treat digestive disorders, and its essential oil possesses notable antimicrobial and anti-inflammatory qualities.",
     "attributes": {
       "droughtTolerance": "high",
       "height": "0.5 m",
@@ -57,7 +57,27 @@
       "medicinalValue": "traditional herbal use"
     },
     "images": {
-      "medical": "/scene-1.jpg"
+      "medical": "/Santolina.jpg"
+    }
+  },
+  "ficus_microcarpa": {
+    "id": "ficus_microcarpa",
+    "displayName": "Ficus Microcarpa",
+    "aliases": ["ficus", "ficus microcarpa"],
+    "sceneId": "scene-3",
+    "model": "/models/Ficus_Microcarpa.glb",
+    "position": [3, -1, -2],
+    "scale": [4, 4, 4],
+    "description": "A tropical fig tree with glossy leaves and an elegant canopy.",
+    "medicalInfo": "Ficus microcarpa has a long history in traditional medicine. Its aerial roots, bark, and leaves contain bioactive compounds used to clear heat, dispel dampness, reduce swelling, and alleviate pain.",
+    "attributes": {
+      "droughtTolerance": "medium",
+      "height": "0.7 m",
+      "lifespan": "perennial",
+      "medicinalValue": "cooling and healing"
+    },
+    "images": {
+      "medical": "/Ficus.jpg"
     }
   }
 }

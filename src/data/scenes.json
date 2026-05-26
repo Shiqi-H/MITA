@@ -41,7 +41,7 @@
     "title": "Scene 3",
     "label": "3",
     "panorama": "/scene-3.jpg",
-    "models": ["ginkgo"],
+    "models": ["ginkgo", "ficus_microcarpa"],
     "links": [
       {
         "target": "scene-1",
