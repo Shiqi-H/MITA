@@ -57,20 +57,26 @@ content.
     fallback), and \emph{TTS narration} so the user never needs to leave
     the VR view to read.
 
-    \item \textbf{LLM-driven dialogue manager.} A Node.js / Express +
-    WebSocket backend routes each user turn through an LLM performing
-    \textbf{intent parsing} (\texttt{query\_info}, \texttt{query\_attribute},
-    \texttt{compare}) and \textbf{slot extraction} (\texttt{medicinal},
-    \texttt{botanical}, \texttt{toxicity}, \texttt{drought},
-    \texttt{feng\_shui}), interpreted against the selected plant, dialogue
-    history and the structured \texttt{plants.json} database.
+    \item \textbf{LLM-driven dialogue manager.} A minimal Node.js HTTP
+    server exposes JSON endpoints (\texttt{/api/parse-intent},
+    \texttt{/api/generate-info}, \texttt{/api/compare}\ldots) that perform
+    LLM-backed \textbf{intent parsing} (\texttt{query\_info},
+    \texttt{query\_attribute}, \texttt{compare}) and \textbf{slot
+    extraction} (\texttt{medicinal}, \texttt{botanical}, \texttt{toxicity},
+    \texttt{drought}, \texttt{feng\_shui}), interpreted against the selected
+    plant, dialogue history and the structured \texttt{plants.json}
+    database. The backend is intentionally stateless; each request
+    carries all context needed for that turn so the interaction loop
+    remains available even when the LLM service is offline.
 
-    \item \textbf{State-machine interaction.} A finite set of WebSocket
-    message types (\texttt{query}, \texttt{clarify}, \texttt{disambiguate},
-    \texttt{response}, \texttt{comparison}, \texttt{fallback},
-    \texttt{clarify\_retry}, \texttt{error}) and a per-client session
-    tracking visited plants, pending disambiguations and history allow the
-    assistant to reason contextually across turns.
+    \item \textbf{Client-side interaction state.} A finite set of response
+    categories (\texttt{response}, \texttt{comparison}, \texttt{fallback},
+    \texttt{disambiguate}, \texttt{clarify}, \texttt{clarify\_retry},
+    \texttt{error}) and \textbf{client-side state} centralised in
+    \texttt{src/app/state.js} --- tracking the selected plant, visited
+    plant ids, pending ambiguity candidates and dialogue history --- allow
+    the assistant to reason contextually across turns without any
+    persistent server session.
 
     \item \textbf{Robust disambiguation.} When raycasting returns overlapping
     plants, candidates are ranked by depth, labelled \emph{A / B / C} and
