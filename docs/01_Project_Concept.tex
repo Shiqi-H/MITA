@@ -6,10 +6,6 @@
 \usepackage{times}
 \usepackage{array}
 \usepackage{enumitem}
-\usepackage{textcomp}
-
-\setlength{\parskip}{3pt}
-\setlist{noitemsep, topsep=3pt, partopsep=0pt, leftmargin=*}
 
 \begin{document}
 
@@ -62,44 +58,58 @@
 
 \newpage
 
-\section{Vision}
-MITA is a browser-based botanical garden combining \textbf{WebVR panoramic
-exploration} with a \textbf{conversational, voice-driven assistant}. Users
-walk through 360\textdegree{} panoramic scenes, point at 3D plant models
-and speak naturally, turning a static exhibit into a fluid multimodal
-dialogue.
+\section{Overview}
+Botanical Garden is a browser-based botanical garden that combines \textbf{immersive panoramic exploration} with a \textbf{conversational, voice-driven assistant}. Users move through 360\textdegree{} garden scenes, look at or select 3D plant models, and ask natural-language questions.
+The goal is to turn a static botanical exhibit into a fluid multimodal
+experience where visual context, plant selection, speech input, adaptive
+information panels and TTS feedback work together.
 
 \section{Characterizing Features}
 \begin{itemize}
-    \item \textbf{Immersive 3D environment.} A-Frame (WebVR) renders five
-    linked panoramic scenes with clickable portals and inspectable 3D plant
-    models.
+    \item \textbf{Immersive 3D environment.} The prototype renders linked
+    360\textdegree{} panoramic garden scenes with navigation
+    portals and 3D plant models. This gives users a spatial
+    context for exploration.
 
-    \item \textbf{Multimodal input.} Gaze/pointer raycasting, speech (STT
-    via the Web Speech API), and click/touch fallback.
+    \item \textbf{Multimodal input.} The system combines visual context,
+    plant selection, typed input, speech-to-text via the Web
+    Speech API, and click/touch fallback controls. Users can therefore
+    interact by looking, selecting, speaking, typing, or clicking overlay
+    options depending on the situation.
 
-    \item \textbf{Multimodal output.} Spatial highlight on the selected
-    plant, adaptive 2D HUD cards (botanical, medicinal, comparison,
-    fallback), and TTS narration.
+    \item \textbf{Multimodal output.} Responses are presented through a
+    coordinated combination of 3D plant highlights, adaptive 2D information
+    panels (botanical, medicinal, comparison and fallback), and text-to-speech
+    narration.
 
-    \item \textbf{LLM-driven dialogue.} A stateless backend performs intent
-    parsing and slot extraction (medicinal, botanical, toxicity, drought,
-    feng shui) with local fallback when the LLM is unavailable.
+    \item \textbf{LLM-assisted dialogue with local fallback.} A lightweight
+    stateless backend provides JSON endpoints for intent parsing, information
+    generation, disambiguation prompts and comparison speech. The prototype
+    first attempts LLM-assisted generation when enabled, but keeps local
+    deterministic parsing and structured plant data as fallback so that the
+    core interaction does not break when the LLM is unavailable.
 
-    \item \textbf{Client-side state.} Selected plant, visited plant history,
-    ambiguity candidates and dialogue history are tracked client-side,
-    enabling multi-turn reasoning without a server session.
+    \item \textbf{Referential ambiguity handling.} When the user asks an
+    ambiguous question such as \emph{``what is this''} while multiple plants
+    are visible or otherwise plausible in the current scene, the system enters
+    a referential ambiguity flow. Candidate plants are labelled
+    A\,/\,B\,/\,C and can be resolved by clicking, typing, or speaking a
+    letter or plant name, with retry guidance and direct-click fallback.
 
-    \item \textbf{Robust disambiguation.} Overlapping candidates are ranked
-    by depth, labelled A\,/\,B\,/\,C, and resolved by voice or overlay
-    click, with two retry attempts before pointer fallback.
+    \item \textbf{Contextual comparison.} The system remembers recently
+    visited plants and can compare the current selection with a named plant,
+    a previously visited plant, or a plant found in the global database. In
+    the current prototype, comparison focuses on drought tolerance while the
+    panel also shows supporting attributes where available.
 \end{itemize}
 
 \section{Target Users and Why It Is Multimodal}
-The system targets \textbf{casual museum visitors, botany students and
-accessibility-oriented users} on desktop, tablet or VR headset. MITA is
-multimodal \textbf{by design}: every interaction fuses pointing and speech
-(input) with 3D highlight, visual card and TTS (output), and degrades
-gracefully when any single modality fails.
+The system targets \textbf{botanical garden visitors, botany students and users who are unable to visit in person} exploring a botanical collection on desktop. Instead of reading long static labels, users can ask focused questions about the plant in front of them.
+
+Botanical Garden is multimodal \textbf{by design}: users interact through
+multiple input modalities, including visual context, click/raycast selection,
+typed text and speech input, while the system responds through multiple output
+modalities, including 3D spatial highlights, visual information cards and
+spoken TTS feedback. 
 
 \end{document}

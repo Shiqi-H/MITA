@@ -74,8 +74,9 @@ At a high level, the prototype is divided into four layers:
     \item \textbf{Immersive scene layer:} renders the panoramic garden, 3D plant
     models, and spatial highlights.
 
-    \item \textbf{Interaction layer:} captures pointer and raycast selection,
-    typed input, speech-to-text input, and ambiguity-resolution actions.
+    \item \textbf{Interaction layer:} captures pointer-based plant selection,
+    typed input, speech-to-text input, visible-plant ambiguity detection, and
+    ambiguity-resolution actions.
 
     \item \textbf{Dialogue and grounding layer:} maps user utterances to intents,
     connects those intents to the currently selected plant or recently visited
@@ -95,12 +96,13 @@ without a persistent server session.
 
 The frontend is a Vite application written in modular JavaScript. The entry
 point is \texttt{src/main.js}, which initializes global UI controls, speech
-recognition, raycast selection, scene navigation, and the first garden scene.
+recognition, plant selection, scene navigation, and the first garden scene.
 
 The main frontend modules are:
 
 \begin{itemize}
-    \item \texttt{src/scene/*}: renders the 360-degree garden scenes, 3D plant models, and raycast-based plant selection.
+    \item \texttt{src/scene/*}: renders the 360-degree garden scenes, 3D plant
+    models, and plant selection in the immersive scene.
 
     \item \texttt{src/app/*}: owns interaction state and high-level behavior
     such as identifying a plant, querying an attribute, comparing plants, and
@@ -120,9 +122,10 @@ The main frontend modules are:
 \end{itemize}
 
 The frontend state is centralized in \texttt{src/app/state.js}. It tracks the
-active panoramic scene, the currently selected plant, ambiguity candidates when
-multiple plants are hit by a raycast, the ordered list of visited plant ids, and
-the speech recognition failure count for retry behavior.
+active panoramic scene, the currently selected plant, the set of plants currently
+visible in the user's view, ambiguity candidates derived from those visible
+plants, the ordered list of visited plant ids, and the speech recognition
+failure count for retry behavior.
 
 This state is small but important. It allows the system to interpret phrases
 such as ``this plant'', ``the previous one'', or ``compare it with lavender''
@@ -171,13 +174,15 @@ data, so the visual part of the interaction remains available.
 
 \section{Core Interaction Flow}
 
-The most common interaction starts when the user points at a plant and asks a
-question.
+The most common interaction starts when the user looks at a plant area and asks
+a question.
 
 \begin{enumerate}[label=\arabic*.]
-    \item The scene raycaster detects one or more plant model intersections.
-    \item The frontend records the selected plant or opens an ambiguity flow if
-    several candidates are possible.
+    \item The system checks the plants that are currently visible in the user's
+    view.
+    \item If only one plant is visible or clearly selected, the frontend records
+    it as the current plant; if several visible plants could match the user's
+    reference, the frontend opens an ambiguity flow.
     \item The user submits text through typing or browser speech recognition.
     \item \texttt{handleQuery()} sends the utterance and current context through
     the intent parser.
@@ -191,9 +196,10 @@ question.
     \item Text-to-speech reads the concise answer or clarification prompt.
 \end{enumerate}
 
-For ambiguous selections, the frontend stores candidate plants in state and
-shows an A/B/C overlay. The user may resolve the ambiguity by clicking an option
-or by speaking a phrase such as ``A'' or the plant name. As a fallback option, users can click the plant model to select.
+For ambiguous references, the frontend stores the visible candidate plants in
+state and shows an A/B/C overlay. The user may resolve the ambiguity by clicking
+an option or by speaking a phrase such as ``A'' or the plant name. As a fallback
+option, users can directly click a plant model to make an explicit selection.
 
 For comparison, the frontend combines the current selected plant with the
 visited plant history. This enables contextual queries such as ``Is this more
@@ -220,21 +226,5 @@ Visual assets are kept in the \texttt{public/} directory:
 This separation keeps the prototype extensible. New plants can be added by
 combining a plant data record, a model asset, and scene placement metadata,
 without changing the main interaction code.
-
-\section{Deployment and Runtime Assumptions}
-
-The prototype is designed for local evaluation:
-
-\begin{itemize}
-    \item the Vite frontend runs with \texttt{npm run dev};
-    \item the backend runs with \texttt{npm run server};
-    \item the browser accesses the frontend and calls the backend through local
-    JSON endpoints;
-    \item speech recognition and speech synthesis rely on browser-native Web
-    Speech APIs;
-    \item LLM support is optional and controlled through environment configuration.
-\end{itemize}
-
-Therefore, it currently does not include features such as user accounts, persistent storage, analytics, and authentication.
 
 \end{document}

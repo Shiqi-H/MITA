@@ -35,13 +35,14 @@ npm.cmd run server
 ### Task 2: 植物选中与深度对话 
 - 支持查询植物属性，例如药用价值、植物基础信息等。
 - 当用户询问 medicinal value / medical / herbal use 时，会打开专门的药用信息面板。
-- 如果用户询问暂不支持的兴趣点，例如 symbolism、feng shui，会显示 fallback 交互，引导用户查看已支持的 botanical features 或 medicinal value。
+- 如果用户询问暂不支持的兴趣点，例如 toxicity
+，会显示 fallback 交互，引导用户查看已支持的 botanical features 或 medicinal value。
 - 信息生成优先走后端 LLM 接口；失败时保留本地 fallback，避免核心交互完全中断。
 
 ### Task 3: 跨上下文的植物比较
 - 支持比较当前选中植物和另一个植物，例如：
 ```text
-Is this more drought tolerant than the giant water lily?
+Is this more drought tolerant than the ficus?
 ```
 - 比较面板会展示两个植物的描述和关键属性，包括 drought tolerance、height、lifespan、medicinal value。
 - 比较目标优先从用户访问历史中查找；如果历史中没有，则回退到全局植物数据库。

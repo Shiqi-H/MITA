@@ -63,96 +63,127 @@
 
 \newpage
 
-This document describes the three interaction tasks for heuristic
-evaluation, specifying the user goal, modalities, expected flow and
-success criteria for each.
+This document defines the three main interaction tasks used for heuristic
+evaluation of the Botanical Garden prototype. The tasks focus on how the
+system combines visual context, plant selection, speech or typed input, LLM
+support, local fallback logic, and adaptive information panels.
 
-\section{Task 1 --- Disambiguation of Overlapping Plants}
-\tasksub{Goal.} Identify \textbf{one specific plant} from a cluster of
-visually overlapping specimens (e.g.\ Lavandula, Nephrolepis and Santolina
-in scene~1).
+\section{Task 1 --- Visual Detection and Multimodal Disambiguation}
+\tasksub{Goal.} The user wants to identify a plant using an ambiguous
+deictic question such as \emph{``what is this''} or \emph{``what plant am I
+looking at?''}. The task evaluates whether the system can detect that the
+reference is unclear and guide the user to the intended plant.
 
-\tasksub{Modalities.} \emph{Input:} raycasting + speech (STT) + overlay
-click fallback. \emph{Output:} 3D highlight on each candidate, A\,/\,B
-labelled overlay, TTS clarification prompt.
-
-\tasksub{Flow.}
-\begin{enumerate}
-    \item User clicks or speaks while gazing at the overlapping plants.
-    \item Frontend detects multiple hits, sorts by depth and labels
-    candidates A, B\ldots; backend generates a spoken clarification prompt.
-    \item Overlay and highlights are displayed; TTS plays the prompt.
-    \item User resolves by voice (\emph{``A''}, plant name) or by clicking;
-    backend matches and returns the information card.
-\end{enumerate}
-
-\tasksub{Success criteria.} Highlight and overlay appear within $\sim$1\,s;
-voice resolution works for natural phrasings; two retries offered before
-click fallback; no card shown until ambiguity is resolved.
-
-\tasksub{Heuristics.} Visibility of system status; match with the real
-world; error prevention and recovery (retry + click fallback).
-
-\section{Task 2 --- Comparing the Current Plant with a Visited One}
-\tasksub{Goal.} \textbf{Compare} a newly selected plant with one seen
-earlier (\emph{``How does this compare to the lavender I just looked at?''}).
-
-\tasksub{Modalities.} \emph{Input:} raycasting to select the new plant +
-speech (comparison query). \emph{Output:} side-by-side comparison card
-and TTS summary.
+\tasksub{Modalities.} \emph{Input:} current camera view, speech-to-text,
+typed text, and click/touch selection on the A\,/\,B\,/\,C overlay.
+\emph{Output:} candidate highlights in the 3D scene, labelled overlay
+options, information panel, and TTS feedback.
 
 \tasksub{Flow.}
 \begin{enumerate}
-    \item User has visited at least one plant; its identity is stored in
-    the client-side visited plant list.
-    \item User selects a second plant and asks a comparison question
-    (\emph{``compare it with the lavender''}, \emph{``which is more
-    drought-tolerant?''}).
-    \item Frontend parses the intent and sends it to the comparison
-    handler with the selected plant and visited history as context.
-    \item Backend resolves the target plant (by name, alias or recency),
-    fetches both records and returns a spoken comparison summary.
-    \item Frontend renders a side-by-side comparison card and plays TTS.
+    \item The user asks an ambiguous identification question, for example
+    \emph{``what is this''} or \emph{``what plant am I looking at?''}.
+    \item If no plant is already selected, the frontend checks the plants in
+    the current visual field. When multiple visible plants are detected, the
+    system enters a referential ambiguity flow. If visibility detection cannot
+    determine a single clear target and the current scene contains multiple
+    candidate plants, the scene candidates are used as a fallback ambiguity
+    set.
+    \item The system generates A\,/\,B\,/\,C labels for the candidate plants,
+    highlights them in the 3D scene, and displays a clarification overlay.
+    A backend LLM call may be used to produce a natural clarification prompt;
+    if this fails, a local prompt is used.
+    \item The user resolves the ambiguity by clicking one candidate, typing a
+    letter, speaking a letter, or saying the plant name.
+    \item If the answer cannot be matched, the system asks the user to choose
+    again. After repeated failures, it guides the user toward directly
+    clicking the intended target.
+    \item Once a candidate is resolved, the selected plant is highlighted and
+    its information card is shown.
 \end{enumerate}
 
-\tasksub{Success criteria.} Implicit references (\emph{``the previous
-one''}, \emph{``lavender''}) are resolved via the visited list; card
-aligns matching attributes; graceful error when no second plant can be
-identified.
+\tasksub{Success criteria.} Ambiguity is triggered when the user uses an
+unclear reference and more than one plant is visible or otherwise plausible in
+the current scene; every candidate is clearly labelled; clicking, typing, and
+voice-based letter selection work; failure cases provide a retry path and a
+direct-click fallback; no plant-specific information card appears before the
+target is resolved.
 
-\tasksub{Heuristics.} Recognition rather than recall; consistency and
-standards; aesthetic and minimalist design.
+\section{Task 2 --- Plant Selection and In-depth Dialogue}
+\tasksub{Goal.} The user selects one plant and asks targeted follow-up
+questions about its properties, such as basic botanical information or
+medicinal value. The task evaluates whether the system keeps the selected
+plant in context and presents the right type of information panel.
 
-\section{Task 3 --- Dynamic Information Card Driven by Spoken Intent}
-\tasksub{Goal.} Obtain \textbf{targeted information} about a single plant
---- botanical description, medicinal use, toxicity, drought tolerance,
-feng-shui symbolism --- without navigating menus.
-
-\tasksub{Modalities.} \emph{Input:} raycasting to select the plant +
-speech (STT); follow-up turns keep the plant in context. \emph{Output:}
-context-sensitive card (medicinal, botanical, or general), 3D highlight
-and TTS answer.
+\tasksub{Modalities.} \emph{Input:} plant selection by click/raycast, speech
+or typed natural-language query, and fallback buttons for supported topics.
+\emph{Output:} selected-plant highlight, botanical or medicinal information
+panel, fallback panel for unsupported interests, and TTS narration.
 
 \tasksub{Flow.}
 \begin{enumerate}
-    \item User selects a plant; intent and topic of interest are parsed.
-    \item Topic is mapped to a card type (medicinal, botanical, general).
-    \item If the topic is unavailable, backend returns a fallback with
-    available topics and a spoken explanation.
-    \item Frontend renders the information card or a fallback card whose
-    buttons re-issue requests for the same plant.
-    \item Subsequent turns are contextual follow-ups using dialogue history.
+    \item The user selects a plant directly, or resolves Task~1 ambiguity so
+    that one plant becomes the current selection.
+    \item The user asks a property question, for example
+    \emph{``what is its medicinal value?''}, \emph{``tell me about this
+    plant''}, or \emph{``what is it used for?''}.
+    \item The frontend parses the intent and topic of interest. For medicinal
+    value, medical, or herbal-use questions, the system opens the dedicated
+    medicinal information panel.
+    \item For supported botanical queries, the system displays the general
+    plant information card. Information generation first attempts to use the
+    backend LLM endpoint; if generation fails or is disabled, the UI still
+    falls back to structured local plant data.
+    \item If the user asks for an unsupported interest, such as a topic not
+    available in the current prototype, the system shows a fallback interaction
+    that guides the user toward supported topics such as botanical features or
+    medicinal value.
+    \item Subsequent follow-up turns remain attached to the selected plant
+    until the user selects another plant or closes the plant panel.
 \end{enumerate}
 
-\tasksub{Success criteria.} Card type matches spoken intent; fallback
-never dead-ends; follow-ups stay locked to the selected plant; TTS, card
-and highlight stay synchronised.
+\tasksub{Success criteria.} The selected plant remains visually highlighted;
+medicinal questions open the medicinal panel; general botanical questions open
+the standard information card; unsupported interests do not dead-end but offer
+supported alternatives; local fallback prevents the core interaction from
+breaking when LLM generation is unavailable.
 
-\tasksub{Heuristics.} Flexibility and efficiency; error recovery via
-fallback topics; consistency between voice and visual output.
+\section{Task 3 --- Contextual Plant Comparison}
+\tasksub{Goal.} The user compares the currently selected plant with another
+plant mentioned by name or inferred from visit history. For example:
 
-\section*{Out-of-Scope}
-\textbf{Not} evaluated: scene navigation via portals; STT/TTS audio
-quality; LLM answer factuality.
+\begin{quote}
+\texttt{Is this more drought tolerant than the ficus?}
+\end{quote}
+
+\tasksub{Flow.}
+\begin{enumerate}
+    \item The user has a current plant selected and asks a comparison question,
+    such as \emph{``Is this more drought tolerant than the ficus?''} or
+    \emph{``compare it with the previous plant''}.
+    \item The frontend parses the comparison intent and resolves the second
+    plant. It first checks explicit plant names and aliases, then uses the
+    user's visited plant history for references such as \emph{``the previous
+    one''}. If the target was not visited but exists in the plant database, it
+    can still be used as a global database fallback.
+    \item The comparison view displays both plant descriptions and key
+    attributes, including drought tolerance, height, lifespan, and medicinal
+    value where available.
+    \item The frontend sends both resolved plant records to the backend
+    \texttt{/api/compare} endpoint when LLM comparison speech is enabled.
+    The backend is responsible for generating a natural-language comparison
+    answer, while the frontend remains responsible for rendering the
+    structured side-by-side result.
+    \item If no valid comparison target can be resolved, the system explains
+    the problem and asks the user to select another plant or use a known plant
+    name.
+\end{enumerate}
+
+\tasksub{Success criteria.} The system resolves comparison targets from
+explicit names, aliases, recent history, or the global plant database; the
+comparison panel shows both plants in a structured layout; drought tolerance
+is compared clearly in the current prototype; missing targets produce a useful
+error instead of a silent failure; the spoken summary and visual comparison
+remain consistent.
 
 \end{document}
