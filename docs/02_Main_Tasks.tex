@@ -1,30 +1,64 @@
-\documentclass[10pt,a4paper]{article}
+\documentclass[12pt,a4paper]{article}
 
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{lmodern}
-\usepackage[margin=0.8in]{geometry}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage{times}
+\usepackage{array}
 \usepackage{enumitem}
-\usepackage{titlesec}
-\usepackage{hyperref}
-\usepackage{parskip}
-\usepackage{textcomp}
-
-\hypersetup{colorlinks=true, linkcolor=blue!50!black, urlcolor=blue!50!black}
-
-\setlist{itemsep=2pt, topsep=3pt, partopsep=0pt, parsep=1pt, leftmargin=*}
-\titlespacing*{\section}{0pt}{8pt}{3pt}
-\titleformat{\section}{\normalfont\bfseries\large}{\thesection}{0.6em}{}
-\setlength{\parskip}{3pt}
 
 \newcommand{\tasksub}[1]{\par\smallskip\noindent\textbf{#1}\quad\ignorespaces}
 
-\title{\vspace{-1.5em}MITA --- Main Tasks for Heuristic Evaluation}
-\author{}
-\date{\textbf{Course:} Multimodal Interactive Technologies and Applications}
-
 \begin{document}
-\maketitle
+
+\begin{titlepage}
+    \thispagestyle{empty}
+
+    % Header
+    \noindent
+    \begin{minipage}{0.5\textwidth}
+        \includegraphics[width=0.8\textwidth]{Politecnico_di_Milano.png}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.5\textwidth}
+        \raggedleft
+        \vspace{0.3cm}
+        {\large\bfseries
+        MULTIMODAL INTERACTIVE TECHNOLOGIES AND APPLICATIONS}
+    \end{minipage}
+
+    \vspace{4.0cm}
+
+    % Title
+    \begin{center}
+        {\Huge\bfseries Main Tasks for Heuristic Evaluation}\\[0.8cm]
+        {\Large Botanical Garden}\\
+    \end{center}
+
+    \vfill
+
+    % Group information
+    \begin{center}
+        \renewcommand{\arraystretch}{2.05}
+        \begin{tabular}{>{\raggedleft}p{5cm} p{1.5cm} p{5cm}}
+            {\Large Group Name} & & {\Large Gardeners} \\
+            {\Large Kaifei Xu } & & {\Large 11115439} \\
+            {\Large Keyan Cheng} & & {\Large 11154362} \\
+            {\Large Shiqi Huang} & & {\Large 11111452} \\
+            {\Large Yufei Liu} & & {\Large 11118413} \\
+        \end{tabular}
+    \end{center}
+
+    \vspace{3.2cm}
+
+    % Date
+    \begin{center}
+        May 25, 2026
+    \end{center}
+
+\end{titlepage}
+
+\newpage
 
 This document describes the three interaction tasks on which the evaluating
 team is expected to run their heuristic evaluation. Each task gives the
