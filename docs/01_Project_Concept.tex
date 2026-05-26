@@ -8,6 +8,9 @@
 \usepackage{enumitem}
 \usepackage{textcomp}
 
+\setlength{\parskip}{3pt}
+\setlist{noitemsep, topsep=3pt, partopsep=0pt, leftmargin=*}
+
 \begin{document}
 
 \begin{titlepage}
@@ -60,70 +63,43 @@
 \newpage
 
 \section{Vision}
-MITA (Multimodal Interactive Tour Assistant) is a browser-based, immersive
-botanical garden combining \textbf{WebVR panoramic exploration} with a
-\textbf{conversational, voice-driven assistant}. Users walk through
-360\textdegree{} panoramic scenes, point at plants in 3D and \emph{talk}
-to the system in natural language, turning a traditional static-label
-exhibit into a fluid multimodal dialogue between user, environment and
-content.
+MITA is a browser-based botanical garden combining \textbf{WebVR panoramic
+exploration} with a \textbf{conversational, voice-driven assistant}. Users
+walk through 360\textdegree{} panoramic scenes, point at 3D plant models
+and speak naturally, turning a static exhibit into a fluid multimodal
+dialogue.
 
 \section{Characterizing Features}
 \begin{itemize}
-    \item \textbf{Immersive 3D environment.} Built on \textbf{A-Frame (WebVR)}
-    and rendered in-browser. Five linked panoramic scenes are connected by
-    clickable arrow portals; plant specimens are positioned 3D models
-    inspectable from any angle.
+    \item \textbf{Immersive 3D environment.} A-Frame (WebVR) renders five
+    linked panoramic scenes with clickable portals and inspectable 3D plant
+    models.
 
-    \item \textbf{Multimodal input.} Three integrated channels:
-    (i)~\emph{gaze / pointer raycasting} to select a plant in 3D;
-    (ii)~\emph{speech (STT)} via the Web Speech API for hands-free queries
-    (\emph{``What is this used for?''}, \emph{``Compare it with the
-    lavender.''});
-    (iii)~\emph{click / touch fallback} for accessibility and noisy
-    environments.
+    \item \textbf{Multimodal input.} Gaze/pointer raycasting, speech (STT
+    via the Web Speech API), and click/touch fallback.
 
-    \item \textbf{Multimodal output.} Coordinated combination of a
-    \emph{spatial highlight} (glow / outline) on the selected plant,
-    \emph{adaptive 2D HUD cards} (botanical, medicinal, comparison,
-    fallback), and \emph{TTS narration} so the user never needs to leave
-    the VR view to read.
+    \item \textbf{Multimodal output.} Spatial highlight on the selected
+    plant, adaptive 2D HUD cards (botanical, medicinal, comparison,
+    fallback), and TTS narration.
 
-    \item \textbf{LLM-driven dialogue manager.} A lightweight backend server
-    performs LLM-backed \textbf{intent parsing} and \textbf{slot extraction}
-    (medicinal use, botanical description, toxicity, drought tolerance,
-    feng shui), interpreted against the selected plant, dialogue history
-    and the structured plant database. The backend is intentionally
-    stateless; each request carries all context needed for that turn so
-    the interaction loop remains available even when the LLM service is
-    offline.
+    \item \textbf{LLM-driven dialogue.} A stateless backend performs intent
+    parsing and slot extraction (medicinal, botanical, toxicity, drought,
+    feng shui) with local fallback when the LLM is unavailable.
 
-    \item \textbf{Client-side interaction state.} A finite set of response
-    categories (response, comparison, fallback, disambiguation,
-    clarification, error) and \textbf{client-side state} --- tracking the
-    selected plant, visited plants, pending ambiguity candidates and
-    dialogue history --- allow the assistant to reason contextually across
-    turns without any persistent server session.
+    \item \textbf{Client-side state.} Selected plant, visited plant history,
+    ambiguity candidates and dialogue history are tracked client-side,
+    enabling multi-turn reasoning without a server session.
 
-    \item \textbf{Robust disambiguation.} When raycasting returns overlapping
-    plants, candidates are ranked by depth, labelled \emph{A / B / C} and
-    announced verbally; the user resolves by voice (\emph{``the one in
-    front''}, \emph{``A''}) or by clicking the overlay, with up to two
-    clarification retries before falling back to pointer selection.
+    \item \textbf{Robust disambiguation.} Overlapping candidates are ranked
+    by depth, labelled A\,/\,B\,/\,C, and resolved by voice or overlay
+    click, with two retry attempts before pointer fallback.
 \end{itemize}
 
 \section{Target Users and Why It Is Multimodal}
 The system targets \textbf{casual museum visitors, botany students and
-accessibility-oriented users} exploring a botanical collection on desktop,
-tablet or VR headset. Rather than reading long labels, users ask focused
-questions (\emph{``Can I keep this around my cat?''}, \emph{``How does it
-compare to the cactus?''}) and receive concise spoken answers paired with
-a visual card. MITA is multimodal \textbf{by design}: every interaction
-loop fuses at least two input modalities (point + speak) and three output
-modalities (3D highlight + card + voice), and degrades gracefully ---
-if STT fails the user can click; if the LLM is uncertain a structured A/B
-overlay takes over; if a slot is missing, a \emph{fallback card} proposes
-alternatives. This redundancy keeps the experience fluent across users,
-devices and ambient conditions.
+accessibility-oriented users} on desktop, tablet or VR headset. MITA is
+multimodal \textbf{by design}: every interaction fuses pointing and speech
+(input) with 3D highlight, visual card and TTS (output), and degrades
+gracefully when any single modality fails.
 
 \end{document}
