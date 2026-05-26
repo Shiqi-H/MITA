@@ -1,0 +1,240 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage{times}
+\usepackage{array}
+\usepackage{enumitem}
+
+\begin{document}
+
+\begin{titlepage}
+    \thispagestyle{empty}
+
+    % Header
+    \noindent
+    \begin{minipage}{0.5\textwidth}
+        \includegraphics[width=0.8\textwidth]{Politecnico_di_Milano.png}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.5\textwidth}
+        \raggedleft
+        \vspace{0.3cm}
+        {\large\bfseries
+        MULTIMODAL INTERACTIVE TECHNOLOGIES AND APPLICATIONS}
+    \end{minipage}
+
+    \vspace{4.0cm}
+
+    % Title
+    \begin{center}
+        {\Huge\bfseries Prototype Architecture}\\[0.8cm]
+        {\Large Botanical Garden}\\
+    \end{center}
+
+    \vfill
+
+    % Group information
+    \begin{center}
+        \renewcommand{\arraystretch}{2.05}
+        \begin{tabular}{>{\raggedleft}p{5cm} p{1.5cm} p{5cm}}
+            {\Large Group Name} & & {\Large Gardeners} \\
+            {\Large Kaifei Xu } & & {\Large 11115439} \\
+            {\Large Keyan Cheng} & & {\Large 11154362} \\
+            {\Large Shiqi Huang} & & {\Large 11111452} \\
+            {\Large Yufei Liu} & & {\Large 11118413} \\
+        \end{tabular}
+    \end{center}
+
+    \vspace{3.2cm}
+
+    % Date
+    \begin{center}
+        May 25, 2026
+    \end{center}
+
+\end{titlepage}
+
+\newpage
+
+\section{Architectural Overview}
+
+Botanical Garden is implemented as a browser-based prototype with a lightweight local
+backend. The frontend provides the immersive garden experience, plant
+selection, speech interaction, visual feedback, and information panels. The
+backend provides optional LLM-assisted intent parsing and response generation,
+while the frontend keeps a deterministic local fallback so that the main
+interaction loop can still work when the LLM service is unavailable.
+
+At a high level, the prototype is divided into four layers:
+
+\begin{enumerate}[label=\arabic*.]
+
+    \item \textbf{Immersive scene layer:} renders the panoramic garden, 3D plant
+    models, and spatial highlights.
+
+    \item \textbf{Interaction layer:} captures pointer and raycast selection,
+    typed input, speech-to-text input, and ambiguity-resolution actions.
+
+    \item \textbf{Dialogue and grounding layer:} maps user utterances to intents,
+    connects those intents to the currently selected plant or recently visited
+    plants, and decides which UI response should be shown.
+
+    \item \textbf{Knowledge and generation layer:} stores structured plant
+    records and, when enabled, uses the backend LLM service to generate more
+    natural spoken explanations.
+\end{enumerate}
+
+The architecture intentionally keeps the most important interaction state on
+the client side. This makes the prototype responsive and allows plant
+selection, local intent parsing, panel rendering, and fallback behavior to work
+without a persistent server session.
+
+\section{Frontend Architecture}
+
+The frontend is a Vite application written in modular JavaScript. The entry
+point is \texttt{src/main.js}, which initializes global UI controls, speech
+recognition, raycast selection, scene navigation, and the first garden scene.
+
+The main frontend modules are:
+
+\begin{itemize}
+    \item \texttt{src/scene/*}: renders the 360-degree garden scenes, 3D plant models, and raycast-based plant selection.
+
+    \item \texttt{src/app/*}: owns interaction state and high-level behavior
+    such as identifying a plant, querying an attribute, comparing plants, and
+    resolving ambiguity.
+
+    \item \texttt{src/intent/*}: parses user utterances locally and optionally
+    delegates to the backend intent API.
+
+    \item \texttt{src/ui/*}: renders the plant information panel, medical panel,
+    comparison panel, fallback panel, ambiguity overlay, and query controls.
+
+    \item \texttt{src/speech/speech.js}: integrates browser speech recognition
+    and text-to-speech output.
+
+    \item \texttt{src/data/*}: contains local scene, plant, and intent data used
+    by the prototype.
+\end{itemize}
+
+The frontend state is centralized in \texttt{src/app/state.js}. It tracks the
+active panoramic scene, the currently selected plant, ambiguity candidates when
+multiple plants are hit by a raycast, the ordered list of visited plant ids, and
+the speech recognition failure count for retry behavior.
+
+This state is small but important. It allows the system to interpret phrases
+such as ``this plant'', ``the previous one'', or ``compare it with lavender''
+against the user's actual interaction history instead of treating each
+utterance as an isolated command.
+
+\section{Backend Architecture}
+
+The backend is a minimal Node.js HTTP server located in \texttt{server/index.js}.
+It exposes JSON endpoints that support the frontend dialogue flow:
+
+\begin{itemize}
+    \item \texttt{GET /api/health}: health check and configured model information.
+    \item \texttt{POST /api/parse-intent}: parses a user utterance into an intent
+    and slots.
+    \item \texttt{POST /api/generate-info}: generates a spoken answer for one
+    plant.
+    \item \texttt{POST /api/generate-disambiguation}: generates a clarification
+    prompt for multiple candidate plants.
+    \item \texttt{POST /api/clarify}: resolves a user's answer to an ambiguity
+    prompt.
+    \item \texttt{POST /api/compare}: generates a comparison response for two
+    plants.
+\end{itemize}
+
+The backend is intentionally stateless from the frontend's perspective. Each
+request includes the context needed for that turn, such as the utterance,
+selected plant, visited plant ids, candidate plants, or dialogue history. This
+keeps the prototype simple to run locally and avoids hidden server-side state
+that would be hard to debug during evaluation.
+
+The backend services are split by responsibility:
+
+\begin{itemize}
+    \item \texttt{server/services/intentParser.js}: deterministic parser fallback.
+    \item \texttt{server/services/llm.js}: LLM-backed parsing and response generation.
+    \item \texttt{server/services/plantDb.js}: reads the plant database from
+    \texttt{src/data/plants.json}.
+    \item \texttt{server/handlers/*}: request handlers for query, clarify, and
+    compare flows.
+\end{itemize}
+
+If the LLM call fails, the server returns a local fallback or an empty generated
+speech field. The frontend can still render structured cards from local plant
+data, so the visual part of the interaction remains available.
+
+\section{Core Interaction Flow}
+
+The most common interaction starts when the user points at a plant and asks a
+question.
+
+\begin{enumerate}[label=\arabic*.]
+    \item The scene raycaster detects one or more plant model intersections.
+    \item The frontend records the selected plant or opens an ambiguity flow if
+    several candidates are possible.
+    \item The user submits text through typing or browser speech recognition.
+    \item \texttt{handleQuery()} sends the utterance and current context through
+    the intent parser.
+    \item The parsed intent is routed to one of the frontend handlers:
+    identification, attribute query, comparison, ambiguity resolution, or
+    unknown intent.
+    \item The selected plant is visually highlighted in the 3D scene.
+    \item The corresponding 2D panel is rendered: botanical information,
+    medicinal information, comparison result, fallback options, or ambiguity
+    choices.
+    \item Text-to-speech reads the concise answer or clarification prompt.
+\end{enumerate}
+
+For ambiguous selections, the frontend stores candidate plants in state and
+shows an A/B/C overlay. The user may resolve the ambiguity by clicking an option
+or by speaking a phrase such as ``A'' or the plant name. As a fallback option, users can click the plant model to select.
+
+For comparison, the frontend combines the current selected plant with the
+visited plant history. This enables contextual queries such as ``Is this more
+drought tolerant than the previous one?'' The comparison handler resolves the
+second plant, chooses the relevant attribute, and renders a side-by-side
+comparison panel.
+
+\section{Data Model and Assets}
+
+Plant knowledge is stored as structured JSON in \texttt{src/data/plants.json}.
+Each plant record contains identifiers, display names, aliases, descriptions,
+attributes, and optional information such as medicinal value, toxicity, or
+drought tolerance. Scene metadata is stored in \texttt{src/data/scenes.json},
+while intent-related rules are stored in \texttt{src/data/intents.json}.
+
+Visual assets are kept in the \texttt{public/} directory:
+
+\begin{itemize}
+    \item panoramic scene images;
+    \item 3D plant models in \texttt{.glb} format;
+    \item UI assets.
+\end{itemize}
+
+This separation keeps the prototype extensible. New plants can be added by
+combining a plant data record, a model asset, and scene placement metadata,
+without changing the main interaction code.
+
+\section{Deployment and Runtime Assumptions}
+
+The prototype is designed for local evaluation:
+
+\begin{itemize}
+    \item the Vite frontend runs with \texttt{npm run dev};
+    \item the backend runs with \texttt{npm run server};
+    \item the browser accesses the frontend and calls the backend through local
+    JSON endpoints;
+    \item speech recognition and speech synthesis rely on browser-native Web
+    Speech APIs;
+    \item LLM support is optional and controlled through environment configuration.
+\end{itemize}
+
+Therefore, it currently does not include features such as user accounts, persistent storage, analytics, and authentication.
+
+\end{document}

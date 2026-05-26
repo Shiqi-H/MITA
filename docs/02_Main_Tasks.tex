@@ -1,30 +1,64 @@
-\documentclass[10pt,a4paper]{article}
+\documentclass[12pt,a4paper]{article}
 
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{lmodern}
-\usepackage[margin=0.8in]{geometry}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage{times}
+\usepackage{array}
 \usepackage{enumitem}
-\usepackage{titlesec}
-\usepackage{hyperref}
-\usepackage{parskip}
-\usepackage{textcomp}
-
-\hypersetup{colorlinks=true, linkcolor=blue!50!black, urlcolor=blue!50!black}
-
-\setlist{itemsep=2pt, topsep=3pt, partopsep=0pt, parsep=1pt, leftmargin=*}
-\titlespacing*{\section}{0pt}{8pt}{3pt}
-\titleformat{\section}{\normalfont\bfseries\large}{\thesection}{0.6em}{}
-\setlength{\parskip}{3pt}
 
 \newcommand{\tasksub}[1]{\par\smallskip\noindent\textbf{#1}\quad\ignorespaces}
 
-\title{\vspace{-1.5em}MITA --- Main Tasks for Heuristic Evaluation}
-\author{}
-\date{\textbf{Course:} Multimodal Interactive Technologies and Applications}
-
 \begin{document}
-\maketitle
+
+\begin{titlepage}
+    \thispagestyle{empty}
+
+    % Header
+    \noindent
+    \begin{minipage}{0.5\textwidth}
+        \includegraphics[width=0.8\textwidth]{Politecnico_di_Milano.png}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.5\textwidth}
+        \raggedleft
+        \vspace{0.3cm}
+        {\large\bfseries
+        MULTIMODAL INTERACTIVE TECHNOLOGIES AND APPLICATIONS}
+    \end{minipage}
+
+    \vspace{4.0cm}
+
+    % Title
+    \begin{center}
+        {\Huge\bfseries Main Tasks for Heuristic Evaluation}\\[0.8cm]
+        {\Large Botanical Garden}\\
+    \end{center}
+
+    \vfill
+
+    % Group information
+    \begin{center}
+        \renewcommand{\arraystretch}{2.05}
+        \begin{tabular}{>{\raggedleft}p{5cm} p{1.5cm} p{5cm}}
+            {\Large Group Name} & & {\Large Gardeners} \\
+            {\Large Kaifei Xu } & & {\Large 11115439} \\
+            {\Large Keyan Cheng} & & {\Large 11154362} \\
+            {\Large Shiqi Huang} & & {\Large 11111452} \\
+            {\Large Yufei Liu} & & {\Large 11118413} \\
+        \end{tabular}
+    \end{center}
+
+    \vspace{3.2cm}
+
+    % Date
+    \begin{center}
+        May 25, 2026
+    \end{center}
+
+\end{titlepage}
+
+\newpage
 
 This document describes the three interaction tasks on which the evaluating
 team is expected to run their heuristic evaluation. Each task gives the
@@ -47,21 +81,23 @@ question.
 \begin{enumerate}
     \item User points at the overlapping plants and clicks (or speaks while
     gazing).
-    \item Frontend collects all raycaster intersections of class
-    \texttt{.plant-model} with their 3D positions and sends a \texttt{query}
-    WebSocket message.
-    \item Server detects \texttt{hits.length > 1}, sorts candidates by depth
-    (\texttt{z} ascending $\to$ \emph{in front}) and returns a
-    \texttt{disambiguate} payload with labelled candidates (\texttt{A},
-    \texttt{B}\ldots) and a spoken question (\emph{``I can see two plants
-    --- do you mean A, the one in front, or B, behind it?''}).
-    \item Client highlights every candidate, opens the A / B overlay and
-    plays the TTS prompt.
+    \item The frontend collects all raycaster intersections of class
+    \texttt{.plant-model} and stores the candidates in client-side state.
+    If more than one candidate is detected, the ambiguity flow starts
+    immediately on the client.
+    \item The frontend sorts candidates by depth (closest first), labels
+    them \texttt{A}, \texttt{B}\ldots, and calls
+    \texttt{/api/generate-disambiguation} to obtain a spoken clarification
+    prompt (\emph{``I can see two plants --- do you mean A, the one in
+    front, or B, behind it?''}).
+    \item The frontend highlights every candidate, opens the A\,/\,B
+    overlay and plays the TTS prompt.
     \item User resolves by voice (\emph{``A''}, \emph{``the one behind''},
-    \emph{``lavender''}) or by clicking; the client sends a \texttt{clarify}.
-    \item Server matches the utterance against the pending candidates and
-    returns a regular \texttt{response}, which renders the card and
-    dismisses the overlay.
+    \emph{``lavender''}) or by clicking; the frontend calls
+    \texttt{/api/clarify} with the utterance and stored candidate context.
+    \item The clarify handler resolves the utterance against the
+    candidates and returns a structured response; the card is rendered and
+    the overlay is dismissed.
 \end{enumerate}
 
 \tasksub{Success criteria.} Highlight, overlay and TTS appear within
@@ -87,17 +123,18 @@ comparison card rendered side-by-side, plus a TTS summary.
 \tasksub{Flow.}
 \begin{enumerate}
     \item User has previously selected at least one plant; its id and name
-    are stored in the client-side \texttt{visitedPlants} list and synced
-    with the server session every turn.
+    are stored in the client-side \texttt{visitedPlants} list in
+    \texttt{src/app/state.js}.
     \item User clicks the second plant and asks a comparison-flavoured
     question (\emph{``compare it with the lavender''}, \emph{``which one is
     more drought-tolerant?''}).
-    \item Frontend sends a \texttt{query} with \texttt{hits}, \texttt{text}
-    and the full \texttt{visited} history.
-    \item Server runs \texttt{parseIntent}; if intent is \texttt{compare}
-    and a \texttt{comparison\_target} is identified (by id, alias or
-    recency), the request is delegated to \texttt{compareHandler.js}.
-    \item Handler fetches both plants from \texttt{plants.json}, optionally
+    \item The frontend calls \texttt{/api/parse-intent}, then routes to
+    \texttt{/api/compare}, passing the utterance, selected plant and the
+    full \texttt{visited} history as request context.
+    \item The compare handler runs \texttt{parseIntent}; if intent is
+    \texttt{compare} and a \texttt{comparison\_target} is identified (by id,
+    alias or recency), it proceeds with both plants.
+    \item The handler fetches both plants from \texttt{plants.json}, optionally
     filters by the detected \texttt{interest\_slot} (e.g.\
     \texttt{medicinal}, \texttt{drought}), and returns a \texttt{comparison}
     payload with both records and a spoken summary.
@@ -124,7 +161,7 @@ compared, not the full record).
 feng-shui symbolism --- without navigating menus.
 
 \tasksub{Modalities.} \emph{Input:} pointer raycasting to select the plant
-+ speech (STT); follow-up turns are sent with \texttt{lockToSelected: true}
++ speech (STT); follow-up turns include the selected plant id as context
 so the system stays focused on the displayed plant. \emph{Output:} a
 context-sensitive card whose layout depends on the detected
 \texttt{interest\_slot} (\texttt{medical}, \texttt{botanical}, default), a
@@ -132,8 +169,9 @@ context-sensitive card whose layout depends on the detected
 
 \tasksub{Flow.}
 \begin{enumerate}
-    \item User selects a plant; server records the visit and the LLM
-    parses intent and slot.
+    \item User selects a plant; the frontend records the visit in
+    client-side state and calls \texttt{/api/parse-intent} to parse intent
+    and slot.
     \item Slot is mapped to a card type via \texttt{SLOT\_TO\_CARD}
     (\texttt{medicinal} $\to$ \texttt{medical}, \texttt{botanical} $\to$
     \texttt{botanical}, others $\to$ \texttt{default}).
@@ -141,13 +179,14 @@ context-sensitive card whose layout depends on the detected
     plant with \texttt{feng\_shui\_info: null}), the server returns a
     \texttt{fallback} payload listing the \textbf{slots that do exist},
     plus a polite spoken explanation.
-    \item Client renders \texttt{renderInfoCard(cardType, data,
+    \item The frontend renders \texttt{renderInfoCard(cardType, data,
     onFollowUp)} for normal answers, or \texttt{renderFallbackCard(msg,
-    onSlotPicked)} for missing data (each button re-issues a \texttt{query}
-    locked to the same plant).
+    onSlotPicked)} for missing data (each button re-issues a request to
+    \texttt{/api/generate-info} locked to the same plant).
     \item Subsequent utterances are treated as \textbf{contextual
-    follow-ups}; \texttt{generateContextualAnswer} reuses dialogue history
-    to produce coherent multi-turn answers.
+    follow-ups}; dialogue history is passed as request context so
+    \texttt{generateContextualAnswer} can produce coherent multi-turn
+    answers.
 \end{enumerate}
 
 \tasksub{Success criteria.} Card type changes with spoken intent (e.g.\

@@ -1,29 +1,63 @@
-\documentclass[10pt,a4paper]{article}
+\documentclass[12pt,a4paper]{article}
 
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{lmodern}
-\usepackage[margin=0.8in]{geometry}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage{times}
+\usepackage{array}
 \usepackage{enumitem}
-\usepackage{titlesec}
-\usepackage{hyperref}
-\usepackage{parskip}
 \usepackage{textcomp}
 
-\hypersetup{colorlinks=true, linkcolor=blue!50!black, urlcolor=blue!50!black}
-
-\setlist{itemsep=2pt, topsep=4pt, partopsep=0pt, parsep=1pt, leftmargin=*}
-\titlespacing*{\section}{0pt}{8pt}{3pt}
-\titleformat{\section}{\normalfont\bfseries\large}{\thesection}{0.6em}{}
-\setlength{\parskip}{4pt}
-
-\title{\vspace{-1.5em}MITA --- Multimodal Interactive Botanical Garden\\
-\large Short Description of the Project Concept}
-\author{}
-\date{\textbf{Course:} Multimodal Interactive Technologies and Applications}
-
 \begin{document}
-\maketitle
+
+\begin{titlepage}
+    \thispagestyle{empty}
+
+    % Header
+    \noindent
+    \begin{minipage}{0.5\textwidth}
+        \includegraphics[width=0.8\textwidth]{Politecnico_di_Milano.png}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.5\textwidth}
+        \raggedleft
+        \vspace{0.3cm}
+        {\large\bfseries
+        MULTIMODAL INTERACTIVE TECHNOLOGIES AND APPLICATIONS}
+    \end{minipage}
+
+    \vspace{4.0cm}
+
+    % Title
+    \begin{center}
+        {\Huge\bfseries Project Concept}\\[0.8cm]
+        {\Large Botanical Garden}\\
+    \end{center}
+
+    \vfill
+
+    % Group information
+    \begin{center}
+        \renewcommand{\arraystretch}{2.05}
+        \begin{tabular}{>{\raggedleft}p{5cm} p{1.5cm} p{5cm}}
+            {\Large Group Name} & & {\Large Gardeners} \\
+            {\Large Kaifei Xu } & & {\Large 11115439} \\
+            {\Large Keyan Cheng} & & {\Large 11154362} \\
+            {\Large Shiqi Huang} & & {\Large 11111452} \\
+            {\Large Yufei Liu} & & {\Large 11118413} \\
+        \end{tabular}
+    \end{center}
+
+    \vspace{3.2cm}
+
+    % Date
+    \begin{center}
+        May 25, 2026
+    \end{center}
+
+\end{titlepage}
+
+\newpage
 
 \section{Vision}
 MITA (Multimodal Interactive Tour Assistant) is a browser-based, immersive
@@ -57,20 +91,26 @@ content.
     fallback), and \emph{TTS narration} so the user never needs to leave
     the VR view to read.
 
-    \item \textbf{LLM-driven dialogue manager.} A Node.js / Express +
-    WebSocket backend routes each user turn through an LLM performing
-    \textbf{intent parsing} (\texttt{query\_info}, \texttt{query\_attribute},
-    \texttt{compare}) and \textbf{slot extraction} (\texttt{medicinal},
-    \texttt{botanical}, \texttt{toxicity}, \texttt{drought},
-    \texttt{feng\_shui}), interpreted against the selected plant, dialogue
-    history and the structured \texttt{plants.json} database.
+    \item \textbf{LLM-driven dialogue manager.} A minimal Node.js HTTP
+    server exposes JSON endpoints (\texttt{/api/parse-intent},
+    \texttt{/api/generate-info}, \texttt{/api/compare}\ldots) that perform
+    LLM-backed \textbf{intent parsing} (\texttt{query\_info},
+    \texttt{query\_attribute}, \texttt{compare}) and \textbf{slot
+    extraction} (\texttt{medicinal}, \texttt{botanical}, \texttt{toxicity},
+    \texttt{drought}, \texttt{feng\_shui}), interpreted against the selected
+    plant, dialogue history and the structured \texttt{plants.json}
+    database. The backend is intentionally stateless; each request
+    carries all context needed for that turn so the interaction loop
+    remains available even when the LLM service is offline.
 
-    \item \textbf{State-machine interaction.} A finite set of WebSocket
-    message types (\texttt{query}, \texttt{clarify}, \texttt{disambiguate},
-    \texttt{response}, \texttt{comparison}, \texttt{fallback},
-    \texttt{clarify\_retry}, \texttt{error}) and a per-client session
-    tracking visited plants, pending disambiguations and history allow the
-    assistant to reason contextually across turns.
+    \item \textbf{Client-side interaction state.} A finite set of response
+    categories (\texttt{response}, \texttt{comparison}, \texttt{fallback},
+    \texttt{disambiguate}, \texttt{clarify}, \texttt{clarify\_retry},
+    \texttt{error}) and \textbf{client-side state} centralised in
+    \texttt{src/app/state.js} --- tracking the selected plant, visited
+    plant ids, pending ambiguity candidates and dialogue history --- allow
+    the assistant to reason contextually across turns without any
+    persistent server session.
 
     \item \textbf{Robust disambiguation.} When raycasting returns overlapping
     plants, candidates are ranked by depth, labelled \emph{A / B / C} and
