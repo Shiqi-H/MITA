@@ -1,5 +1,5 @@
 # MITA Botanical Garden
-MITA 是一个面向植物场景探索的交互式 Web Demo。前端使用 Vite + A-Frame/Three.js 呈现 360 全景、3D 植物模型和交互面板；后端提供意图解析、植物信息生成、歧义澄清和植物比较等。
+Botanical Garden 是一个面向植物场景探索的交互式 Web Demo。前端使用 Vite + A-Frame/Three.js 呈现 360 全景、3D 植物模型和交互面板；后端提供意图解析、植物信息生成、歧义澄清和植物比较等。
 
 ## 运行方式
 项目需要先在本地安装相关依赖。在项目根目录运行：
