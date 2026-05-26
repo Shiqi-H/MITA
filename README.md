@@ -38,7 +38,7 @@ npm.cmd run server
 - 如果用户询问暂不支持的兴趣点，例如 symbolism、feng shui，会显示 fallback 交互，引导用户查看已支持的 botanical features 或 medicinal value。
 - 信息生成优先走后端 LLM 接口；失败时保留本地 fallback，避免核心交互完全中断。
 
-### Task 4: 跨上下文的植物比较
+### Task 3: 跨上下文的植物比较
 - 支持比较当前选中植物和另一个植物，例如：
 ```text
 Is this more drought tolerant than the giant water lily?
