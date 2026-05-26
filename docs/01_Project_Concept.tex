@@ -71,11 +71,9 @@ content.
 \section{Characterizing Features}
 \begin{itemize}
     \item \textbf{Immersive 3D environment.} Built on \textbf{A-Frame (WebVR)}
-    and rendered in-browser. Five panoramic scenes (\texttt{scene-1}\ldots
-    \texttt{scene-5}) are linked by clickable arrow portals; plant specimens
-    (\texttt{Lavandula}, \texttt{Nephrolepis}, \texttt{Santolina},
-    \texttt{Opuntia}\ldots) are positioned \texttt{glTF} models inspectable
-    from any angle.
+    and rendered in-browser. Five linked panoramic scenes are connected by
+    clickable arrow portals; plant specimens are positioned 3D models
+    inspectable from any angle.
 
     \item \textbf{Multimodal input.} Three integrated channels:
     (i)~\emph{gaze / pointer raycasting} to select a plant in 3D;
@@ -91,26 +89,21 @@ content.
     fallback), and \emph{TTS narration} so the user never needs to leave
     the VR view to read.
 
-    \item \textbf{LLM-driven dialogue manager.} A minimal Node.js HTTP
-    server exposes JSON endpoints (\texttt{/api/parse-intent},
-    \texttt{/api/generate-info}, \texttt{/api/compare}\ldots) that perform
-    LLM-backed \textbf{intent parsing} (\texttt{query\_info},
-    \texttt{query\_attribute}, \texttt{compare}) and \textbf{slot
-    extraction} (\texttt{medicinal}, \texttt{botanical}, \texttt{toxicity},
-    \texttt{drought}, \texttt{feng\_shui}), interpreted against the selected
-    plant, dialogue history and the structured \texttt{plants.json}
-    database. The backend is intentionally stateless; each request
-    carries all context needed for that turn so the interaction loop
-    remains available even when the LLM service is offline.
+    \item \textbf{LLM-driven dialogue manager.} A lightweight backend server
+    performs LLM-backed \textbf{intent parsing} and \textbf{slot extraction}
+    (medicinal use, botanical description, toxicity, drought tolerance,
+    feng shui), interpreted against the selected plant, dialogue history
+    and the structured plant database. The backend is intentionally
+    stateless; each request carries all context needed for that turn so
+    the interaction loop remains available even when the LLM service is
+    offline.
 
     \item \textbf{Client-side interaction state.} A finite set of response
-    categories (\texttt{response}, \texttt{comparison}, \texttt{fallback},
-    \texttt{disambiguate}, \texttt{clarify}, \texttt{clarify\_retry},
-    \texttt{error}) and \textbf{client-side state} centralised in
-    \texttt{src/app/state.js} --- tracking the selected plant, visited
-    plant ids, pending ambiguity candidates and dialogue history --- allow
-    the assistant to reason contextually across turns without any
-    persistent server session.
+    categories (response, comparison, fallback, disambiguation,
+    clarification, error) and \textbf{client-side state} --- tracking the
+    selected plant, visited plants, pending ambiguity candidates and
+    dialogue history --- allow the assistant to reason contextually across
+    turns without any persistent server session.
 
     \item \textbf{Robust disambiguation.} When raycasting returns overlapping
     plants, candidates are ranked by depth, labelled \emph{A / B / C} and

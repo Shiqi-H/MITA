@@ -65,15 +65,15 @@ team is expected to run their heuristic evaluation. Each task gives the
 user goal, the modalities involved, the expected interaction flow and the
 success criteria. All tasks take place inside the immersive A-Frame
 botanical garden after the loading screen dismisses and the first
-panoramic scene (\texttt{scene-1}) is visible.
+panoramic scene is visible.
 
 \section{Task 1 --- Disambiguation of Overlapping Plants}
 \tasksub{Goal.} Ask a question about \textbf{one specific plant} in a
 region where several specimens visually overlap (e.g.\ the cluster of
-Lavandula / Nephrolepis / Santolina near the right path in \texttt{scene-1}).
+Lavandula, Nephrolepis, and Santolina near the right path in scene~1).
 
 \tasksub{Modalities.} \emph{Input:} pointer raycasting + speech (STT) +
-click fallback on the A / B overlay. \emph{Output:} 3D highlight on every
+click fallback on the A\,/\,B overlay. \emph{Output:} 3D highlight on every
 candidate, modal overlay with labelled options, and a TTS clarification
 question.
 
@@ -81,31 +81,29 @@ question.
 \begin{enumerate}
     \item User points at the overlapping plants and clicks (or speaks while
     gazing).
-    \item The frontend collects all raycaster intersections of class
-    \texttt{.plant-model} and stores the candidates in client-side state.
-    If more than one candidate is detected, the ambiguity flow starts
-    immediately on the client.
+    \item The frontend collects all raycaster hits and stores the candidates
+    in client-side state. If more than one candidate is detected, the
+    ambiguity flow starts immediately on the client.
     \item The frontend sorts candidates by depth (closest first), labels
-    them \texttt{A}, \texttt{B}\ldots, and calls
-    \texttt{/api/generate-disambiguation} to obtain a spoken clarification
-    prompt (\emph{``I can see two plants --- do you mean A, the one in
+    them A, B\ldots, and requests a spoken clarification prompt from the
+    backend (\emph{``I can see two plants --- do you mean A, the one in
     front, or B, behind it?''}).
     \item The frontend highlights every candidate, opens the A\,/\,B
     overlay and plays the TTS prompt.
     \item User resolves by voice (\emph{``A''}, \emph{``the one behind''},
-    \emph{``lavender''}) or by clicking; the frontend calls
-    \texttt{/api/clarify} with the utterance and stored candidate context.
-    \item The clarify handler resolves the utterance against the
-    candidates and returns a structured response; the card is rendered and
+    \emph{``lavender''}) or by clicking; the frontend sends the utterance
+    and candidate context to the backend for resolution.
+    \item The backend resolves the utterance against the candidates and
+    returns a structured response; the information card is rendered and
     the overlay is dismissed.
 \end{enumerate}
 
 \tasksub{Success criteria.} Highlight, overlay and TTS appear within
 $\sim$1\,s of the click; voice resolution succeeds for natural phrasings
 (\emph{``A''}, \emph{``the front one''}, plant name); if unresolved, a
-\texttt{clarify\_retry} with softer wording is issued and after \textbf{two}
-failed retries the user is guided to the click buttons; no information
-card is rendered until the ambiguity is resolved.
+retry prompt with softer wording is issued and after \textbf{two} failed
+retries the user is guided to the click buttons; no information card is
+rendered until the ambiguity is resolved.
 
 \tasksub{Heuristics.} Match between system and the real world; visibility
 of system status; user control and freedom (overlay always dismissible);
@@ -122,37 +120,34 @@ comparison card rendered side-by-side, plus a TTS summary.
 
 \tasksub{Flow.}
 \begin{enumerate}
-    \item User has previously selected at least one plant; its id and name
-    are stored in the client-side \texttt{visitedPlants} list in
-    \texttt{src/app/state.js}.
+    \item User has previously selected at least one plant; its identity is
+    stored in the client-side visited plant list.
     \item User clicks the second plant and asks a comparison-flavoured
     question (\emph{``compare it with the lavender''}, \emph{``which one is
     more drought-tolerant?''}).
-    \item The frontend calls \texttt{/api/parse-intent}, then routes to
-    \texttt{/api/compare}, passing the utterance, selected plant and the
-    full \texttt{visited} history as request context.
-    \item The compare handler runs \texttt{parseIntent}; if intent is
-    \texttt{compare} and a \texttt{comparison\_target} is identified (by id,
-    alias or recency), it proceeds with both plants.
-    \item The handler fetches both plants from \texttt{plants.json}, optionally
-    filters by the detected \texttt{interest\_slot} (e.g.\
-    \texttt{medicinal}, \texttt{drought}), and returns a \texttt{comparison}
-    payload with both records and a spoken summary.
-    \item Client renders \texttt{renderComparisonCard(plant1, plant2, slot)}
-    and plays the TTS narration.
+    \item The frontend parses the intent and routes to the comparison
+    handler, passing the utterance, selected plant and visited history as
+    request context.
+    \item The backend identifies the comparison intent and resolves the
+    target plant by name, alias or recency.
+    \item The backend fetches both plants, optionally filters by the
+    detected attribute of interest (e.g.\ medicinal use, drought
+    tolerance), and returns a comparison response with a spoken summary.
+    \item The frontend renders a side-by-side comparison card and plays
+    the TTS narration.
 \end{enumerate}
 
 \tasksub{Success criteria.} Implicit references (\emph{``the previous
-one''}, \emph{``lavender''}) are resolved via the visited list and alias
-table; the card visually aligns matching attributes (height, toxicity,
-drought tolerance, family\ldots); comparison only triggers when the user is
-\textbf{not locked} to a single plant via the contextual follow-up path
-(preventing accidental comparisons in a focused Q\&A); a graceful error is
-returned when no valid second plant can be identified.
+one''}, \emph{``lavender''}) are resolved via the visited list; the card
+visually aligns matching attributes (height, toxicity, drought tolerance,
+family\ldots); comparison only triggers when the user is \textbf{not
+locked} to a single plant via the contextual follow-up path (preventing
+accidental comparisons in a focused Q\&A); a graceful error is returned
+when no valid second plant can be identified.
 
 \tasksub{Heuristics.} Recognition rather than recall (visited plants are
 remembered for the user); consistency and standards (same card layout as
-Task 3); aesthetic and minimalist design (only the requested slot is
+Task~3); aesthetic and minimalist design (only the requested attribute is
 compared, not the full record).
 
 \section{Task 3 --- Dynamic Information Card Driven by Spoken Intent}
@@ -161,44 +156,40 @@ compared, not the full record).
 feng-shui symbolism --- without navigating menus.
 
 \tasksub{Modalities.} \emph{Input:} pointer raycasting to select the plant
-+ speech (STT); follow-up turns include the selected plant id as context
++ speech (STT); follow-up turns include the selected plant as context
 so the system stays focused on the displayed plant. \emph{Output:} a
-context-sensitive card whose layout depends on the detected
-\texttt{interest\_slot} (\texttt{medical}, \texttt{botanical}, default), a
-3D highlight, and a TTS answer.
+context-sensitive card whose layout depends on the detected topic of
+interest (medicinal, botanical, or general), a 3D highlight, and a TTS
+answer.
 
 \tasksub{Flow.}
 \begin{enumerate}
     \item User selects a plant; the frontend records the visit in
-    client-side state and calls \texttt{/api/parse-intent} to parse intent
-    and slot.
-    \item Slot is mapped to a card type via \texttt{SLOT\_TO\_CARD}
-    (\texttt{medicinal} $\to$ \texttt{medical}, \texttt{botanical} $\to$
-    \texttt{botanical}, others $\to$ \texttt{default}).
-    \item If the requested slot is missing (e.g.\ \texttt{feng\_shui} for a
-    plant with \texttt{feng\_shui\_info: null}), the server returns a
-    \texttt{fallback} payload listing the \textbf{slots that do exist},
-    plus a polite spoken explanation.
-    \item The frontend renders \texttt{renderInfoCard(cardType, data,
-    onFollowUp)} for normal answers, or \texttt{renderFallbackCard(msg,
-    onSlotPicked)} for missing data (each button re-issues a request to
-    \texttt{/api/generate-info} locked to the same plant).
+    client-side state and the system parses the user's intent and topic
+    of interest.
+    \item The detected topic is mapped to a card type: medicinal, botanical,
+    or general information.
+    \item If the requested topic is unavailable for that plant (e.g.\ feng
+    shui for a plant without that data), the backend returns a fallback
+    response listing the available topics, plus a polite spoken
+    explanation.
+    \item The frontend renders an information card for normal answers, or a
+    fallback card with alternative topic buttons (each of which re-issues
+    a request for the same plant).
     \item Subsequent utterances are treated as \textbf{contextual
-    follow-ups}; dialogue history is passed as request context so
-    \texttt{generateContextualAnswer} can produce coherent multi-turn
-    answers.
+    follow-ups}; dialogue history is passed as context for coherent
+    multi-turn answers.
 \end{enumerate}
 
 \tasksub{Success criteria.} Card type changes with spoken intent (e.g.\
 \emph{``is it safe for my dog?''} surfaces toxicity content, not the
 default description); the fallback path never dead-ends --- at least one
-alternative slot is always offered; multi-turn follow-ups remain locked to
-the selected plant, and switching plants clears the dialogue panel
-(\texttt{clearDialogue()} on \texttt{selectedPlantId} change); TTS, card
-and 3D highlight stay synchronised across turns.
+alternative topic is always offered; multi-turn follow-ups remain locked
+to the selected plant, and switching plants clears the dialogue panel;
+TTS, card and 3D highlight stay synchronised across turns.
 
 \tasksub{Heuristics.} Flexibility and efficiency of use; help users
-recognise and recover from errors (fallback slots); consistency between
+recognise and recover from errors (fallback topics); consistency between
 voice and visual answers; minimalist design of each card.
 
 \section*{Out-of-Scope}
@@ -206,7 +197,7 @@ voice and visual answers; minimalist design of each card.
 between the five panoramic environments via arrow portals (evaluated only
 as a pre-condition for reaching the plants); \emph{STT/TTS audio quality}
 itself (inherits the browser-native Web Speech API); \emph{LLM answer
-factuality} (bounded by the curated \texttt{plants.json} database, not a
-target of the UX evaluation).
+factuality} (bounded by the curated plant database, not a target of the
+UX evaluation).
 
 \end{document}
