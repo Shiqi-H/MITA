@@ -1,0 +1,79 @@
+# MITA Botanical Garden
+
+[English](README.md) | 中文
+
+[![Vite](https://img.shields.io/badge/Vite-8.0.10-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
+[![A-Frame](https://img.shields.io/badge/A--Frame-1.5.0-EF2D5E?logo=aframe&logoColor=white)](https://aframe.io/)
+[![Three.js](https://img.shields.io/badge/Three.js-0.158.0-000000?logo=three.js&logoColor=white)](https://threejs.org/)
+[![Photo Sphere Viewer](https://img.shields.io/badge/Photo%20Sphere%20Viewer-5.14.1-2F80ED)](https://photo-sphere-viewer.js.org/)
+[![GSAP](https://img.shields.io/badge/GSAP-3.15.0-88CE02?logo=greensock&logoColor=white)](https://gsap.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-backend-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+
+Botanical Garden 是一个面向植物场景探索的交互式 Web Demo。前端使用 Vite + A-Frame/Three.js 呈现 360 全景、3D 植物模型和交互面板；后端提供意图解析、植物信息生成、歧义澄清和植物比较等。
+
+## 运行方式
+项目需要先在本地安装相关依赖。在项目根目录运行：
+```powershell
+npm install
+```
+然后再启动前端和后端两个进程。
+
+### 1. 启动前端
+在项目根目录运行：
+```powershell
+npm.cmd run dev
+```
+
+### 2. 启动后端
+
+另开一个终端，在项目根目录运行：
+
+```powershell
+npm.cmd run server
+```
+该命令会执行根目录 `package.json` 中的 `server` 脚本，并转到 `server` 目录运行后端：
+> PowerShell 中建议使用 `npm.cmd`。如果环境支持，也可以使用 `npm run dev` 和 `npm run server`。
+
+## 课程任务设计
+
+### Task 1: 视野检测与多模态消歧
+- 用户可以问类似 `what is this`、`what plant am I looking at` 的问题。
+- 当前视野或当前场景中有多个候选植物时，会进入 Referential Ambiguity 流程。
+- 系统为候选植物生成 A/B/C 标记，用户可以点击候选项，也可以输入或语音回答字母。
+- 如果语音识别或回答无法匹配，系统会提示用户重新选择，并在多次失败后引导用户直接点击目标植物。
+
+### Task 2: 植物选中与深度对话 
+- 支持查询植物属性，例如药用价值、植物基础信息等。
+- 当用户询问 medicinal value / medical / herbal use 时，会打开专门的药用信息面板。
+- 如果用户询问暂不支持的兴趣点，例如 toxicity
+，会显示 fallback 交互，引导用户查看已支持的 botanical features 或 medicinal value。
+- 信息生成优先走后端 LLM 接口；失败时保留本地 fallback，避免核心交互完全中断。
+
+### Task 3: 跨上下文的植物比较
+- 支持比较当前选中植物和另一个植物，例如：
+```text
+Is this more drought tolerant than the ficus?
+```
+- 比较面板会展示两个植物的描述和关键属性，包括 drought tolerance、height、lifespan、medicinal value。
+- 比较目标优先从用户访问历史中查找；如果历史中没有，则回退到全局植物数据库。
+- 后端 `/api/compare` 接口负责生成自然语言比较回答，前端负责展示结构化对比结果。
+
+## 已完成
+- [x] 历史比较：支持用户问“这个选中的植物和上一个选中的植物相比，谁更耐旱一些？”（**注意：目前只支持比较耐旱性**），系统根据 `visitedPlantIds` 找到上一次选中的植物并自动比较。
+- [x] 多轮追问：用户可以先选择植物，再问“那它有什么药用价值？”（**注意：目前只支持询问药用价值**）、“它和刚才那个比呢？”，系统自动继承上下文。
+- [x] 离线模式：在没有 LLM 的情况下，可以使用本地规则和模板生成回答。
+- [x] 切换创建场景时，之前场景的资源未清除。如 dom元素。
+- [x] 语音输入后，识别的文字应该先显示在输入框中，用户确认后再发送给系统进行处理。让用户有机会修改输入内容。
+- [x] 统一卡片样式，优化布局。
+- [x] 歧义植物数量解析，前后端保持一致，根据视野内的植物数量，动态调整解析逻辑，支持更多的植物选项。
+
+## 未完成：
+- [ ] 完善数据库：为每个植物提供模型，补充图片，丰富相关信息。
+- [ ] 添加更多植物，并优化植物模型摆放位置。
+- [x] 植物取消选中（关闭植物信息卡片）后，高亮状态未取消，仍然显示为选中状态。需要在取消选中时同时取消高亮状态。
+- [ ] 支持比较更多属性。
+- [ ] 空间语句可以作为歧义解析实现，如 “the one in front”。植物候选没有按“前后深度”排序。 identify 流程使用可见植物或当前场景植物列表，visiblePlants 里是按屏幕 X 坐标排序，不是按 depth/front/back 排序。
+- [ ] 多次识别失败后引导用户使用可点击备用选项”只是弱实现。 它只改 placeholder；可点击候选按钮从一开始就已经显示，没有新增更明显的 fallback UI。
+- [ ] 歧义候选存在时，即使用户输入普通问题，也会被当成歧义回复处理。需要优化意图解析逻辑，确保只有在用户明确表达歧义时才触发歧义回复。
+- [ ] 消歧时，无法识别用户输入 “Choose A”，只能识别 "A"。需要优化意图解析逻辑，支持更多选择指令。
+- [ ] 若无法识别用户的语音输入内容，应该给用户明确的反馈。可以添加一个新的回复类型，例如 "unrecognized_input"，当用户的输入无法被识别时，返回这个类型的回复。

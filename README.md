@@ -1,69 +1,100 @@
 # MITA Botanical Garden
-Botanical Garden 是一个面向植物场景探索的交互式 Web Demo。前端使用 Vite + A-Frame/Three.js 呈现 360 全景、3D 植物模型和交互面板；后端提供意图解析、植物信息生成、歧义澄清和植物比较等。
 
-## 运行方式
-项目需要先在本地安装相关依赖。在项目根目录运行：
+English | [中文](README-zh_cn.md)
+
+[![Vite](https://img.shields.io/badge/Vite-8.0.10-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
+[![A-Frame](https://img.shields.io/badge/A--Frame-1.5.0-EF2D5E?logo=aframe&logoColor=white)](https://aframe.io/)
+[![Three.js](https://img.shields.io/badge/Three.js-0.158.0-000000?logo=three.js&logoColor=white)](https://threejs.org/)
+[![Photo Sphere Viewer](https://img.shields.io/badge/Photo%20Sphere%20Viewer-5.14.1-2F80ED)](https://photo-sphere-viewer.js.org/)
+[![GSAP](https://img.shields.io/badge/GSAP-3.15.0-88CE02?logo=greensock&logoColor=white)](https://gsap.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-backend-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+
+Botanical Garden is an interactive web demo designed for exploring plant scenes. The frontend uses Vite and A-Frame/Three.js to present 360-degree panoramic scenes, 3D plant models, and interactive panels. The backend provides functions such as intent parsing, plant information generation, ambiguity clarification, and plant comparison.
+
+## How to Run
+
+The project requires the necessary dependencies to be installed locally first. In the project root directory, run:
+
 ```powershell
 npm install
 ```
-然后再启动前端和后端两个进程。
 
-### 1. 启动前端
-在项目根目录运行：
+Then start the frontend and backend in two separate processes.
+
+### 1. Start the Frontend
+
+In the project root directory, run:
+
 ```powershell
 npm.cmd run dev
 ```
 
-### 2. 启动后端
+### 2. Start the Backend
 
-另开一个终端，在项目根目录运行：
+Open another terminal and run the following command in the project root directory:
 
 ```powershell
 npm.cmd run server
 ```
-该命令会执行根目录 `package.json` 中的 `server` 脚本，并转到 `server` 目录运行后端：
-> PowerShell 中建议使用 `npm.cmd`。如果环境支持，也可以使用 `npm run dev` 和 `npm run server`。
 
-## 课程任务设计
+This command executes the `server` script defined in the root `package.json` file and starts the backend from the `server` directory.
 
-### Task 1: 视野检测与多模态消歧
-- 用户可以问类似 `what is this`、`what plant am I looking at` 的问题。
-- 当前视野或当前场景中有多个候选植物时，会进入 Referential Ambiguity 流程。
-- 系统为候选植物生成 A/B/C 标记，用户可以点击候选项，也可以输入或语音回答字母。
-- 如果语音识别或回答无法匹配，系统会提示用户重新选择，并在多次失败后引导用户直接点击目标植物。
+> In PowerShell, it is recommended to use `npm.cmd`. If your environment supports it, you can also use `npm run dev` and `npm run server`.
 
-### Task 2: 植物选中与深度对话 
-- 支持查询植物属性，例如药用价值、植物基础信息等。
-- 当用户询问 medicinal value / medical / herbal use 时，会打开专门的药用信息面板。
-- 如果用户询问暂不支持的兴趣点，例如 toxicity
-，会显示 fallback 交互，引导用户查看已支持的 botanical features 或 medicinal value。
-- 信息生成优先走后端 LLM 接口；失败时保留本地 fallback，避免核心交互完全中断。
+After both processes are running, open the local development URL printed in the frontend terminal in a web browser. It is usually:
 
-### Task 3: 跨上下文的植物比较
-- 支持比较当前选中植物和另一个植物，例如：
+```text
+http://localhost:5173/
+```
+
+If the terminal shows a different port, open the URL shown in the terminal instead.
+
+## Course Task Design
+
+### Task 1: Visual Detection and Multimodal Disambiguation
+
+- Users can ask questions such as `what is this` or `what plant am I looking at`.
+- When there are multiple candidate plants in the current view or current scene, the system enters the referential ambiguity flow.
+- The system generates A/B/C labels for the candidate plants. Users can click a candidate, type a letter, or answer with a letter by voice.
+- If speech recognition fails or the answer cannot be matched, the system prompts the user to choose again and, after repeated failures, guides the user to directly click the target plant.
+
+### Task 2: Plant Selection and In-depth Dialogue
+
+- The system supports queries about plant properties, such as medicinal value and basic botanical information.
+- When the user asks about medicinal value, medical use, or herbal use, the system opens a dedicated medicinal information panel.
+- If the user asks about an unsupported topic, such as toxicity, the system displays a fallback interaction and guides the user to supported topics, such as botanical features or medicinal value.
+- Information generation first attempts to use the backend LLM interface. If it fails, the system keeps a local fallback to prevent the core interaction from breaking completely.
+
+### Task 3: Cross-context Plant Comparison
+
+- The system supports comparing the currently selected plant with another plant, for example:
+
 ```text
 Is this more drought tolerant than the ficus?
 ```
-- 比较面板会展示两个植物的描述和关键属性，包括 drought tolerance、height、lifespan、medicinal value。
-- 比较目标优先从用户访问历史中查找；如果历史中没有，则回退到全局植物数据库。
-- 后端 `/api/compare` 接口负责生成自然语言比较回答，前端负责展示结构化对比结果。
 
-## 已完成
-- [x] 历史比较：支持用户问“这个选中的植物和上一个选中的植物相比，谁更耐旱一些？”（**注意：目前只支持比较耐旱性**），系统根据 `visitedPlantIds` 找到上一次选中的植物并自动比较。
-- [x] 多轮追问：用户可以先选择植物，再问“那它有什么药用价值？”（**注意：目前只支持询问药用价值**）、“它和刚才那个比呢？”，系统自动继承上下文。
-- [x] 离线模式：在没有 LLM 的情况下，可以使用本地规则和模板生成回答。
-- [x] 切换创建场景时，之前场景的资源未清除。如 dom元素。
-- [x] 语音输入后，识别的文字应该先显示在输入框中，用户确认后再发送给系统进行处理。让用户有机会修改输入内容。
-- [x] 统一卡片样式，优化布局。
-- [x] 歧义植物数量解析，前后端保持一致，根据视野内的植物数量，动态调整解析逻辑，支持更多的植物选项。
+- The comparison panel displays the descriptions and key attributes of both plants, including drought tolerance, height, lifespan, and medicinal value.
+- The comparison target is first searched from the user's visit history. If it is not found in the history, the system falls back to the global plant database.
+- The backend `/api/compare` endpoint is responsible for generating the natural-language comparison answer, while the frontend is responsible for displaying the structured comparison result.
 
-## 未完成：
-- [ ] 完善数据库：为每个植物提供模型，补充图片，丰富相关信息。
-- [ ] 添加更多植物，并优化植物模型摆放位置。
-- [x] 植物取消选中（关闭植物信息卡片）后，高亮状态未取消，仍然显示为选中状态。需要在取消选中时同时取消高亮状态。
-- [ ] 支持比较更多属性。
-- [ ] 空间语句可以作为歧义解析实现，如 “the one in front”。植物候选没有按“前后深度”排序。 identify 流程使用可见植物或当前场景植物列表，visiblePlants 里是按屏幕 X 坐标排序，不是按 depth/front/back 排序。
-- [ ] 多次识别失败后引导用户使用可点击备用选项”只是弱实现。 它只改 placeholder；可点击候选按钮从一开始就已经显示，没有新增更明显的 fallback UI。
-- [ ] 歧义候选存在时，即使用户输入普通问题，也会被当成歧义回复处理。需要优化意图解析逻辑，确保只有在用户明确表达歧义时才触发歧义回复。
-- [ ] 消歧时，无法识别用户输入 “Choose A”，只能识别 "A"。需要优化意图解析逻辑，支持更多选择指令。
-- [ ] 若无法识别用户的语音输入内容，应该给用户明确的反馈。可以添加一个新的回复类型，例如 "unrecognized_input"，当用户的输入无法被识别时，返回这个类型的回复。
+## Completed
+
+- [x] Historical comparison: The system supports questions such as “Which is more drought tolerant, this selected plant or the previously selected plant?” (**Note: currently, only drought tolerance comparison is supported**). The system uses `visitedPlantIds` to find the previously selected plant and compare it automatically.
+- [x] Multi-turn follow-up dialogue: Users can first select a plant and then ask questions such as “What is its medicinal value?” (**Note: currently, only medicinal-value questions are supported**) or “How does it compare with the previous one?”. The system automatically maintains the context.
+- [x] Offline mode: When no LLM is available, the system can use local rules and templates to generate responses.
+- [x] When switching or creating scenes, resources from the previous scene, such as DOM elements, are cleared.
+- [x] After voice input, the recognized text is first displayed in the input box. The user can confirm it before sending it to the system, giving the user a chance to modify the input.
+- [x] Unified card styles and optimized layout.
+- [x] Ambiguous plant count parsing: The frontend and backend remain consistent. The parsing logic is dynamically adjusted according to the number of plants in the current view, supporting more plant options.
+
+## To Do
+
+- [ ] Improve the database: provide a model for each plant, add images, and enrich the related information.
+- [ ] Add more plants and optimize the placement of plant models.
+- [x] After a plant is deselected by closing the plant information card, the highlight state is also removed. Previously, the plant still appeared as selected.
+- [ ] Support comparison of more attributes.
+- [ ] Support spatial expressions in ambiguity resolution, such as “the one in front”. Currently, plant candidates are not sorted by front/back depth. The identification flow uses visible plants or the current scene plant list, and `visiblePlants` is sorted by screen X coordinate rather than by depth or front/back position.
+- [ ] The fallback guidance after multiple recognition failures is only weakly implemented. It only changes the placeholder text; clickable candidate buttons are already displayed from the beginning, and no more obvious fallback UI is added.
+- [ ] When ambiguity candidates exist, even normal user questions may be treated as ambiguity responses. The intent parsing logic needs to be improved so that ambiguity replies are triggered only when the user clearly expresses a disambiguation choice.
+- [ ] During disambiguation, the system cannot recognize input such as “Choose A”; it can only recognize “A”. The intent parsing logic needs to be improved to support more selection commands.
+- [ ] If the system cannot recognize the user's voice input, it should give clear feedback. A new response type, such as `"unrecognized_input"`, could be added so that this type of response is returned when the user's input cannot be recognized.
