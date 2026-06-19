@@ -1,3 +1,4 @@
+import { appendConversationTurn } from '../app/state.js';
 import { appendVoiceLog } from '../ui/panels.js';
 
 let speechRecognition = null;
@@ -9,13 +10,44 @@ let previousPlaceholder = '';
 
 const LISTENING_PLACEHOLDER = 'Listening ...';
 
+// Trigger voice list load early so it's ready before first speak()
+if ('speechSynthesis' in window) {
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.addEventListener('voiceschanged', () => window.speechSynthesis.getVoices(), { once: true });
+}
+
 export function speak(text) {
   appendVoiceLog(`System: ${text}`);
+  appendConversationTurn(`System: ${text}`);
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'en-US';
+  utterance.rate = 0.92;
+  utterance.pitch = 1.05;
+  const voice = pickBestVoice();
+  if (voice) utterance.voice = voice;
   window.speechSynthesis.speak(utterance);
+}
+
+function pickBestVoice() {
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices.length) return null;
+  const enVoices = voices.filter((v) => v.lang.startsWith('en'));
+
+  // Prefer Microsoft natural/neural voices (Windows online voices sound much better)
+  const neural = enVoices.find((v) => /aria|jenny|guy|sonia|ryan|natasha|neural|natural/i.test(v.name));
+  if (neural) return neural;
+
+  // Next: any online voice
+  const online = enVoices.find((v) => v.localService === false);
+  if (online) return online;
+
+  // Next: en-US local voice over anything else
+  const usLocal = enVoices.find((v) => v.lang === 'en-US');
+  if (usLocal) return usLocal;
+
+  return enVoices[0] ?? null;
 }
 
 export function initSpeechRecognition({ onRecognitionFailure }) {

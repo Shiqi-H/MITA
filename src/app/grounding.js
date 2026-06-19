@@ -1,8 +1,8 @@
-import { parseIntent } from '../intent/llmClient.js';
+import { generateInfoSpeech, generateSceneSpeech, parseIntent } from '../intent/llmClient.js';
 import { speak } from '../speech/speech.js';
 import { appendVoiceLog, displayPlant } from '../ui/panels.js';
-import { findPlantByNameOrAlias, getDisplayName } from './selectors.js';
-import { state } from './state.js';
+import { findPlantByNameOrAlias, getCurrentPlant, getCurrentScenePlantIds, getDisplayName, getPlant } from './selectors.js';
+import { appendConversationTurn, state } from './state.js';
 import {
   cancelAmbiguity,
   findAmbiguityCandidateByName,
@@ -20,6 +20,7 @@ export { cancelAmbiguity, handleAmbiguityRecognitionFailure, selectPlantById };
 export async function handleQuery(text) {
   if (!text.trim()) return;
   appendVoiceLog(`User: ${text}`);
+  appendConversationTurn(`User: ${text}`);
 
   const parsed = await parseIntent(text, getIntentContext());
 
@@ -34,7 +35,7 @@ export async function handleQuery(text) {
   }
 
   if (parsed.intent === 'compare') {
-    await handleCompareIntent(parsed, text);
+    await handleCompareIntent(enrichCompareFromState(parsed), text);
     return;
   }
 
@@ -50,7 +51,7 @@ export async function handleQuery(text) {
     return;
   }
 
-  handleUnknownIntent();
+  await handleUnknownIntent(text);
 }
 
 function getIntentContext() {
@@ -77,6 +78,32 @@ function handleAmbiguousQuery(parsed, text) {
   handleAmbiguityReply(parsed);
 }
 
-function handleUnknownIntent() {
+async function handleUnknownIntent(text) {
+  const history = state.conversationHistory.slice(-6);
+
+  const currentPlant = getCurrentPlant();
+  if (currentPlant) {
+    const speech = await generateInfoSpeech({ plant: currentPlant, question: text, history });
+    if (speech) { speak(speech); return; }
+  }
+
+  const scenePlants = getCurrentScenePlantIds().map(getPlant).filter(Boolean);
+  if (scenePlants.length > 0) {
+    const speech = await generateSceneSpeech({ plants: scenePlants, question: text, history });
+    if (speech) { speak(speech); return; }
+  }
+
   speak('I could not identify a clear target. Please click the scene or add more detail.');
+}
+
+function enrichCompareFromState(parsed) {
+  const { leftPlantId, rightPlantId } = state.compareState;
+  if (!leftPlantId || !rightPlantId) return parsed;
+  if (parsed.target2Referent === 'namedPlant' && parsed.target2Name) return parsed;
+  // Only reuse the saved pair when the user is still on the same left plant.
+  // If they moved to a different plant, fall back to previousSelection.
+  if (state.selectedPlantId !== leftPlantId) return parsed;
+  const right = getPlant(rightPlantId);
+  if (!right) return parsed;
+  return { ...parsed, target2Referent: 'namedPlant', target2Name: getDisplayName(right) };
 }

@@ -46,6 +46,10 @@ export async function generateInfoSpeech({ plant, question = '', interest = '', 
   return postSpeech('/api/generate-info', { plant, question, interest, history });
 }
 
+export async function generateSceneSpeech({ plants, question = '', history = [], gardenSummary = [], currentScene = '' }) {
+  return postSpeech('/api/generate-scene', { plants, question, history, gardenSummary, currentScene });
+}
+
 export async function generateCompareSpeech({ left, right, attribute = 'droughtTolerance', history = [] }) {
   return postSpeech('/api/compare', { left, right, attribute, history });
 }

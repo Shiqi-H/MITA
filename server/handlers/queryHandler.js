@@ -1,4 +1,4 @@
-import { generateDisambiguationQuestion, generateInfoResponse, parseIntentWithLlm } from '../services/llm.js';
+import { generateDisambiguationQuestion, generateInfoResponse, generateSceneResponse, parseIntentWithLlm } from '../services/llm.js';
 import { parseIntentLocally } from '../services/intentParser.js';
 
 export async function queryHandler(req, res) {
@@ -26,6 +26,17 @@ export async function infoHandler(req, res) {
 
   try {
     const speech = await generateInfoResponse({ plant, question, interest, history });
+    res.json({ speech, source: 'llm' });
+  } catch (error) {
+    console.warn(error.message);
+    res.json({ speech: '', source: 'fallback', error: error.message });
+  }
+}
+
+export async function sceneHandler(req, res) {
+  const { plants = [], question = '', history = [], gardenSummary = [], currentScene = '' } = req.body ?? {};
+  try {
+    const speech = await generateSceneResponse({ plants, question, history, gardenSummary, currentScene });
     res.json({ speech, source: 'llm' });
   } catch (error) {
     console.warn(error.message);

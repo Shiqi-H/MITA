@@ -26,7 +26,7 @@ export async function speakPlantInfo(plant, question = '') {
   const generatedSpeech = await generateInfoSpeech({
     plant,
     question,
-    history: state.visitedPlantIds,
+    history: state.conversationHistory.slice(-6),
   });
   speak(generatedSpeech || `${getDisplayName(plant)} information is shown.`);
 }

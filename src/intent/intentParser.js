@@ -176,7 +176,7 @@ function getComparisonAttribute(text) {
     text.includes('medicine') ||
     text.includes('herbal')
   ) {
-    return 'unsupported';
+    return 'medicinalValue';
   }
   if (
     text.includes('height') ||
@@ -184,16 +184,17 @@ function getComparisonAttribute(text) {
     text.includes('taller') ||
     text.includes('shorter')
   ) {
-    return 'unsupported';
+    return 'height';
   }
   if (
     text.includes('lifespan') ||
     text.includes('life span') ||
     text.includes('live longer') ||
     text.includes('lives longer') ||
-    text.includes('long-lived')
+    text.includes('long-lived') ||
+    text.includes('longer')
   ) {
-    return 'unsupported';
+    return 'lifespan';
   }
   return 'droughtTolerance';
 }

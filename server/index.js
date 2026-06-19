@@ -2,13 +2,14 @@ import { createServer } from 'node:http';
 import { config } from './config.js';
 import { clarifyHandler } from './handlers/clarifyHandler.js';
 import { compareHandler } from './handlers/compareHandler.js';
-import { disambiguationHandler, infoHandler, queryHandler } from './handlers/queryHandler.js';
+import { disambiguationHandler, infoHandler, queryHandler, sceneHandler } from './handlers/queryHandler.js';
 
 const routes = {
   'GET /api/health': (_req, res) => res.json({ ok: true, model: config.openai.model }),
   'POST /api/parse-intent': queryHandler,
   'POST /api/generate-info': infoHandler,
   'POST /api/generate-disambiguation': disambiguationHandler,
+  'POST /api/generate-scene': sceneHandler,
   'POST /api/clarify': clarifyHandler,
   'POST /api/compare': compareHandler,
 };

@@ -7,7 +7,7 @@ const RESPONSE_SCHEMA = {
   target1: 'currentSelection when comparing',
   target2Referent: 'previousSelection when comparing against the previous or last selected plant, or when no second named plant is provided; namedPlant when comparing against a plant name',
   target2Name: 'plant name when comparing',
-  attribute: 'droughtTolerance for supported comparisons, or unsupported for height, lifespan, medicinalValue, and other comparison attributes',
+  attribute: 'droughtTolerance | height | lifespan | medicinalValue | or any other plant attribute the user asks about',
   referent: 'currentSelection when querying selected plant, previousSelection when querying the previous or last plant, or namedPlant when user names a plant',
   targetPlantName: 'plant name when querying an attribute of a named plant',
   interest: 'medicinalValue | unknown',
@@ -28,7 +28,7 @@ export async function parseIntentWithLlm({ text, context }) {
           'For attribute questions about "previous one", "last one", "the one before", or "the previous plant", set referent to "previousSelection".',
           'For comparisons, classify phrases such as "previous", "last", "the one before", "previously selected", "last selected", or comparisons without a named second plant as target2Referent "previousSelection".',
           'For comparisons against a named plant, set target2Referent to "namedPlant" and put the plant name in target2Name.',
-          'Only droughtTolerance comparisons are supported. Set attribute to "droughtTolerance" for drought comparisons or unclear comparisons; set it to "unsupported" for height, lifespan, medicinalValue, or any other comparison attribute.',
+          'For comparisons, set attribute to the specific attribute the user asks about (droughtTolerance, height, lifespan, medicinalValue, etc.). Default to "droughtTolerance" only when the user does not specify an attribute.',
           'If an utterance names a plant, return that plant in targetPlantName instead of resolving it to currentSelection.',
           `Allowed response shape: ${JSON.stringify(RESPONSE_SCHEMA)}`,
           `Available plants: ${JSON.stringify(getPlantContext())}`,
@@ -41,7 +41,7 @@ export async function parseIntentWithLlm({ text, context }) {
     ],
     { json: true, temperature: 0 },
   );
-  const parsed = JSON.parse(content);
+  const parsed = JSON.parse(stripMarkdownJson(content));
   if (!parsed || typeof parsed.intent !== 'string') {
     throw new Error('LLM response did not include an intent.');
   }
@@ -49,41 +49,78 @@ export async function parseIntentWithLlm({ text, context }) {
 }
 
 export async function generateInfoResponse({ plant, question = '', interest = '', history = [] }) {
+  const slim = slimPlant(plant);
+  const historyText = history.slice(-6).join('\n');
   const content = await chatCompletion([
     {
       role: 'system',
       content: [
         'You are the spoken guide for a concise 3D botanical garden demo.',
         'Answer in one or two natural English sentences for text-to-speech.',
-        'Use only the plant data provided. If the requested field is missing, say what is available instead.',
-      ].join('\n'),
+        'Use the provided plant data as your primary source. When the data is incomplete or missing a field, supplement with your own botanical knowledge to give a helpful answer.',
+        `The selected plant is "${slim?.displayName ?? 'unknown'}".`,
+        `Its key attributes: ${JSON.stringify(slim?.attributes ?? {})}.`,
+        slim?.description ? `Description: ${slim.description}` : null,
+        slim?.medicalInfo ? `Medicinal info: ${slim.medicalInfo}` : null,
+        historyText ? `Recent conversation:\n${historyText}` : null,
+      ].filter(Boolean).join('\n'),
     },
     {
       role: 'user',
-      content: JSON.stringify({ plant: slimPlant(plant), question, interest, history }),
+      content: question || interest || 'Tell me about this plant.',
     },
   ]);
   return content.trim();
 }
 
 export async function generateCompareResponse({ left, right, attribute = 'droughtTolerance', history = [] }) {
+  const slimLeft = slimPlant(left);
+  const slimRight = slimPlant(right);
+  const historyText = history.slice(-6).join('\n');
   const content = await chatCompletion([
     {
       role: 'system',
       content: [
         'You compare plants for a 3D botanical garden demo.',
         'Answer in two short English sentences for text-to-speech.',
-        'Base the comparison only on the provided plant attributes.',
-      ].join('\n'),
+        'Use the provided plant data as your primary source for comparison. When specific values are missing, supplement with your botanical knowledge to give a meaningful answer.',
+        `Compare "${slimLeft?.displayName}" vs "${slimRight?.displayName}" on: ${attribute}.`,
+        `${slimLeft?.displayName} data: ${JSON.stringify(slimLeft?.attributes)}.`,
+        `${slimRight?.displayName} data: ${JSON.stringify(slimRight?.attributes)}.`,
+        'If the attribute is not in the data, say so and mention what you can compare instead.',
+        historyText ? `Recent conversation:\n${historyText}` : null,
+      ].filter(Boolean).join('\n'),
     },
     {
       role: 'user',
-      content: JSON.stringify({
-        left: slimPlant(left),
-        right: slimPlant(right),
-        attribute,
-        history,
-      }),
+      content: `Compare ${attribute}.`,
+    },
+  ]);
+  return content.trim();
+}
+
+export async function generateSceneResponse({ plants, question = '', history = [], gardenSummary = [], currentScene = '' }) {
+  const historyText = history.slice(-6).join('\n');
+  const plantList = plants.map((p) => slimPlant(p));
+  const totalPlants = gardenSummary.reduce((sum, s) => sum + s.plants.length, 0);
+  const content = await chatCompletion([
+    {
+      role: 'system',
+      content: [
+        'You are the spoken guide for a concise 3D botanical garden demo.',
+        'Answer in one or two natural English sentences for text-to-speech.',
+        'Use the provided plant data as your primary source. When data is incomplete, supplement with your botanical knowledge.',
+        currentScene ? `The visitor is currently in ${currentScene}.` : null,
+        `Plants in this scene: ${JSON.stringify(plantList)}.`,
+        gardenSummary.length > 0
+          ? `Full garden across all scenes (${totalPlants} plants total): ${JSON.stringify(gardenSummary)}.`
+          : null,
+        historyText ? `Recent conversation:\n${historyText}` : null,
+      ].filter(Boolean).join('\n'),
+    },
+    {
+      role: 'user',
+      content: question || 'Tell me about the plants in this scene.',
     },
   ]);
   return content.trim();
@@ -140,6 +177,10 @@ async function chatCompletion(messages, { json = false, temperature = 0.2 } = {}
   const content = payload.choices?.[0]?.message?.content;
   if (!content) throw new Error('LLM response did not include content.');
   return content;
+}
+
+function stripMarkdownJson(text) {
+  return text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
 }
 
 function slimPlant(plant) {

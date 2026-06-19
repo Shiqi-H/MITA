@@ -24,9 +24,20 @@ export async function handleAttributeIntent(parsed, text = '') {
       plant,
       question: 'What is the medicinal value of this plant?',
       interest: parsed.interest,
-      history: state.visitedPlantIds,
+      history: state.conversationHistory.slice(-6),
     });
     speak(generatedSpeech || `${getDisplayName(plant)} medicinal value: ${plant.medicalInfo}`);
+    return;
+  }
+
+  const generatedSpeech = await generateInfoSpeech({
+    plant,
+    question: text,
+    history: state.conversationHistory.slice(-6),
+  });
+  if (generatedSpeech) {
+    displayPlant(plant);
+    speak(generatedSpeech);
     return;
   }
 

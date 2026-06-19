@@ -4,7 +4,7 @@ import { renderComparePanel } from '../../ui/comparePanel.js';
 import { showSelectionRequiredFallback } from '../../ui/fallbackPanel.js';
 import { displayPlant, showInteractionPanel } from '../../ui/panels.js';
 import { findPlantByNameOrAlias, findVisitedPlantByNameOrAlias, getDisplayName } from '../selectors.js';
-import { state } from '../state.js';
+import { setCompareState, state } from '../state.js';
 import { resolvePlantReferent } from './shared.js';
 
 export async function handleCompareIntent(parsed, text = '') {
@@ -20,11 +20,6 @@ export async function handleCompareIntent(parsed, text = '') {
   const targetText = namedTargetFromText ? getDisplayName(namedTargetFromText) : parsed.target2Name || '';
   const right = resolvePlantReferent(target2Referent, targetText);
   const attribute = parsed.attribute || 'droughtTolerance';
-
-  if (attribute !== 'droughtTolerance') {
-    speak('Comparison for that attribute is not supported yet. I can compare drought tolerance.');
-    return;
-  }
 
   if (!right) {
     if (target2Referent === 'previousSelection') {
@@ -51,13 +46,14 @@ export async function handleCompareIntent(parsed, text = '') {
         ? ''
         : `${getDisplayName(right)} was not in your visited history, so I used the plant database instead.`;
 
+  setCompareState(left.id, right.id);
   displayPlant(left, 'compare');
   renderComparePanel(left, right, attribute, note);
   const generatedSpeech = await generateCompareSpeech({
     left,
     right,
     attribute,
-    history: state.visitedPlantIds,
+    history: state.conversationHistory.slice(-6),
   });
   speak(generatedSpeech || getCompareFallbackSpeech(left, right));
 }

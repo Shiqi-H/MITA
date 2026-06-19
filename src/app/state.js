@@ -4,6 +4,8 @@ export const state = {
   ambiguityCandidates: [],
   visitedPlantIds: [],
   voiceFailures: 0,
+  conversationHistory: [],
+  compareState: { leftPlantId: null, rightPlantId: null },
 };
 
 export function setActiveScene(id) {
@@ -40,4 +42,13 @@ export function resetVoiceFailures() {
 export function incrementVoiceFailures() {
   state.voiceFailures += 1;
   return state.voiceFailures;
+}
+
+export function appendConversationTurn(text) {
+  state.conversationHistory.push(text);
+  if (state.conversationHistory.length > 20) state.conversationHistory.shift();
+}
+
+export function setCompareState(leftPlantId, rightPlantId) {
+  state.compareState = { leftPlantId, rightPlantId };
 }
