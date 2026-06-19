@@ -3,7 +3,7 @@ import { getVisiblePlantIds } from '../../scene/visiblePlants.js';
 import { els } from '../../ui/dom.js';
 import { showSelectionRequiredFallback } from '../../ui/fallbackPanel.js';
 import { displayPlant } from '../../ui/panels.js';
-import { getCurrentPlant, getCurrentScenePlantIds, getPlant } from '../selectors.js';
+import { getCurrentPlant, getPlant } from '../selectors.js';
 import { promptAmbiguity } from './ambiguity.js';
 import { selectPlantById, speakPlantInfo } from './shared.js';
 
@@ -19,15 +19,9 @@ export async function handleIdentifyIntent(question = '') {
     container: els.container,
     camera: els.scene.camera,
   });
-  const scenePlantIds = getCurrentScenePlantIds();
 
   if (visiblePlantIds.length >= 2) {
     promptAmbiguity(visiblePlantIds);
-    return;
-  }
-
-  if (scenePlantIds.length >= 2) {
-    promptAmbiguity(scenePlantIds);
     return;
   }
 

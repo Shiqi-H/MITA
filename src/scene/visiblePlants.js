@@ -2,6 +2,7 @@ const frustum = new THREE.Frustum();
 const projectionMatrix = new THREE.Matrix4();
 const box = new THREE.Box3();
 const center = new THREE.Vector3();
+const FOCUS_AREA = { x: 0.9, y: 0.9 };
 
 export function getVisiblePlantIds({ container, camera }) {
   if (!container || !camera) return [];
@@ -38,8 +39,19 @@ function getVisiblePlantCandidate(entity, camera) {
 
 function toCandidate(id, worldCenter, camera) {
   const projected = worldCenter.clone().project(camera);
+  if (!isInsideFocusArea(projected)) return null;
+
   return {
     id,
     screenX: projected.x,
   };
+}
+
+function isInsideFocusArea(projected) {
+  return (
+    projected.z >= -1 &&
+    projected.z <= 1 &&
+    Math.abs(projected.x) <= FOCUS_AREA.x &&
+    Math.abs(projected.y) <= FOCUS_AREA.y
+  );
 }
