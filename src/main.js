@@ -1,5 +1,6 @@
 import { cancelAmbiguity, handleAmbiguityRecognitionFailure, handleQuery } from './app/grounding.js';
 import { resetVoiceFailures, state } from './app/state.js';
+import { startLlmStatusConsoleMonitor } from './intent/llmStatusClient.js';
 import { initRaycastSelection } from './scene/raycastSelection.js';
 import { buildSceneNav, goToScene, updateNav } from './scene/sceneRenderer.js';
 import { initSpeechRecognition, startSpeechRecognition } from './speech/speech.js';
@@ -34,6 +35,7 @@ function initApp() {
   hidePlantPanel();
   hideComparePanel();
   hideHistoryPanel();
+  startLlmStatusConsoleMonitor();
 }
 
 registerOutlineComponent();

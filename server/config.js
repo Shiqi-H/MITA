@@ -30,11 +30,9 @@ function ensureV1Path(url) {
 
 function loadLocalEnv() {
   const serverDir = dirname(fileURLToPath(import.meta.url));
-  const envPaths = [resolve(serverDir, '.env'), resolve(process.cwd(), '.env')];
-  envPaths.filter((envPath, index) => envPaths.indexOf(envPath) === index).forEach((envPath) => {
-    if (!existsSync(envPath)) return;
-    readEnvFile(envPath);
-  });
+  const projectRoot = resolve(serverDir, '..');
+  const envPath = resolve(projectRoot, '.env');
+  if (existsSync(envPath)) readEnvFile(envPath);
 }
 
 function readEnvFile(envPath) {

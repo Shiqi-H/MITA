@@ -3,9 +3,11 @@ import { config } from './config.js';
 import { clarifyHandler } from './handlers/clarifyHandler.js';
 import { compareHandler } from './handlers/compareHandler.js';
 import { disambiguationHandler, infoHandler, queryHandler, sceneHandler } from './handlers/queryHandler.js';
+import { getLlmStatus, startLlmStatusMonitor } from './services/llmStatus.js';
 
 const routes = {
   'GET /api/health': (_req, res) => res.json({ ok: true, model: config.openai.model }),
+  'GET /api/llm-status': async (_req, res) => res.json(await getLlmStatus()),
   'POST /api/parse-intent': queryHandler,
   'POST /api/generate-info': infoHandler,
   'POST /api/generate-disambiguation': disambiguationHandler,
@@ -38,6 +40,7 @@ const server = createServer(async (request, response) => {
 
 server.listen(config.port, () => {
   console.log(`MITA intent server listening on http://localhost:${config.port}`);
+  startLlmStatusMonitor();
 });
 
 function sendJson(response, statusCode, payload) {
