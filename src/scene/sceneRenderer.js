@@ -1,8 +1,8 @@
-import { getAllScenes, getPlant, getScene, formatVec3 } from '../app/selectors.js';
+import { getAllScenes, getPlant, getScene } from '../app/selectors.js';
 import { cancelAmbiguity } from '../app/handlers/ambiguity.js';
 import { clearSelectedPlant, setActiveScene, state } from '../app/state.js';
 import { createPlantEntity } from './plantRenderer.js';
-import { displayPlant, hidePlantPanel } from '../ui/panels.js';
+import { hidePlantPanel } from '../ui/panels.js';
 import { hideComparePanel } from '../ui/comparePanel.js';
 import { els } from '../ui/dom.js';
 import { gsap } from 'gsap';
@@ -139,25 +139,5 @@ function renderSceneContent(scene) {
   els.container.innerHTML = '';
   scene.models.map((id) => getPlant(id)).filter(Boolean).forEach((plant) => {
     els.container.appendChild(createPlantEntity(plant));
-  });
-  renderHotspots(scene.hotspots);
-}
- 
-function renderHotspots(hotspots) {
-  hotspots.forEach((hotspot) => {
-    if (hotspot.candidateIds.length !== 1) return;
-    const hotspotEntity = document.createElement('a-sphere');
-    hotspotEntity.setAttribute('radius', '0.12');
-    hotspotEntity.setAttribute('color', hotspot.mode === 'compare' ? '#9dd7e6' : '#95d06a');
-    hotspotEntity.setAttribute('opacity', '0.45');
-    hotspotEntity.setAttribute('position', formatVec3(hotspot.position));
-    hotspotEntity.setAttribute('class', 'clickable hotspot');
-    hotspotEntity.addEventListener('click', (event) => {
-      event.stopPropagation();
-      window.__mitaSkipNextRaycast = true;
-      const plant = getPlant(hotspot.candidateIds[0]);
-      if (plant) displayPlant(plant);
-    });
-    els.container.appendChild(hotspotEntity);
   });
 }

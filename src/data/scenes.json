@@ -3,14 +3,12 @@
     "title": "Scene 1",
     "label": "1",
     "panorama": "/scene-1.jpg",
-    "models": ["lavender", "nephrolepis", "santolina"],
-    "hotspots": []
+    "models": ["lavender", "nephrolepis", "santolina"]
   },
   "scene-2": {
     "title": "Scene 2",
     "label": "2",
     "panorama": "/scene-2.jpg",
-    "models": ["ficus_microcarpa"],
-    "hotspots": []
+    "models": ["ficus_microcarpa"]
   }
 }
