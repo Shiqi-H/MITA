@@ -109,14 +109,16 @@ function currentSceneIndex() {
  
 function goToPrevScene() {
   const i = currentSceneIndex();
-  if (i <= 0) return;
-  goToScene(sceneIds[i - 1]);
+  if (i === -1 || sceneIds.length === 0) return;
+  const prevIndex = (i - 1 + sceneIds.length) % sceneIds.length;
+  goToScene(sceneIds[prevIndex]);
 }
  
 function goToNextScene() {
   const i = currentSceneIndex();
-  if (i === -1 || i >= sceneIds.length - 1) return; 
-  goToScene(sceneIds[i + 1]);
+  if (i === -1 || sceneIds.length === 0) return;
+  const nextIndex = (i + 1) % sceneIds.length;
+  goToScene(sceneIds[nextIndex]);
 }
  
 function togglePager() {
