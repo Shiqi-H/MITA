@@ -23,25 +23,25 @@ async function checkAndLogLlmStatus() {
 }
 
 export async function getLlmStatus() {
-  if (!config.openai.apiKey) {
+  if (!config.llm.apiKey) {
     return {
       state: 'disabled',
-      detail: 'missing OPENAI_API_KEY or NEWAPI_API_KEY',
+      detail: 'missing LLM API key',
     };
   }
 
-  if (!config.openai.model) {
+  if (!config.llm.model) {
     return {
       state: 'disabled',
-      detail: 'missing OPENAI_MODEL or NEWAPI_MODEL',
+      detail: 'missing LLM model',
     };
   }
 
   try {
-    const response = await fetchWithTimeout(`${config.openai.baseUrl}/models`, {
+    const response = await fetchWithTimeout(`${config.llm.baseUrl}/models`, {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${config.openai.apiKey}`,
+        Authorization: `Bearer ${config.llm.apiKey}`,
         Accept: 'application/json',
       },
     });
@@ -49,13 +49,13 @@ export async function getLlmStatus() {
     if (response.ok) {
       return {
         state: 'connected',
-        detail: `${config.openai.baseUrl} (model: ${config.openai.model})`,
+        detail: `${config.llm.baseUrl} (model: ${config.llm.model})`,
       };
     }
 
     return {
       state: 'unavailable',
-      detail: `${response.status} ${response.statusText || 'response'} from ${config.openai.baseUrl}/models`,
+      detail: `${response.status} ${response.statusText || 'response'} from ${config.llm.baseUrl}/models`,
     };
   } catch (error) {
     return {

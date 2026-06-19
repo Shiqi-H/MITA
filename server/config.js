@@ -6,9 +6,9 @@ loadLocalEnv();
 
 export const config = {
   port: Number(process.env.PORT ?? 8787),
-  openai: {
+  llm: {
     apiKey: process.env.OPENAI_API_KEY ?? process.env.NEWAPI_API_KEY ?? '',
-    baseUrl: getOpenAiBaseUrl(),
+    baseUrl: getLlmBaseUrl(),
     model: process.env.OPENAI_MODEL ?? process.env.NEWAPI_MODEL ?? 'gpt-4o-mini',
   },
 };
@@ -17,7 +17,7 @@ function normalizeBaseUrl(url) {
   return url.replace(/\/+$/, '');
 }
 
-function getOpenAiBaseUrl() {
+function getLlmBaseUrl() {
   if (process.env.OPENAI_BASE_URL) return normalizeBaseUrl(process.env.OPENAI_BASE_URL);
   if (process.env.NEWAPI_BASE_URL) return ensureV1Path(process.env.NEWAPI_BASE_URL);
   return 'https://api.openai.com/v1';

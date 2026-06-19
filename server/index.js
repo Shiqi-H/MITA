@@ -6,7 +6,7 @@ import { disambiguationHandler, infoHandler, queryHandler, sceneHandler } from '
 import { getLlmStatus, startLlmStatusMonitor } from './services/llmStatus.js';
 
 const routes = {
-  'GET /api/health': (_req, res) => res.json({ ok: true, model: config.openai.model }),
+  'GET /api/health': (_req, res) => res.json({ ok: true, model: config.llm.model }),
   'GET /api/llm-status': async (_req, res) => res.json(await getLlmStatus()),
   'POST /api/parse-intent': queryHandler,
   'POST /api/generate-info': infoHandler,

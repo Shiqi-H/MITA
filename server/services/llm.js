@@ -148,21 +148,21 @@ export async function generateDisambiguationQuestion(candidates) {
 }
 
 async function chatCompletion(messages, { json = false, temperature = 0.2 } = {}) {
-  if (!config.openai.apiKey) {
-    throw new Error('OPENAI_API_KEY or NEWAPI_API_KEY is not configured.');
+  if (!config.llm.apiKey) {
+    throw new Error('LLM API key is not configured.');
   }
 
   const body = {
-    model: config.openai.model,
+    model: config.llm.model,
     messages,
     temperature,
   };
   if (json) body.response_format = { type: 'json_object' };
 
-  const response = await fetch(`${config.openai.baseUrl}/chat/completions`, {
+  const response = await fetch(`${config.llm.baseUrl}/chat/completions`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${config.openai.apiKey}`,
+      Authorization: `Bearer ${config.llm.apiKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
