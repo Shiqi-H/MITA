@@ -1,4 +1,4 @@
-import { cancelAmbiguity, handleAmbiguityRecognitionFailure, handleQuery } from './app/grounding.js';
+import { cancelAmbiguity, handleQuery, handleSpeechRecognitionFailure } from './app/grounding.js';
 import { resetVoiceFailures, state } from './app/state.js';
 import { startLlmStatusConsoleMonitor } from './intent/llmStatusClient.js';
 import { initRaycastSelection } from './scene/raycastSelection.js';
@@ -37,7 +37,7 @@ function initApp() {
   initAudioBar(els.audioBar);
 
   initSpeechRecognition({
-    onRecognitionFailure: handleAmbiguityRecognitionFailure,
+    onRecognitionFailure: handleSpeechRecognitionFailure,
   });
 
   resetVoiceFailures();

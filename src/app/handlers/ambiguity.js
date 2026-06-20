@@ -92,12 +92,6 @@ export function handleAmbiguityReply(parsed) {
   applyAmbiguityFailure(failures);
 }
 
-export function handleAmbiguityRecognitionFailure() {
-  if (!state.ambiguityCandidates.length) return;
-  const failures = incrementVoiceFailures();
-  applyAmbiguityFailure(failures);
-}
-
 export function findAmbiguityCandidateByName(text) {
   const namedPlant = findPlantByNameOrAlias(text);
   if (!namedPlant) return null;

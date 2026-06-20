@@ -15,6 +15,7 @@ let narrationToken = 0;
 const narrationListeners = new Set();
 
 const LISTENING_PLACEHOLDER = 'Listening ...';
+const LOW_CONFIDENCE_THRESHOLD = 0.6;
 
 // Trigger voice list load early so it's ready before first speak()
 if ('speechSynthesis' in window) {
@@ -157,7 +158,20 @@ export function initSpeechRecognition({ onRecognitionFailure }) {
   speechRecognition.interimResults = false;
   speechRecognition.addEventListener('result', (event) => {
     receivedResult = true;
-    const transcript = event.results[0][0].transcript;
+    const alternative = event.results[0]?.[0];
+    const transcript = String(alternative?.transcript ?? '').trim();
+    const confidence = alternative?.confidence;
+
+    if (!transcript) {
+      handleRecognitionFailure(onRecognitionFailure, { reason: 'empty-transcript' });
+      return;
+    }
+
+    if (Number.isFinite(confidence) && confidence < LOW_CONFIDENCE_THRESHOLD) {
+      handleRecognitionFailure(onRecognitionFailure, { reason: 'low-confidence', confidence, transcript });
+      return;
+    }
+
     if (activeInput) {
       activeInput.value = transcript;
       activeInput.dispatchEvent(new Event('input', { bubbles: true }));
@@ -169,13 +183,17 @@ export function initSpeechRecognition({ onRecognitionFailure }) {
     setListening(true);
   });
   speechRecognition.addEventListener('end', () => {
-    if (!receivedResult) onRecognitionFailure?.('no-result');
+    if (!receivedResult) {
+      handleRecognitionFailure(onRecognitionFailure, { reason: 'no-result' });
+      return;
+    }
+    const inputToFocus = activeInput;
     setListening(false);
+    inputToFocus?.focus();
   });
   speechRecognition.addEventListener('error', () => {
     receivedResult = true;
-    onRecognitionFailure?.('error');
-    setListening(false);
+    handleRecognitionFailure(onRecognitionFailure, { reason: 'error' });
   });
   return speechRecognition;
 }
@@ -191,6 +209,13 @@ export function startSpeechRecognition(input = null, button = null) {
   activeButton = button;
   previousPlaceholder = activeInput?.placeholder ?? '';
   if (speechRecognition) speechRecognition.start();
+}
+
+function handleRecognitionFailure(onRecognitionFailure, detail) {
+  const inputToFocus = activeInput;
+  onRecognitionFailure?.(detail);
+  setListening(false);
+  inputToFocus?.focus();
 }
 
 function setListening(nextListening) {

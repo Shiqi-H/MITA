@@ -6,7 +6,6 @@ import { appendConversationTurn, state } from './state.js';
 import {
   cancelAmbiguity,
   findAmbiguityCandidateByName,
-  handleAmbiguityRecognitionFailure,
   handleAmbiguityReply,
   resolveAmbiguityById,
 } from './handlers/ambiguity.js';
@@ -15,7 +14,13 @@ import { handleCompareIntent } from './handlers/compare.js';
 import { handleIdentifyIntent } from './handlers/identify.js';
 import { selectPlantById } from './handlers/shared.js';
 
-export { cancelAmbiguity, handleAmbiguityRecognitionFailure, selectPlantById };
+const SPEECH_RECOGNITION_FAILURE_MESSAGE = "Didn't catch that — try again or type your question";
+
+export { cancelAmbiguity, selectPlantById };
+
+export function handleSpeechRecognitionFailure() {
+  speak(SPEECH_RECOGNITION_FAILURE_MESSAGE);
+}
 
 export async function handleQuery(text) {
   if (!text.trim()) return;
