@@ -7,6 +7,7 @@ import { initSpeechRecognition, startSpeechRecognition } from './speech/speech.j
 import { hideComparePanel } from './ui/comparePanel.js';
 import { els } from './ui/dom.js';
 import { closePlantPanelAndClearSelection, hideHistoryPanel, hidePlantPanel, showHistoryPanel } from './ui/panels.js';
+import { hidePlantListPanel, togglePlantListPanel } from './ui/plantListPanel.js';
 import { renderQueryControls } from './ui/queryControls.js';
 import { registerOutlineComponent } from './ui/outlineEffect.js';
 
@@ -16,6 +17,8 @@ function initApp() {
   els.compareClose.addEventListener('click', hideComparePanel);
   els.historyClose.addEventListener('click', hideHistoryPanel);
   els.historyTrigger.addEventListener('click', showHistoryPanel);
+  els.plantListClose.addEventListener('click', hidePlantListPanel);
+  els.plantListTrigger.addEventListener('click', togglePlantListPanel);
 
   renderQueryControls(els.globalQueryControls, {
     placeholder: 'Ask about this plant...',
@@ -35,6 +38,7 @@ function initApp() {
   hidePlantPanel();
   hideComparePanel();
   hideHistoryPanel();
+  hidePlantListPanel();
   startLlmStatusConsoleMonitor();
 }
 

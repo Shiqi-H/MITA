@@ -4,6 +4,7 @@ import { clearSelectedPlant, setActiveScene, state } from '../app/state.js';
 import { createPlantEntity } from './plantRenderer.js';
 import { hidePlantPanel } from '../ui/panels.js';
 import { hideComparePanel } from '../ui/comparePanel.js';
+import { hidePlantListPanel } from '../ui/plantListPanel.js';
 import { els } from '../ui/dom.js';
 import { gsap } from 'gsap';
  
@@ -89,6 +90,7 @@ function resetSceneTransientUi() {
   clearSelectedPlant();
   hidePlantPanel();
   hideComparePanel();
+  hidePlantListPanel();
 }
 
 export function updateNav() {

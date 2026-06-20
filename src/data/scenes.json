@@ -10,5 +10,11 @@
     "label": "2",
     "panorama": "/scene-2.jpg",
     "models": ["ficus_microcarpa"]
+  },
+  "scene-3":{
+    "title": "Scene 3",
+    "label": "3",
+    "panorama": "/scene-3.jpg",
+    "models": []
   }
 }
