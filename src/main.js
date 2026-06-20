@@ -14,7 +14,6 @@ import { registerOutlineComponent } from './ui/outlineEffect.js';
 
 function initApp() {
   els.panelClose.addEventListener('click', () => {
-    stopNarration();
     closePlantPanelAndClearSelection();
   });
   els.interactionClose.addEventListener('click', () => {
