@@ -5,7 +5,7 @@ const INTENT_ENGINE = import.meta.env.VITE_INTENT_ENGINE ?? 'local';
 export async function parseIntent(text, context) {
   const deterministicIntent = parseIntentLocally(text, context);
   if (
-    ['identify', 'resolveAmbiguity'].includes(deterministicIntent.intent) ||
+    deterministicIntent.intent === 'resolveAmbiguity' ||
     hasNamedCompareTarget(deterministicIntent)
   ) {
     return { ...deterministicIntent, source: 'local' };
