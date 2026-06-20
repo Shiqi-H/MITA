@@ -184,12 +184,18 @@ export function initSpeechRecognition({ onRecognitionFailure }) {
   });
   speechRecognition.addEventListener('end', () => {
     if (!receivedResult) {
+      if (activeInput?.value.trim()) {
+        const inputToFocus = activeInput;
+        setListening(false);
+        window.requestAnimationFrame(() => inputToFocus?.focus());
+        return;
+      }
       handleRecognitionFailure(onRecognitionFailure, { reason: 'no-result' });
       return;
     }
     const inputToFocus = activeInput;
     setListening(false);
-    inputToFocus?.focus();
+    window.requestAnimationFrame(() => inputToFocus?.focus());
   });
   speechRecognition.addEventListener('error', () => {
     receivedResult = true;
@@ -201,7 +207,6 @@ export function initSpeechRecognition({ onRecognitionFailure }) {
 export function startSpeechRecognition(input = null, button = null) {
   if (isListening) {
     speechRecognition?.stop();
-    setListening(false);
     return;
   }
 
@@ -215,7 +220,7 @@ function handleRecognitionFailure(onRecognitionFailure, detail) {
   const inputToFocus = activeInput;
   onRecognitionFailure?.(detail);
   setListening(false);
-  inputToFocus?.focus();
+  window.requestAnimationFrame(() => inputToFocus?.focus());
 }
 
 function setListening(nextListening) {
