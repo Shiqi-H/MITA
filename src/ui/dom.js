@@ -20,6 +20,7 @@ export const els = {
   plantListTrigger: document.querySelector('#plant-list-trigger'),
   plantListBody: document.querySelector('#plant-list-body'),
   globalQueryControls: document.querySelector('#global-query-controls'),
+  audioBar: document.querySelector('#audio-bar'),
   comparePanel: document.querySelector('.compare-panel'),
   compareBody: document.querySelector('#compare-body'),
   compareClose: document.querySelector('#compare-close'),

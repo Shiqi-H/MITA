@@ -7,6 +7,12 @@ let activeButton = null;
 let isListening = false;
 let receivedResult = false;
 let previousPlaceholder = '';
+let activeText = '';
+let activeUtterance = null;
+let narrationStatus = 'idle';
+let narrationToken = 0;
+
+const narrationListeners = new Set();
 
 const LISTENING_PLACEHOLDER = 'Listening ...';
 
@@ -17,17 +23,106 @@ if ('speechSynthesis' in window) {
 }
 
 export function speak(text) {
-  appendVoiceLog(`System: ${text}`);
-  appendConversationTurn(`System: ${text}`);
-  if (!('speechSynthesis' in window)) return;
+  const nextText = String(text ?? '').trim();
+  if (!nextText) return;
+
+  appendVoiceLog(`System: ${nextText}`);
+  appendConversationTurn(`System: ${nextText}`);
+  startNarration(nextText);
+}
+
+export function pauseNarration() {
+  if (!('speechSynthesis' in window) || narrationStatus !== 'playing') return;
+  window.speechSynthesis.pause();
+  narrationStatus = 'paused';
+  notifyNarrationListeners();
+}
+
+export function resumeNarration() {
+  if (!('speechSynthesis' in window) || narrationStatus !== 'paused') return;
+  window.speechSynthesis.resume();
+  narrationStatus = 'playing';
+  notifyNarrationListeners();
+}
+
+export function stopNarration() {
+  if (!activeText && narrationStatus === 'idle') return;
+  narrationToken += 1;
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+  activeUtterance = null;
+  narrationStatus = activeText ? 'stopped' : 'idle';
+  notifyNarrationListeners();
+}
+
+export function replayNarration() {
+  if (!activeText) return;
+  startNarration(activeText);
+}
+
+export function subscribeNarration(listener) {
+  narrationListeners.add(listener);
+  listener(getNarrationState());
+  return () => narrationListeners.delete(listener);
+}
+
+function startNarration(text) {
+  activeText = text;
+
+  if (!('speechSynthesis' in window)) {
+    activeUtterance = null;
+    narrationStatus = 'unsupported';
+    notifyNarrationListeners();
+    return;
+  }
+
+  narrationToken += 1;
+  const token = narrationToken;
   window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
+  const utterance = new SpeechSynthesisUtterance(activeText);
   utterance.lang = 'en-US';
   utterance.rate = 0.92;
   utterance.pitch = 1.05;
   const voice = pickBestVoice();
   if (voice) utterance.voice = voice;
+  utterance.addEventListener('start', () => {
+    if (token !== narrationToken) return;
+    narrationStatus = 'playing';
+    notifyNarrationListeners();
+  });
+  utterance.addEventListener('end', () => {
+    if (token !== narrationToken) return;
+    activeUtterance = null;
+    narrationStatus = 'ended';
+    notifyNarrationListeners();
+  });
+  utterance.addEventListener('error', () => {
+    if (token !== narrationToken) return;
+    activeUtterance = null;
+    narrationStatus = 'ended';
+    notifyNarrationListeners();
+  });
+  activeUtterance = utterance;
+  narrationStatus = 'playing';
+  notifyNarrationListeners();
   window.speechSynthesis.speak(utterance);
+}
+
+function getNarrationState() {
+  return {
+    status: narrationStatus,
+    text: activeText,
+    canPause: narrationStatus === 'playing',
+    canResume: narrationStatus === 'paused',
+    canReplay: Boolean(activeText),
+    canStop: narrationStatus === 'playing' || narrationStatus === 'paused',
+  };
+}
+
+function notifyNarrationListeners() {
+  const state = getNarrationState();
+  narrationListeners.forEach((listener) => listener(state));
 }
 
 function pickBestVoice() {
