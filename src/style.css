@@ -248,16 +248,6 @@ h2 {
   padding: 20px;
 }
 
-.interaction-panel.medical-panel {
-  left: auto;
-  right: 22px;
-  bottom: calc(84px + var(--plant-panel-height, 0px) + 20px);
-  width: min(360px, calc(100vw - 44px));
-  height: auto;
-  max-height: calc(100svh - 44px - 84px - var(--plant-panel-height, 0px) - 20px);
-  overflow: auto;
-}
-
 .history-panel {
   left: 50%;
   top: 86px;
@@ -757,19 +747,6 @@ h2 {
   outline: none;
 }
 
-.medical-layout {
-  display: grid;
-  grid-template-columns: 112px 1fr;
-  gap: 12px;
-  align-items: start;
-}
-
-.medical-layout img {
-  width: 100%;
-  border-radius: 10px;
-  object-fit: cover;
-}
-
 @keyframes listenButtonPulse {
   0%,
   100% {
@@ -837,15 +814,6 @@ h2 {
     bottom: 74px;
   }
 
-  .interaction-panel.medical-panel {
-    left: 16px;
-    right: 16px;
-    bottom: calc(74px + var(--plant-panel-height, 0px) + 20px);
-    width: auto;
-    height: auto;
-    max-height: calc(100svh - 32px - 74px - var(--plant-panel-height, 0px) - 20px);
-  }
-
   .history-panel {
     top: 96px;
     transform: none;
@@ -874,10 +842,6 @@ h2 {
     grid-column: 1 / -1;
   }
 
-  .compare-grid,
-  .medical-layout {
-    grid-template-columns: 1fr;
-  }
 }
 
 .scene-nav-arrow,

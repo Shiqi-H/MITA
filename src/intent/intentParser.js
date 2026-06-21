@@ -9,9 +9,12 @@ const intents = {
     'what is in front of me',
     'tell me about this plant',
   ],
-  compare: ['compare', 'more drought tolerant', 'drought tolerance', 'than the giant water lily'],
+  compare: ['compare', 'compared to', 'compared with', 'how does it compare', 'how do they compare'],
   medical: ['medicinal value', 'medical', 'medicine', 'medicinal', 'herbal use'],
-  unknownInterest: ['feng shui', 'symbolism', 'spiritual'],
+  droughtTolerance: ['drought tolerance', 'drought tolerant', 'drought-resistant', 'drought resistant'],
+  height: ['height', 'how tall', 'tall'],
+  lifespan: ['lifespan', 'life span', 'how long does it live', 'live longer', 'lives longer', 'long-lived'],
+  unknownInterest: ['feng shui', 'symbolism', 'spiritual', 'toxicity', 'toxic'],
 };
 
 function normalize(text) {
@@ -38,14 +41,15 @@ export function parseIntentLocally(text, context = {}) {
     };
   }
 
-  if (matchesAny(normalized, intents.medical)) {
+  const attributeInterest = getAttributeInterest(normalized);
+  if (attributeInterest) {
     const targetPlantName = extractPlantTarget(normalized);
     const referent = getAttributeReferent(normalized, targetPlantName);
     return {
       intent: 'queryAttribute',
       referent,
       targetPlantName,
-      interest: 'medicinalValue',
+      interest: attributeInterest,
     };
   }
 
@@ -74,16 +78,10 @@ function matchesAny(text, phrases) {
 function isCompareIntent(text) {
   if (matchesAny(text, intents.compare)) return true;
   return (
-    text.includes('compared to') ||
-    text.includes('compared with') ||
-    text.includes('compare it with') ||
-    text.includes('compare this one with') ||
-    text.includes('compare that plant with') ||
-    text.includes('how does it compare') ||
-    text.includes('how do they compare') ||
     text.includes('what about compared to') ||
     text.includes('what about compared with') ||
-    (text.includes('than') && hasComparisonCue(text))
+    (text.includes('than') && hasComparisonCue(text)) ||
+    (hasComparatorCue(text) && hasAttributeCue(text))
   );
 }
 
@@ -93,6 +91,7 @@ function hasComparisonCue(text) {
     'less',
     'better',
     'worse',
+    'greater',
     'taller',
     'shorter',
     'longer',
@@ -102,6 +101,23 @@ function hasComparisonCue(text) {
     'height',
     'lifespan',
   ].some((cue) => text.includes(cue));
+}
+
+function hasComparatorCue(text) {
+  return [
+    'more',
+    'less',
+    'better',
+    'worse',
+    'greater',
+    'taller',
+    'shorter',
+    'longer',
+  ].some((cue) => text.includes(cue));
+}
+
+function hasAttributeCue(text) {
+  return Boolean(getAttributeInterest(text));
 }
 
 function parseMarker(text, context = {}) {
@@ -197,6 +213,14 @@ function getComparisonAttribute(text) {
     return 'lifespan';
   }
   return 'droughtTolerance';
+}
+
+function getAttributeInterest(text) {
+  if (matchesAny(text, intents.medical)) return 'medicinalValue';
+  if (matchesAny(text, intents.droughtTolerance)) return 'droughtTolerance';
+  if (matchesAny(text, intents.height)) return 'height';
+  if (matchesAny(text, intents.lifespan)) return 'lifespan';
+  return '';
 }
 
 function extractPlantTarget(text) {

@@ -1,11 +1,17 @@
 import { generateInfoSpeech } from '../../intent/llmClient.js';
 import { speak } from '../../speech/speech.js';
 import { showSelectionRequiredFallback, showUnsupportedInterestFallback } from '../../ui/fallbackPanel.js';
-import { renderMedicalPanel } from '../../ui/medicalPanel.js';
 import { clearFallbackActions, displayPlant } from '../../ui/panels.js';
 import { findPlantByNameOrAlias, getDisplayName } from '../selectors.js';
 import { resetVoiceFailures, state } from '../state.js';
 import { resolvePlantReferent } from './shared.js';
+
+const KNOWN_ATTRIBUTE_LABELS = {
+  droughtTolerance: 'drought tolerance',
+  height: 'height',
+  lifespan: 'lifespan',
+  medicinalValue: 'medicinal value',
+};
 
 export async function handleAttributeIntent(parsed, text = '') {
   const plant = resolveAttributeTarget(parsed, text);
@@ -15,32 +21,24 @@ export async function handleAttributeIntent(parsed, text = '') {
     return;
   }
 
-  if (parsed.interest === 'medicinalValue') {
+  if (isKnownAttributeInterest(parsed.interest)) {
     resetVoiceFailures();
     clearFallbackActions();
-    displayPlant(plant, 'medical');
-    renderMedicalPanel(plant);
+    displayPlant(plant);
     const generatedSpeech = await generateInfoSpeech({
       plant,
-      question: 'What is the medicinal value of this plant?',
+      question: text,
       interest: parsed.interest,
       history: state.conversationHistory.slice(-6),
     });
-    speak(generatedSpeech || `${getDisplayName(plant)} medicinal value: ${plant.medicalInfo}`);
+    speak(generatedSpeech || getAttributeFallbackSpeech(plant, parsed.interest));
     return;
   }
 
-  const generatedSpeech = await generateInfoSpeech({
-    plant,
-    question: text,
-    history: state.conversationHistory.slice(-6),
-  });
-  if (generatedSpeech) {
-    displayPlant(plant);
-    speak(generatedSpeech);
-    return;
-  }
+  showUnsupportedAttributeFallback(plant, parsed, text);
+}
 
+function showUnsupportedAttributeFallback(plant, parsed, text) {
   showUnsupportedInterestFallback({
     onMedical: () => handleAttributeIntent({ ...parsed, interest: 'medicinalValue' }, text),
     onBotanical: () => {
@@ -49,6 +47,17 @@ export async function handleAttributeIntent(parsed, text = '') {
     },
   });
   speak('I do not have that information. I can show medicinal value or botanical features.');
+}
+
+function isKnownAttributeInterest(interest) {
+  return Object.hasOwn(KNOWN_ATTRIBUTE_LABELS, interest);
+}
+
+function getAttributeFallbackSpeech(plant, interest) {
+  const label = KNOWN_ATTRIBUTE_LABELS[interest];
+  const value = plant.attributes?.[interest];
+  if (value) return `${getDisplayName(plant)} ${label}: ${value}.`;
+  return `${getDisplayName(plant)} ${label} information is shown.`;
 }
 
 function resolveAttributeTarget(parsed, text) {

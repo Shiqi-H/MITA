@@ -10,7 +10,7 @@ const RESPONSE_SCHEMA = {
   attribute: 'droughtTolerance | height | lifespan | medicinalValue | or any other plant attribute the user asks about',
   referent: 'currentSelection when querying selected plant, previousSelection when querying the previous or last plant, or namedPlant when user names a plant',
   targetPlantName: 'plant name when querying an attribute of a named plant',
-  interest: 'medicinalValue | unknown',
+  interest: 'droughtTolerance | height | lifespan | medicinalValue | unknown',
   confidence: 'number from 0 to 1',
 };
 
@@ -26,6 +26,9 @@ export async function parseIntentWithLlm({ text, context }) {
           'Classify referential questions such as "what is this", "what plant is this", "what am I looking at", "what is in front of me", and "tell me about this plant" as intent "identify".',
           'For attribute questions about "it", "this one", "that plant", or "the selected plant", set referent to "currentSelection".',
           'For attribute questions about "previous one", "last one", "the one before", or "the previous plant", set referent to "previousSelection".',
+          'For known plant attribute questions, return intent "queryAttribute" and set interest to exactly one of: droughtTolerance, height, lifespan, medicinalValue.',
+          'Treat questions about medicinal value, medical use, medicine, or herbal use as interest "medicinalValue".',
+          'For unsupported attribute or interest questions such as toxicity, feng shui, symbolism, or spiritual meaning, return intent "queryAttribute" with interest "unknown".',
           'For comparisons, classify phrases such as "previous", "last", "the one before", "previously selected", "last selected", or comparisons without a named second plant as target2Referent "previousSelection".',
           'For comparisons against a named plant, set target2Referent to "namedPlant" and put the plant name in target2Name.',
           'For comparisons, set attribute to the specific attribute the user asks about (droughtTolerance, height, lifespan, medicinalValue, etc.). Default to "droughtTolerance" only when the user does not specify an attribute.',

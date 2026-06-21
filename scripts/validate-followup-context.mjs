@@ -17,6 +17,30 @@ const cases = [
     },
   },
   {
+    text: 'What is its height?',
+    expected: {
+      intent: 'queryAttribute',
+      referent: 'currentSelection',
+      interest: 'height',
+    },
+  },
+  {
+    text: 'What is its lifespan?',
+    expected: {
+      intent: 'queryAttribute',
+      referent: 'currentSelection',
+      interest: 'lifespan',
+    },
+  },
+  {
+    text: 'What is its drought tolerance?',
+    expected: {
+      intent: 'queryAttribute',
+      referent: 'currentSelection',
+      interest: 'droughtTolerance',
+    },
+  },
+  {
     text: 'What plant am I looking at?',
     expected: {
       intent: 'identify',
@@ -35,7 +59,7 @@ const cases = [
     expected: {
       intent: 'compare',
       target2Referent: 'previousSelection',
-      attribute: 'unsupported',
+      attribute: 'medicinalValue',
     },
   },
   {
@@ -52,7 +76,7 @@ const cases = [
       intent: 'compare',
       target2Referent: 'namedPlant',
       target2Name: 'ginkgo',
-      attribute: 'unsupported',
+      attribute: 'height',
     },
   },
   {
@@ -61,7 +85,7 @@ const cases = [
       intent: 'compare',
       target2Referent: 'namedPlant',
       target2Name: 'lavender',
-      attribute: 'unsupported',
+      attribute: 'lifespan',
     },
   },
   {
@@ -71,7 +95,14 @@ const cases = [
       referent: 'currentSelection',
       interest: 'unknown',
     },
-    skipServer: true,
+  },
+  {
+    text: 'Is it toxic?',
+    expected: {
+      intent: 'queryAttribute',
+      referent: 'currentSelection',
+      interest: 'unknown',
+    },
   },
   {
     text: 'option f',

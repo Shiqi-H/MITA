@@ -47,7 +47,7 @@ export async function handleCompareIntent(parsed, text = '') {
         : `${getDisplayName(right)} was not in your visited history, so I used the plant database instead.`;
 
   setCompareState(left.id, right.id);
-  displayPlant(left, 'compare');
+  displayPlant(left);
   renderComparePanel(left, right, attribute, note);
   const generatedSpeech = await generateCompareSpeech({
     left,

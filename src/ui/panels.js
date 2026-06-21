@@ -12,12 +12,12 @@ export function appendVoiceLog(text) {
   }
 }
 
-export function displayPlant(plant, focusType = 'default') {
+export function displayPlant(plant) {
   if (!plant) return;
   setSelectedPlant(plant.id);
   els.plantName.textContent = getDisplayName(plant);
   els.plantDescription.textContent = plant.description;
-  renderAttributes(plant, focusType);
+  renderAttributes(plant);
   els.plantPanel.hidden = false;
   updatePlantPanelMetrics();
 }
@@ -45,16 +45,12 @@ export function hideHistoryPanel() {
   els.historyPanel.hidden = true;
 }
 
-export function showInteractionPanel(title, body, options = {}) {
+export function showInteractionPanel(title, body) {
   els.interactionTitle.textContent = title;
   if (typeof body === 'string') {
     els.interactionBody.textContent = body;
   } else {
     els.interactionBody.replaceChildren(body);
-  }
-  els.interactionPanel.classList.toggle('medical-panel', options.variant === 'medical');
-  if (options.variant === 'medical') {
-    updatePlantPanelMetrics();
   }
   els.interactionPanel.hidden = false;
 }
@@ -77,18 +73,13 @@ export function clearFallbackActions() {
   els.interactionBody.querySelectorAll('.fallback-actions').forEach((node) => node.remove());
 }
 
-function renderAttributes(plant, focusType) {
-  const rows =
-    focusType === 'medical'
-      ? [
-          ['Medicinal value', plant.attributes.medicinalValue],
-        ]
-      : [
-          ['Drought tolerance', plant.attributes.droughtTolerance],
-          ['Height', plant.attributes.height],
-          ['Lifespan', plant.attributes.lifespan],
-          ['Medicinal value', plant.attributes.medicinalValue],
-        ];
+function renderAttributes(plant) {
+  const rows = [
+    ['Drought tolerance', plant.attributes.droughtTolerance],
+    ['Height', plant.attributes.height],
+    ['Lifespan', plant.attributes.lifespan],
+    ['Medicinal value', plant.attributes.medicinalValue],
+  ];
 
   els.plantAttributes.innerHTML = rows
     .map(([key, value]) => `<div class="attribute-row"><span>${key}</span><strong>${value}</strong></div>`)
@@ -102,9 +93,4 @@ export function updatePlantPanelMetrics() {
   });
 }
 
-window.addEventListener('resize', () => {
-  if (els.interactionPanel.classList.contains('medical-panel')) {
-    updatePlantPanelMetrics();
-  }
-});
 

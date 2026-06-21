@@ -6,7 +6,8 @@ export async function parseIntent(text, context) {
   const deterministicIntent = parseIntentLocally(text, context);
   if (
     deterministicIntent.intent === 'resolveAmbiguity' ||
-    hasNamedCompareTarget(deterministicIntent)
+    hasNamedCompareTarget(deterministicIntent) ||
+    deterministicIntent.intent === 'queryAttribute'
   ) {
     return { ...deterministicIntent, source: 'local' };
   }
