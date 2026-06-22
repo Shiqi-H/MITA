@@ -1,6 +1,6 @@
 import { getAllScenes, getPlant, getScene } from '../app/selectors.js';
 import { cancelAmbiguity } from '../app/handlers/ambiguity.js';
-import { clearSelectedPlant, setActiveScene, state } from '../app/state.js';
+import { clearFocusedPlant, clearSelectedPlant, setActiveScene, state } from '../app/state.js';
 import { createPlantEntity } from './plantRenderer.js';
 import { hidePlantPanel } from '../ui/panels.js';
 import { hideComparePanel } from '../ui/comparePanel.js';
@@ -88,6 +88,7 @@ export function goToScene(id) {
 function resetSceneTransientUi() {
   cancelAmbiguity();
   clearSelectedPlant();
+  clearFocusedPlant();
   hidePlantPanel();
   hideComparePanel();
   hidePlantListPanel();

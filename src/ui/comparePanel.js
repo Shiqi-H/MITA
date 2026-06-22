@@ -1,7 +1,7 @@
 import { getDisplayName } from '../app/selectors.js';
 import { els } from './dom.js';
 
-export function renderComparePanel(left, right, attribute = 'droughtTolerance', note = '') {
+export function renderComparePanel(left, right, attribute = 'droughtTolerance') {
   const rows = [
     ['Drought tolerance', left.attributes.droughtTolerance, right.attributes.droughtTolerance],
     ['Height', left.attributes.height, right.attributes.height],
@@ -10,7 +10,6 @@ export function renderComparePanel(left, right, attribute = 'droughtTolerance', 
   ];
 
   els.compareBody.innerHTML = `
-    ${note ? `<p class="panel-status">${note}</p>` : ''}
     <div class="compare-grid">
       <article class="compare-card">
         <p class="eyebrow">Current target</p>

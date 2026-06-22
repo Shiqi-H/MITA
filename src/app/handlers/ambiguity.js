@@ -17,7 +17,10 @@ import {
   speakPlantInfo,
 } from './shared.js';
 
+let ambiguitySessionId = 0;
+
 export function promptAmbiguity(candidateIds, options = {}) {
+  const sessionId = ++ambiguitySessionId;
   setQueryPlaceholder(DEFAULT_QUERY_PLACEHOLDER);
 
   const candidates = candidateIds
@@ -72,12 +75,17 @@ export function promptAmbiguity(candidateIds, options = {}) {
     generateDisambiguationSpeech(candidates),
     fallbackSpeech,
   );
-  generatedSpeech.then(speak);
+  generatedSpeech.then((speechText) => {
+    if (sessionId === ambiguitySessionId && state.ambiguityCandidates.length) {
+      speak(speechText);
+    }
+  });
 }
 
 export async function resolveAmbiguityById(id) {
   const plant = getPlant(id);
   if (!plant) return;
+  ambiguitySessionId += 1;
   const pendingHandled = selectPlantById(id);
   if (pendingHandled) return;
   await speakPlantInfo(plant, 'Introduce this selected plant.');
@@ -105,6 +113,7 @@ export function findAmbiguityCandidateByName(text) {
 }
 
 export function cancelAmbiguity() {
+  ambiguitySessionId += 1;
   resetAmbiguity();
   clearPendingPlantQuery();
   clearCandidateHighlights();

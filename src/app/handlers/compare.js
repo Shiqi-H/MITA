@@ -2,22 +2,22 @@ import { generateCompareSpeech } from '../../intent/llmClient.js';
 import { speak } from '../../speech/speech.js';
 import { renderComparePanel } from '../../ui/comparePanel.js';
 import { displayPlant, showInteractionPanel } from '../../ui/panels.js';
-import { findPlantByNameOrAlias, findVisitedPlantByNameOrAlias, getDisplayName } from '../selectors.js';
+import { findPlantByNameOrAlias, getDisplayName, getLastVisitedPlant } from '../selectors.js';
 import { setCompareState, state } from '../state.js';
 import { requestPlantForPendingQuery } from './pendingPlantQuery.js';
 import { resolvePlantReferent } from './shared.js';
 
 export async function handleCompareIntent(parsed, text = '') {
-  const left = resolvePlantReferent(parsed.target1 || 'currentSelection', parsed.target1Name || '');
+  const namedTargetFromText = findPlantByNameOrAlias(text);
+  const target2Referent = namedTargetFromText ? 'namedPlant' : parsed.target2Referent || 'previousSelection';
+  const targetText = namedTargetFromText ? getDisplayName(namedTargetFromText) : parsed.target2Name || '';
+  const right = resolvePlantReferent(target2Referent, targetText);
+  const left = resolveCompareLeft(parsed, right);
   if (!left) {
     requestPlantForPendingQuery({ intent: 'compare', parsed, text });
     return;
   }
 
-  const namedTargetFromText = findPlantByNameOrAlias(text);
-  const target2Referent = namedTargetFromText ? 'namedPlant' : parsed.target2Referent || 'previousSelection';
-  const targetText = namedTargetFromText ? getDisplayName(namedTargetFromText) : parsed.target2Name || '';
-  const right = resolvePlantReferent(target2Referent, targetText);
   const attribute = parsed.attribute || 'droughtTolerance';
 
   if (!right) {
@@ -38,16 +38,18 @@ export async function handleCompareIntent(parsed, text = '') {
     return;
   }
 
-  const note =
-    target2Referent === 'previousSelection'
-      ? 'Compared with the previously selected plant.'
-      : findVisitedPlantByNameOrAlias(targetText)
-        ? ''
-        : `${getDisplayName(right)} was not in your visited history, so I used the plant database instead.`;
+  if (left.id === right.id) {
+    showInteractionPanel(
+      'Comparison target is the same plant',
+      `Please choose a different plant to compare with ${getDisplayName(right)}.`,
+    );
+    speak(`Please choose a different plant to compare with ${getDisplayName(right)}.`);
+    return;
+  }
 
   setCompareState(left.id, right.id);
   displayPlant(left);
-  renderComparePanel(left, right, attribute, note);
+  renderComparePanel(left, right, attribute);
   const generatedSpeech = await generateCompareSpeech({
     left,
     right,
@@ -59,4 +61,11 @@ export async function handleCompareIntent(parsed, text = '') {
 
 function getCompareFallbackSpeech(left, right) {
   return `${getDisplayName(left)} and ${getDisplayName(right)} are compared by drought tolerance.`;
+}
+
+function resolveCompareLeft(parsed, right) {
+  const left = resolvePlantReferent(parsed.target1 || 'currentSelection', parsed.target1Name || '');
+  if (!left) return null;
+  if (!right || left.id !== right.id) return left;
+  return getLastVisitedPlant(right.id);
 }

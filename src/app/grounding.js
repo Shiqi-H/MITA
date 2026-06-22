@@ -65,6 +65,7 @@ function getIntentContext() {
   return {
     activeSceneId: state.activeSceneId,
     selectedPlantId: state.selectedPlantId,
+    focusedPlantId: state.focusedPlantId,
     visitedPlantIds: state.visitedPlantIds,
     ambiguityCandidates: state.ambiguityCandidates,
   };

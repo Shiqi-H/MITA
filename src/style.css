@@ -197,14 +197,6 @@ h2 {
   display: none;
 }
 
-.panel-status {
-  padding: 10px 12px;
-  border-radius: 8px;
-  background: rgba(149, 208, 106, 0.08);
-  color: var(--muted);
-  margin-bottom: 14px;
-}
-
 .attribute-list {
   display: grid;
   gap: 8px;

@@ -19,16 +19,30 @@ export function getAllScenes() {
 }
 
 export function getCurrentPlant() {
-  return state.selectedPlantId ? getPlant(state.selectedPlantId) : null;
+  return state.selectedPlantId ? getPlant(state.selectedPlantId) : getFocusedPlant();
+}
+
+export function getFocusedPlant() {
+  return state.focusedPlantId ? getPlant(state.focusedPlantId) : null;
 }
 
 export function getPreviousSelectedPlant() {
-  const currentId = state.selectedPlantId;
+  const currentId = state.selectedPlantId || state.focusedPlantId;
   if (!currentId) return null;
 
   for (let index = state.visitedPlantIds.length - 2; index >= 0; index -= 1) {
     const id = state.visitedPlantIds[index];
     const plant = id && id !== currentId ? getPlant(id) : null;
+    if (plant) return plant;
+  }
+
+  return null;
+}
+
+export function getLastVisitedPlant(excludeId = '') {
+  for (let index = state.visitedPlantIds.length - 1; index >= 0; index -= 1) {
+    const id = state.visitedPlantIds[index];
+    const plant = id && id !== excludeId ? getPlant(id) : null;
     if (plant) return plant;
   }
 

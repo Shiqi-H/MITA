@@ -1,6 +1,7 @@
 export const state = {
   activeSceneId: 'scene-1',
   selectedPlantId: null,
+  focusedPlantId: null,
   ambiguityCandidates: [],
   visitedPlantIds: [],
   voiceFailures: 0,
@@ -15,11 +16,16 @@ export function setActiveScene(id) {
 
 export function setSelectedPlant(id) {
   state.selectedPlantId = id;
+  state.focusedPlantId = id;
   recordVisitedPlant(id);
 }
 
 export function clearSelectedPlant() {
   state.selectedPlantId = null;
+}
+
+export function clearFocusedPlant() {
+  state.focusedPlantId = null;
 }
 
 export function recordVisitedPlant(id) {
