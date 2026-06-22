@@ -6,7 +6,7 @@ import { DISAMBIG_COLORS, clearAllHighlights, highlightPlant } from '../../ui/hi
 import { clearFallbackActions, hideInteractionPanel, showInteractionPanel } from '../../ui/panels.js';
 import { showDisambiguationOverlay } from '../../ui/overlay.js';
 import { findPlantByNameOrAlias, getDisplayName, getPlant } from '../selectors.js';
-import { incrementVoiceFailures, resetAmbiguity, setAmbiguityCandidates, state } from '../state.js';
+import { clearPendingPlantQuery, incrementVoiceFailures, resetAmbiguity, setAmbiguityCandidates, state } from '../state.js';
 import {
   AMBIGUITY_FALLBACK_PLACEHOLDER,
   DEFAULT_QUERY_PLACEHOLDER,
@@ -17,7 +17,7 @@ import {
   speakPlantInfo,
 } from './shared.js';
 
-export function promptAmbiguity(candidateIds) {
+export function promptAmbiguity(candidateIds, options = {}) {
   setQueryPlaceholder(DEFAULT_QUERY_PLACEHOLDER);
 
   const candidates = candidateIds
@@ -44,7 +44,9 @@ export function promptAmbiguity(candidateIds) {
   const letters = candidates.map(({ marker }) => marker).join(' / ');
   const body = document.createElement('div');
   const intro = document.createElement('p');
-  intro.textContent = 'Multiple plants were detected. Choose one candidate, or type/speak its letter, then submit.';
+  intro.textContent = options.pendingQuestion
+    ? 'Choose the plant you mean, then I will answer your question.'
+    : 'Multiple plants were detected. Choose one candidate, or type/speak its letter, then submit.';
 
   const choices = document.createElement('div');
   choices.className = 'ambiguity-choices';
@@ -63,9 +65,12 @@ export function promptAmbiguity(candidateIds) {
 
   body.append(intro, choices);
   showInteractionPanel('Referential Ambiguity', body);
+  const fallbackSpeech = options.pendingQuestion
+    ? `Choose ${letters.replaceAll(' / ', ', ')} and I will answer your question.`
+    : `Multiple plants were detected. Choose ${letters.replaceAll(' / ', ', ')} or speak a letter, then submit it.`;
   const generatedSpeech = awaitGeneratedSpeech(
     generateDisambiguationSpeech(candidates),
-    `Multiple plants were detected. Choose ${letters.replaceAll(' / ', ', ')} or speak a letter, then submit it.`,
+    fallbackSpeech,
   );
   generatedSpeech.then(speak);
 }
@@ -73,7 +78,8 @@ export function promptAmbiguity(candidateIds) {
 export async function resolveAmbiguityById(id) {
   const plant = getPlant(id);
   if (!plant) return;
-  selectPlantById(id);
+  const pendingHandled = selectPlantById(id);
+  if (pendingHandled) return;
   await speakPlantInfo(plant, 'Introduce this selected plant.');
 }
 
@@ -100,6 +106,7 @@ export function findAmbiguityCandidateByName(text) {
 
 export function cancelAmbiguity() {
   resetAmbiguity();
+  clearPendingPlantQuery();
   clearCandidateHighlights();
   clearAllHighlights();
   clearFallbackActions();

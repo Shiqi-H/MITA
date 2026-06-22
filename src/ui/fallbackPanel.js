@@ -4,6 +4,13 @@ export function showSelectionRequiredFallback() {
   showInteractionPanel('Select a plant first', 'Please select a plant in the scene before asking for a focused attribute.');
 }
 
+export function showPendingPlantSelectionFallback(question) {
+  showInteractionPanel(
+    'Select a plant to answer',
+    `Select a plant to answer: ${question}`,
+  );
+}
+
 export function showUnsupportedInterestFallback({ onMedical, onBotanical }) {
   showInteractionPanel(
     'Information not available',

@@ -6,6 +6,7 @@ export const state = {
   voiceFailures: 0,
   conversationHistory: [],
   compareState: { leftPlantId: null, rightPlantId: null },
+  pendingPlantQuery: null,
 };
 
 export function setActiveScene(id) {
@@ -51,4 +52,18 @@ export function appendConversationTurn(text) {
 
 export function setCompareState(leftPlantId, rightPlantId) {
   state.compareState = { leftPlantId, rightPlantId };
+}
+
+export function setPendingPlantQuery(query) {
+  state.pendingPlantQuery = query;
+}
+
+export function consumePendingPlantQuery() {
+  const query = state.pendingPlantQuery;
+  state.pendingPlantQuery = null;
+  return query;
+}
+
+export function clearPendingPlantQuery() {
+  state.pendingPlantQuery = null;
 }

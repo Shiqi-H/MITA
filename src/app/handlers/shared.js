@@ -17,6 +17,12 @@ import { resetAmbiguity, state } from '../state.js';
 export const DEFAULT_QUERY_PLACEHOLDER = 'Ask about this plant...';
 export const AMBIGUITY_FALLBACK_PLACEHOLDER = 'Please click on the plant you want.';
 
+let pendingSelectionHandler = null;
+
+export function registerPendingPlantSelectionHandler(handler) {
+  pendingSelectionHandler = handler;
+}
+
 export function setQueryPlaceholder(text) {
   const input = els.globalQueryControls?.querySelector('input');
   if (input) input.placeholder = text;
@@ -51,7 +57,9 @@ export function selectPlantById(id, { announce = false } = {}) {
   highlightOnly(id);
   displayPlant(plant);
 
+  if (pendingSelectionHandler?.(plant)) return true;
   if (announce) speak(`${getDisplayName(plant)} information is shown.`);
+  return false;
 }
 
 export function clearCandidateHighlights() {

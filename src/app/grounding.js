@@ -2,7 +2,7 @@ import { generateInfoSpeech, generateSceneSpeech, parseIntent } from '../intent/
 import { speak } from '../speech/speech.js';
 import { appendVoiceLog, displayPlant } from '../ui/panels.js';
 import { findPlantByNameOrAlias, getCurrentPlant, getCurrentScenePlantIds, getDisplayName, getPlant } from './selectors.js';
-import { appendConversationTurn, state } from './state.js';
+import { appendConversationTurn, consumePendingPlantQuery, setPendingPlantQuery, state } from './state.js';
 import {
   cancelAmbiguity,
   findAmbiguityCandidateByName,
@@ -12,11 +12,13 @@ import {
 import { handleAttributeIntent } from './handlers/attribute.js';
 import { handleCompareIntent } from './handlers/compare.js';
 import { handleIdentifyIntent } from './handlers/identify.js';
-import { selectPlantById } from './handlers/shared.js';
+import { registerPendingPlantSelectionHandler, selectPlantById } from './handlers/shared.js';
 
 const SPEECH_RECOGNITION_FAILURE_MESSAGE = "Didn't catch that — try again or type your question";
 
 export { cancelAmbiguity, selectPlantById };
+
+registerPendingPlantSelectionHandler(handlePendingPlantSelection);
 
 export function handleSpeechRecognitionFailure() {
   speak(SPEECH_RECOGNITION_FAILURE_MESSAGE);
@@ -80,7 +82,41 @@ function handleAmbiguousQuery(parsed, text) {
     return;
   }
 
+  if (isPlantScopedIntent(parsed)) {
+    setPendingPlantQuery({ intent: parsed.intent, parsed, text });
+    speak('Choose the plant you mean, then I will answer your question.');
+    return;
+  }
+
   handleAmbiguityReply(parsed);
+}
+
+function isPlantScopedIntent(parsed) {
+  return parsed.intent === 'queryAttribute' || parsed.intent === 'compare';
+}
+
+function handlePendingPlantSelection() {
+  const pending = consumePendingPlantQuery();
+  if (!pending) return false;
+  void executePendingPlantQuery(pending);
+  return true;
+}
+
+async function executePendingPlantQuery(pending) {
+  if (pending.intent === 'queryAttribute') {
+    await handleAttributeIntent(
+      { ...pending.parsed, referent: 'currentSelection', targetPlantName: '' },
+      pending.text,
+    );
+    return;
+  }
+
+  if (pending.intent === 'compare') {
+    await handleCompareIntent(
+      { ...pending.parsed, target1: 'currentSelection', target1Name: '' },
+      pending.text,
+    );
+  }
 }
 
 async function handleUnknownIntent(text) {

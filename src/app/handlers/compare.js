@@ -1,17 +1,16 @@
 import { generateCompareSpeech } from '../../intent/llmClient.js';
 import { speak } from '../../speech/speech.js';
 import { renderComparePanel } from '../../ui/comparePanel.js';
-import { showSelectionRequiredFallback } from '../../ui/fallbackPanel.js';
 import { displayPlant, showInteractionPanel } from '../../ui/panels.js';
 import { findPlantByNameOrAlias, findVisitedPlantByNameOrAlias, getDisplayName } from '../selectors.js';
 import { setCompareState, state } from '../state.js';
+import { requestPlantForPendingQuery } from './pendingPlantQuery.js';
 import { resolvePlantReferent } from './shared.js';
 
 export async function handleCompareIntent(parsed, text = '') {
   const left = resolvePlantReferent(parsed.target1 || 'currentSelection', parsed.target1Name || '');
   if (!left) {
-    showSelectionRequiredFallback();
-    speak('Please select a plant first.');
+    requestPlantForPendingQuery({ intent: 'compare', parsed, text });
     return;
   }
 

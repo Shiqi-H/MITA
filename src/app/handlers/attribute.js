@@ -1,9 +1,10 @@
 import { generateInfoSpeech } from '../../intent/llmClient.js';
 import { speak } from '../../speech/speech.js';
-import { showSelectionRequiredFallback, showUnsupportedInterestFallback } from '../../ui/fallbackPanel.js';
+import { showUnsupportedInterestFallback } from '../../ui/fallbackPanel.js';
 import { clearFallbackActions, displayPlant } from '../../ui/panels.js';
 import { findPlantByNameOrAlias, getDisplayName } from '../selectors.js';
 import { resetVoiceFailures, state } from '../state.js';
+import { requestPlantForPendingQuery } from './pendingPlantQuery.js';
 import { resolvePlantReferent } from './shared.js';
 
 const KNOWN_ATTRIBUTE_LABELS = {
@@ -16,8 +17,7 @@ const KNOWN_ATTRIBUTE_LABELS = {
 export async function handleAttributeIntent(parsed, text = '') {
   const plant = resolveAttributeTarget(parsed, text);
   if (!plant) {
-    showSelectionRequiredFallback();
-    speak('Please select a plant first.');
+    requestPlantForPendingQuery({ intent: 'queryAttribute', parsed, text });
     return;
   }
 
