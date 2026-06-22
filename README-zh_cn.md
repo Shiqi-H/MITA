@@ -34,6 +34,38 @@ npm.cmd run server
 该命令会执行根目录 `package.json` 中的 `server` 脚本，并转到 `server` 目录运行后端：
 > PowerShell 中建议使用 `npm.cmd`。如果环境支持，也可以使用 `npm run dev` 和 `npm run server`。
 
+两个进程都启动后，在浏览器中打开前端终端输出的本地开发地址。通常是：
+
+```text
+http://localhost:5173/
+```
+
+如果终端显示的是其他端口，请打开终端中显示的 URL。
+
+## 配置 LLM 环境（推荐）
+
+如果需要连接并调用后端 LLM，项目根目录必须包含 `.env` 文件，格式如下：
+
+```env
+# API key for the LLM backend
+NEWAPI_API_KEY=
+
+# Base URL of the LLM API endpoint
+NEWAPI_BASE_URL=
+
+# Model ID used for all server-side LLM calls
+NEWAPI_MODEL=
+
+# Controls how user utterances are parsed.
+# "llm" — routes input through the server-side LLM intent parser (recommended)
+# "local" — keyword-only matching, no LLM call (default when unset)
+VITE_INTENT_ENGINE=
+```
+
+运行本项目需要的 `.env` 文件可以从以下链接下载：
+
+[下载 .env 文件](https://polimi365-my.sharepoint.com/:u:/g/personal/11154362_polimi_it/IQAVrYLa-ew1RanHhA0KbhLKAfRzFDODf1YSdYMJqXxLLnA?e=JEQozX)
+
 ## 课程任务设计
 
 ### Task 1: 视野检测与多模态消歧
@@ -44,7 +76,7 @@ npm.cmd run server
 
 ### Task 2: 植物选中与深度对话 
 - 支持查询已知植物属性，包括 drought tolerance、height、lifespan、medicinal value。
-- 属性查询统一显示普通植物信息卡片，并在可用时通过后端 LLM 生成语音回答。
+- 属性查询统一显示植物信息卡片，并在可用时通过后端 LLM 生成语音回答。
 - 如果用户询问暂不支持的兴趣点，例如 toxicity
 ，会显示 fallback 交互，引导用户查看已支持的 botanical features 或 medicinal value。
 - 信息生成优先走后端 LLM 接口；失败时保留本地 fallback，避免核心交互完全中断。
