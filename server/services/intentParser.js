@@ -118,13 +118,18 @@ function parseMarker(text, context = {}) {
     return (
       text === normalizedMarker ||
       markerPhraseMatches(text, 'option', normalizedMarker) ||
-      markerPhraseMatches(text, 'plant', normalizedMarker)
+      markerPhraseMatches(text, 'plant', normalizedMarker) ||
+      markerCommandMatches(text, normalizedMarker)
     );
   }) ?? null;
 }
 
 function markerPhraseMatches(text, prefix, marker) {
   return new RegExp(`\\b${prefix}\\s+${marker}\\b`).test(text);
+}
+
+function markerCommandMatches(text, marker) {
+  return new RegExp(`\\b(?:choose|select|pick)\\s+(?:(?:option|plant)\\s+)?${marker}\\b`).test(text);
 }
 
 function getAllowedMarkers(context = {}) {
@@ -198,7 +203,8 @@ function getComparisonAttribute(text) {
     text.includes('life span') ||
     text.includes('live longer') ||
     text.includes('lives longer') ||
-    text.includes('long-lived')
+    text.includes('long-lived') ||
+    text.includes('longer')
   ) {
     return 'lifespan';
   }
@@ -249,6 +255,7 @@ function extractPlantTarget(text) {
   }
   if (text.includes('cactus')) return 'cactus';
   if (text.includes('ginkgo')) return 'ginkgo';
+  if (text.includes('ficus microcarpa') || text.includes('ficus')) return 'ficus';
   if (text.includes('lavender') || text.includes('lavandula')) return 'lavender';
   if (text.includes('fern') || text.includes('nephrolepis')) return 'nephrolepis';
   if (text.includes('santolina')) return 'santolina';
