@@ -55,9 +55,11 @@ NEWAPI_BASE_URL=
 # Model ID used for all server-side LLM calls
 NEWAPI_MODEL=
 
-# Controls how user utterances are parsed.
-# "llm" — routes input through the server-side LLM intent parser (recommended)
-# "local" — keyword-only matching, no LLM call (default when unset)
+# Controls whether frontend calls backend LLM features.
+# "llm" — 本地规则优先处理明确意图；不明确的意图再调用后端 LLM 解析。
+#         信息、场景、比较和歧义提示的语音回答优先使用后端 LLM，
+#         如果调用失败，则回退到本地模板。
+# "local" — 仅使用本地关键词/规则解析；跳过后端 LLM 回答生成，直接使用本地模板。
 VITE_INTENT_ENGINE=
 ```
 
@@ -78,7 +80,7 @@ VITE_INTENT_ENGINE=
 - 属性查询统一显示植物信息卡片，并在可用时通过后端 LLM 生成语音回答。
 - 如果用户询问暂不支持的兴趣点，例如 toxicity
 ，会显示 fallback 交互，引导用户查看已支持的 botanical features 或 medicinal value。
-- 信息生成优先走后端 LLM 接口；失败时保留本地 fallback，避免核心交互完全中断。
+- 当 `VITE_INTENT_ENGINE=llm` 时，信息生成优先走后端 LLM 接口；失败时回退到本地模板。当使用 `local` 模式时，系统会跳过后端 LLM 生成，直接使用本地模板。
 
 ### Task 3: 跨上下文的植物比较
 - 支持比较当前选中植物和另一个植物，例如：
