@@ -15,10 +15,6 @@
     "vite": "^8.0.10"
   },
   "dependencies": {
-    "@photo-sphere-viewer/compass-plugin": "^5.14.1",
-    "@photo-sphere-viewer/core": "^5.14.1",
-    "@photo-sphere-viewer/virtual-tour-plugin": "^5.14.1",
-    "@photo-sphere-viewer/visible-range-plugin": "^5.14.1",
     "gsap": "^3.15.0",
     "three": "^0.158.0"
   }

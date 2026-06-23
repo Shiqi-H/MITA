@@ -5,7 +5,6 @@
 [![Vite](https://img.shields.io/badge/Vite-8.0.10-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
 [![A-Frame](https://img.shields.io/badge/A--Frame-1.5.0-EF2D5E?logo=aframe&logoColor=white)](https://aframe.io/)
 [![Three.js](https://img.shields.io/badge/Three.js-0.158.0-000000?logo=three.js&logoColor=white)](https://threejs.org/)
-[![Photo Sphere Viewer](https://img.shields.io/badge/Photo%20Sphere%20Viewer-5.14.1-2F80ED)](https://photo-sphere-viewer.js.org/)
 [![GSAP](https://img.shields.io/badge/GSAP-3.15.0-88CE02?logo=greensock&logoColor=white)](https://gsap.com/)
 [![Node.js](https://img.shields.io/badge/Node.js-backend-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 
