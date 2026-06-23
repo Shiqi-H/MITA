@@ -7,6 +7,13 @@ import { setCompareState, state } from '../state.js';
 import { requestPlantForPendingQuery } from './pendingPlantQuery.js';
 import { resolvePlantReferent } from './shared.js';
 
+const ATTRIBUTE_LABELS = {
+  droughtTolerance: 'drought tolerance',
+  height: 'height',
+  lifespan: 'lifespan',
+  medicinalValue: 'medicinal value',
+};
+
 export async function handleCompareIntent(parsed, text = '') {
   const namedTargetFromText = findPlantByNameOrAlias(text);
   const target2Referent = namedTargetFromText ? 'namedPlant' : parsed.target2Referent || 'previousSelection';
@@ -56,11 +63,12 @@ export async function handleCompareIntent(parsed, text = '') {
     attribute,
     history: state.conversationHistory.slice(-6),
   });
-  speak(generatedSpeech || getCompareFallbackSpeech(left, right));
+  speak(generatedSpeech || getCompareFallbackSpeech(left, right, attribute));
 }
 
-function getCompareFallbackSpeech(left, right) {
-  return `${getDisplayName(left)} and ${getDisplayName(right)} are compared by drought tolerance.`;
+function getCompareFallbackSpeech(left, right, attribute = 'droughtTolerance') {
+  const label = ATTRIBUTE_LABELS[attribute] || attribute || ATTRIBUTE_LABELS.droughtTolerance;
+  return `${getDisplayName(left)} and ${getDisplayName(right)} are compared by ${label}.`;
 }
 
 function resolveCompareLeft(parsed, right) {
